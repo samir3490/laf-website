@@ -1,6 +1,6 @@
 # LAF Learning Resource Library — Implementation Plan
 
-**Status:** Planning (not started)  
+**Status:** Phase 0 in progress (browse + search live)  
 **Last updated:** June 2026  
 **Stack:** Next.js 16 (Vercel) · Firestore (`lata-agrawal-foundation`) · Firebase Auth · AI via server API only
 
@@ -258,13 +258,16 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 ## Phased rollout
 
-### Phase 0 — Seed content (1 week, before public submit)
+### Phase 0 — Seed content (1 week, before public submit) ✅ shipped
 
 **Goal:** Library is useful on day one.
 
-- Manually add **50–75 trusted resources** (Khan Academy, Scratch, Code.org, NCERT, etc.)
-- Script: `scripts/seed-library.mjs` or admin bulk import CSV
-- Ship browse + search only (no submit yet)
+- [x] **58 trusted resources** in `src/content/library-resources.json`
+- [x] Public page at `/library` with search + filters
+- [x] Nav + footer + sitemap links
+- [x] Firestore `library_resources` rules + `npm run seed:library` script
+- [ ] Publish updated Firestore rules in Firebase Console
+- [ ] Run `npm run seed:library` (optional — site works from JSON until seeded)
 - **Success metric:** 50 resources live, pages indexed in sitemap
 
 ### Phase 1 — MVP community pipeline (4–6 weeks)

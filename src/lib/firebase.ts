@@ -56,3 +56,4 @@ export function getFirebaseDb(): Firestore | null {
 
 export const SCRATCH_GAMES_COLLECTION = "scratchGames";
 export const SCRATCH_USERS_COLLECTION = "scratchUsers";
+export const LIBRARY_RESOURCES_COLLECTION = "library_resources";
