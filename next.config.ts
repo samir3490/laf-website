@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
       { source: "/faqs", destination: "/faq", permanent: true },
       { source: "/service-we-provide", destination: "/ways-to-help", permanent: true },
       { source: "/home-2", destination: "/", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/csr-companies", destination: "/csr", permanent: true },
+      { source: "/volunteers", destination: "/volunteer", permanent: true },
+      { source: "/mission", destination: "/about", permanent: true },
+      { source: "/our-causes", destination: "/ways-to-help", permanent: true },
+      { source: "/gallery", destination: "/about", permanent: true },
     ];
     return redirects;
   },

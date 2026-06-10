@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Analytics from "@/components/Analytics";
 import { getSite } from "@/lib/content";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -27,6 +28,10 @@ export const metadata: Metadata = {
     type: "website",
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/favicon.jpg",
+    apple: "/favicon.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -38,6 +43,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1 pt-16 lg:pt-[4.5rem]">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
