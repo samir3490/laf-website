@@ -59,6 +59,10 @@ export function articleJsonLd(post: {
   };
 }
 
+function socialSameAs() {
+  return Object.values(getSite().social).filter(Boolean);
+}
+
 export function organizationJsonLd() {
   const site = getSite();
   return {
@@ -69,10 +73,40 @@ export function organizationJsonLd() {
     description: site.tagline,
     email: site.contact.email,
     telephone: site.contact.phone,
+    sameAs: socialSameAs(),
     address: {
       "@type": "PostalAddress",
       streetAddress: site.contact.address,
+      addressLocality: "Wardha",
+      addressRegion: "Maharashtra",
+      postalCode: "442001",
       addressCountry: "IN",
+    },
+  };
+}
+
+export function contactPageJsonLd() {
+  const site = getSite();
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: `Contact ${site.name}`,
+    url: siteUrl("/contact"),
+    mainEntity: {
+      "@type": "NGO",
+      name: site.name,
+      email: site.contact.email,
+      telephone: site.contact.phone,
+      url: site.url,
+      sameAs: socialSameAs(),
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: site.contact.address,
+        addressLocality: "Wardha",
+        addressRegion: "Maharashtra",
+        postalCode: "442001",
+        addressCountry: "IN",
+      },
     },
   };
 }

@@ -18,14 +18,15 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Wider page container (less side whitespace)
 - [x] Navbar logo sizing + contrast on dark header
 - [ ] Optional: horizontal logo variant for mobile (if square feels too tall)
-- [ ] Footer logo update to match new brand
+- [x] Footer logo update to match new brand
+- [x] Social media links (Facebook, Instagram, LinkedIn, YouTube)
 
 ## Page polish
 
 - [x] Volunteer page — two-column layout (content + HubSpot form)
-- [ ] Contact page — match volunteer two-column style
+- [x] Contact page — match volunteer two-column style
 - [ ] About page — impact grid styling on new width
-- [ ] Donate page — layout pass on wide screens
+- [x] Donate page — layout pass on wide screens
 - [ ] Home hero — balance images on ultra-wide monitors
 - [ ] CSR / FAQ / Ways to help — content review
 
@@ -48,7 +49,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Google Ads tag (`AW-17149139381`) from old site
 - [ ] Google Search Console verification (if you have meta tag, share it)
 - [ ] Rank Math redirects audit — any high-traffic URLs still 404?
-- [ ] Local SEO: address/phone schema on Contact page
+- [x] Local SEO: address/phone schema on Contact page
 - [ ] Social preview image (`og:image`) — create 1200×630 banner
 
 ## Features not yet migrated
@@ -66,7 +67,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus (in progress):** branding, layout width, volunteer page, blog cleanup, SEO foundations.
+**Current focus (in progress):** About page polish, blog featured images, `og:image` banner, DNS propagation.
 
 **Live preview:** https://laf-website.vercel.app  
 **After DNS:** https://www.agrawalfoundation.org

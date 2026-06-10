@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import PageContainer from "@/components/PageContainer";
+import SocialLinks from "@/components/SocialLinks";
 import { getSite } from "@/lib/content";
 
 export default function Footer() {
@@ -19,6 +20,7 @@ export default function Footer() {
               className="h-16 w-16 object-contain rounded-lg bg-laf-cream p-1"
             />
             <p className="mt-4 text-white/75 text-sm leading-relaxed">{site.tagline}</p>
+            <SocialLinks variant="footer" className="mt-5" />
           </div>
           <div>
             <p className="font-semibold text-laf-gold mb-3">Quick Links</p>
