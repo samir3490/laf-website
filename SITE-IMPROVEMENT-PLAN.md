@@ -54,6 +54,13 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Rank Math redirects audit — legacy blog URLs → `/blog/[slug]` middleware + page redirects
 - [x] Local SEO: address/phone schema on Contact page
 - [x] Social preview image (`og:image`) — create 1200×630 banner
+- [x] Home page metadata + WebSite JSON-LD (Jun 2026)
+- [x] FAQPage schema on `/faq`
+- [x] LearningResource + BreadcrumbList on library detail pages
+- [x] Enhanced NGO schema (logo, area served, Twitter OG images)
+- [x] Sitemap priority tuning (donate, volunteer, library)
+- [x] Privacy/Terms full metadata + canonical URLs
+- [x] `lang="en-IN"` + local keywords (Wardha) on key pages
 
 ## Features not yet migrated
 
@@ -104,12 +111,13 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Rate limits on submit + notify-submission; HTML-escaped admin emails
 - [x] `scratchUsers` read restricted to owner
 - [x] `robots.txt` disallows `/admin`
-- [ ] **Re-publish Firestore rules** in Firebase Console (`firebase-laf/firestore.rules`)
+- [x] **Re-publish Firestore rules** in Firebase Console (`firebase-laf/firestore.rules`) — Jun 2026
+- [x] Security smoke tests passed on production (Jun 2026)
 - [ ] Firebase App Check (optional — reduces scripted Firestore abuse)
 
 ---
 
-**Current focus:** Re-publish Firestore rules after security update. Ongoing: library submission reviews, GSC monitoring.
+**Current focus:** Ongoing ops — library submission reviews, GSC monitoring. Optional: Lighthouse re-run, App Check.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

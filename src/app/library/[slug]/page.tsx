@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import PageContainer from "@/components/PageContainer";
 import ResourceDetailView from "@/components/library/ResourceDetailView";
+import JsonLd from "@/components/JsonLd";
 import { getSeedLibraryResources, getSeedResourceBySlug } from "@/lib/library-data";
-import { pageMetadata, siteUrl } from "@/lib/seo";
+import { breadcrumbJsonLd, learningResourceJsonLd, pageMetadata, siteUrl } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -28,24 +29,26 @@ export default async function LibraryResourcePage({ params }: Props) {
   const seedResource = getSeedResourceBySlug(slug) ?? null;
 
   const jsonLd = seedResource
-    ? {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        name: seedResource.title,
-        description: seedResource.description,
-        url: siteUrl(`/library/${slug}`),
-        isPartOf: { "@type": "WebSite", name: "Lata Agrawal Foundation Learning Library" },
-      }
+    ? [
+        learningResourceJsonLd({
+          title: seedResource.title,
+          description: seedResource.description,
+          slug,
+          externalUrl: seedResource.url,
+        }),
+        breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Learning Library", path: "/library" },
+          { name: seedResource.title, path: `/library/${slug}` },
+        ]),
+      ]
     : null;
 
   return (
     <PageContainer className="py-12 lg:py-16">
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
+      {jsonLd?.map((data, index) => (
+        <JsonLd key={index} data={data} />
+      ))}
       <ResourceDetailView slug={slug} seedResource={seedResource} />
     </PageContainer>
   );

@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "About Us",
   description:
-    "Learn about the Lata Agrawal Foundation — our mission, vision, and impact in education and community programs across India.",
+    "About the Lata Agrawal Foundation — an NGO in Wardha, Maharashtra empowering children through education, nutrition, and community programs across India.",
   path: "/about",
 });
 

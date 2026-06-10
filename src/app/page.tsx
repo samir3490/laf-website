@@ -1,13 +1,24 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import home from "@/content/home.json";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
+import JsonLd from "@/components/JsonLd";
+import { pageMetadata, websiteJsonLd } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Education & Community Programs in Wardha, India",
+  description:
+    "Lata Agrawal Foundation supports children's education, nutrition, and wellbeing in Wardha and across India. Donate, volunteer, or explore our free learning resource library.",
+  path: "/",
+});
 
 export default function HomePage() {
   const { hero, impact, help } = home;
 
   return (
     <>
+      <JsonLd data={websiteJsonLd()} />
       <section className="relative min-h-[70vh] flex items-center overflow-hidden">
         <Image
           src={hero.backgroundImage}
@@ -17,6 +28,7 @@ export default function HomePage() {
           quality={80}
           className="object-cover"
           sizes="100vw"
+          aria-hidden
         />
         <div className="absolute inset-0 bg-laf-navy/75" />
         <PageContainer className="relative py-16 lg:py-20 grid lg:grid-cols-2 xl:grid-cols-[1.15fr_0.85fr] gap-10 xl:gap-16 items-center">
@@ -60,7 +72,7 @@ export default function HomePage() {
                 <div className="relative h-44">
                   <Image
                     src={item.image}
-                    alt=""
+                    alt={item.title}
                     fill
                     quality={75}
                     className="object-cover"

@@ -9,7 +9,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Become a Volunteer",
   description:
-    "Volunteer with the Lata Agrawal Foundation — mentor, teach, and support education and community programs across India.",
+    "Volunteer with the Lata Agrawal Foundation in Wardha and across India — mentor children, support education programs, and join our community of changemakers.",
   path: "/volunteer",
 });
 

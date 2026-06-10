@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Donate",
   description:
-    "Donate to the Lata Agrawal Foundation — secure online payment, bank transfer, or UPI. Every contribution supports education and community programs.",
+    "Donate to the Lata Agrawal Foundation in Wardha, Maharashtra — secure online payment, bank transfer, or UPI. Tax-exempt under Section 80G. Support children's education across India.",
   path: "/donate",
 });
 

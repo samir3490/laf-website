@@ -3,6 +3,35 @@ import { getAllPosts, getSite } from "@/lib/content";
 import { getSeedLibraryResources } from "@/lib/library-data";
 import { getLearningPaths } from "@/lib/library-paths";
 
+const ROUTE_PRIORITY: Record<string, number> = {
+  "": 1,
+  "/donate": 0.9,
+  "/volunteer": 0.9,
+  "/library": 0.85,
+  "/about": 0.85,
+  "/ways-to-help": 0.8,
+  "/contact": 0.75,
+  "/reviews": 0.75,
+  "/blog": 0.7,
+  "/library/submit": 0.65,
+  "/library/robotics": 0.65,
+  "/library/scholarships": 0.65,
+  "/library/paths": 0.65,
+  "/community-scratch-games": 0.6,
+  "/gallery": 0.55,
+  "/faq": 0.55,
+  "/csr": 0.5,
+  "/library/contributors": 0.45,
+  "/library/ngo": 0.45,
+  "/library/volunteer-training": 0.45,
+  "/privacy-policy": 0.3,
+  "/terms-conditions": 0.3,
+};
+
+function routePriority(path: string): number {
+  return ROUTE_PRIORITY[path] ?? 0.7;
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const site = getSite();
   const base = site.url.replace(/\/$/, "");
@@ -35,8 +64,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${base}${path}`,
     lastModified: new Date(),
-    changeFrequency: path === "" || path === "/blog" ? "weekly" : "monthly",
-    priority: path === "" ? 1 : 0.7,
+    changeFrequency: path === "" || path === "/blog" || path === "/library" ? "weekly" : "monthly",
+    priority: routePriority(path),
   }));
 
   const libraryResources: MetadataRoute.Sitemap = getSeedLibraryResources().map((r) => ({
@@ -50,7 +79,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}/library/paths/${p.id}`,
     lastModified: new Date(),
     changeFrequency: "monthly",
-    priority: 0.65,
+    priority: 0.62,
   }));
 
   const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({

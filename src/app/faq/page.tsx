@@ -5,18 +5,20 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import FaqAccordion from "@/components/FaqAccordion";
 import faq from "@/content/faq.json";
-import { pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
+import { faqPageJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "FAQs",
   description:
-    "Frequently asked questions about donating, volunteering, and supporting the Lata Agrawal Foundation.",
+    "Frequently asked questions about donating, volunteering, visiting our Wardha collection centre, and supporting the Lata Agrawal Foundation.",
   path: "/faq",
 });
 
 export default function FaqPage() {
   return (
     <>
+      <JsonLd data={faqPageJsonLd(faq.items)} />
       <PageHeader title="FAQs" subtitle="Common questions about how you can help" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-[1fr_min(320px,32%)] gap-10 lg:gap-14 items-start">

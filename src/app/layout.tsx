@@ -29,6 +29,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: "en_IN",
     type: "website",
+    images: [{ url: siteUrl("/opengraph-image"), width: 1200, height: 630, alt: site.name }],
   },
   robots: { index: true, follow: true },
   icons: {
@@ -49,7 +50,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <body className={`${jakarta.className} min-h-screen flex flex-col`}>
         <Navbar />
         <main className="flex-1 pt-[4.25rem] lg:pt-[5rem]">{children}</main>

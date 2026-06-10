@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import WpContent from "@/components/WpContent";
 import { getPage } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy",
+  description:
+    "Privacy policy for the Lata Agrawal Foundation website, including our Learning Resource Library and contact forms.",
+  path: "/privacy-policy",
+});
 
 export default function PrivacyPage() {
   const page = getPage("privacy-policy");
