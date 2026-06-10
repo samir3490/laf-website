@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import WpContent from "@/components/WpContent";
-import Button from "@/components/Button";
+import HubSpotForm from "@/components/HubSpotForm";
 import { getPage } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -20,9 +20,12 @@ export default function VolunteerPage() {
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
         {page && <WpContent html={page.html} />}
-        <div className="mt-10 text-center">
-          <Button href="/contact">Get in Touch</Button>
-        </div>
+        <section className="mt-12 rounded-2xl border border-laf-border bg-white p-6 md:p-10 shadow-sm">
+          <h2 className="text-2xl font-bold text-laf-navy text-center mb-8">
+            To Join Please Fill Out the Form Below
+          </h2>
+          <HubSpotForm formKey="volunteer" />
+        </section>
       </div>
     </>
   );

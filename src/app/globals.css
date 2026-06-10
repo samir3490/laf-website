@@ -85,3 +85,17 @@ body {
   font-size: 0.9rem;
   color: var(--color-laf-muted);
 }
+
+.hubspot-form-wrapper .hs-form label {
+  color: var(--laf-navy);
+  font-weight: 500;
+}
+
+.hubspot-form-wrapper .hs-button {
+  background-color: var(--laf-gold) !important;
+  border-color: var(--laf-gold) !important;
+}
+
+.hubspot-form-wrapper .hs-button:hover {
+  background-color: var(--color-laf-gold-bright) !important;
+}

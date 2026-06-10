@@ -8,5 +8,13 @@
     "address": "Wardha, Maharashtra, India"
   },
   "razorpayPaymentButtonId": "pl_PetTf2rANXljZC",
+  "hubspot": {
+    "portalId": "46692189",
+    "region": "na1",
+    "forms": {
+      "volunteer": "13b57729-b83a-40bf-84ef-d7b19abf4471",
+      "contact": "1175195f-6928-4123-b690-e3ed64a84203"
+    }
+  },
   "exportedAt": "2026-06-10T11:42:28.528Z"
 }
