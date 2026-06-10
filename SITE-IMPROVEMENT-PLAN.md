@@ -9,7 +9,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Razorpay donate page
 - [x] DNS fully propagated — `agrawalfoundation.org` shows new site
 - [ ] Confirm Google email still works after DNS change (send/receive test)
-- [ ] Submit sitemap in Google Search Console
+- [ ] Submit sitemap in Google Search Console (`/sitemap.xml` — see SEO section)
 - [ ] Cancel BigRock WordPress hosting (after 1–2 weeks stable)
 
 ## Branding & layout
