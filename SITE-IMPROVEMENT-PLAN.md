@@ -47,7 +47,8 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] `metadataBase` + canonical URLs
 - [x] Organization JSON-LD on all pages
 - [x] Google Ads tag (`AW-17149139381`) from old site
-- [ ] Google Search Console verification (if you have meta tag, share it)
+- [x] Google Search Console — property already added (clicks/impressions showing)
+- [ ] Submit sitemap in GSC: `https://www.agrawalfoundation.org/sitemap.xml`
 - [ ] Rank Math redirects audit — any high-traffic URLs still 404?
 - [x] Local SEO: address/phone schema on Contact page
 - [x] Social preview image (`og:image`) — create 1200×630 banner
@@ -75,7 +76,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus (in progress):** Search Console verify + submit sitemap, email test, Lighthouse audit.
+**Current focus (in progress):** GSC sitemap submit, email test, Lighthouse audit, redirect audit.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
