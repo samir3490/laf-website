@@ -267,7 +267,7 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] Nav + footer + sitemap links
 - [x] Firestore `library_resources` rules + `npm run seed:library` script
 - [x] Publish Firestore rules in Firebase Console (Phase 0 `library_resources`)
-- [ ] Import seed to Firestore — use **Admin → Import 58 seed resources** at `/admin/library` (no service account needed)
+- [x] Import seed to Firestore — **59 resources** verified in `library_resources` (Jun 2026)
 - **Success metric:** 50 resources live, pages indexed in sitemap ✅
 
 ### Phase 1 — MVP community pipeline ✅ shipped (core)
@@ -296,8 +296,8 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] `/library/scholarships`, `/library/volunteer-training`
 - [x] Resource detail pages `/library/[slug]` with share + JSON-LD
 - [ ] “Notify me when approved” for submitters — deferred
-- [ ] Re-publish Firestore rules (`library_search_events`) in Firebase Console
-- [ ] Optional: set `CRON_SECRET` on Vercel for weekly link checks
+- [x] Re-publish Firestore rules (`library_search_events`) in Firebase Console
+- [x] `CRON_SECRET` set on Vercel (not in GitHub — secrets stay in Vercel only)
 
 **Success metric:** 200+ resources; search used 100+ times/month.
 

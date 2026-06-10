@@ -72,7 +72,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 1 (core): Submit at `/library/submit`, admin at `/admin/library`, robotics page, report + clicks
   - [x] Phase 1 follow-up: Gemini API key configured
   - [x] Phase 2 (core): Detail pages, scholarships/volunteer modules, search analytics, dead-link checks
-  - [ ] Phase 2 follow-up: Re-publish rules (`library_search_events`), optional `CRON_SECRET`
+  - [x] Phase 2 follow-up: Firestore rules + seed import verified; `CRON_SECRET` on Vercel
   - [ ] Phase 3: Learning paths, AI assistant, gamification
 
 ## Performance
