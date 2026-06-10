@@ -34,6 +34,10 @@ type AnalysisResult = {
   educationalScore: number;
   rejected: boolean;
   rejectReason: string | null;
+  eligibility?: string | null;
+  deadline?: string | null;
+  ageMin?: number | null;
+  ageMax?: number | null;
 };
 
 export default function SubmitResourceForm() {
@@ -107,6 +111,10 @@ export default function SubmitResourceForm() {
         educationalScore: analysis.educationalScore,
         status: "pending",
         submitterEmail: email.trim() || null,
+        eligibility: analysis.eligibility ?? null,
+        deadline: analysis.deadline ?? null,
+        ageMin: analysis.ageMin ?? null,
+        ageMax: analysis.ageMax ?? null,
         createdAt: serverTimestamp(),
       });
 

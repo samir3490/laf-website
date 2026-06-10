@@ -27,6 +27,13 @@ export type LibraryDifficulty = (typeof LIBRARY_DIFFICULTIES)[number];
 export type LibraryCost = (typeof LIBRARY_COSTS)[number];
 export type LibraryModule = (typeof LIBRARY_MODULES)[number];
 
+export type ScholarshipFields = {
+  eligibility?: string;
+  deadline?: string;
+  ageMin?: number;
+  ageMax?: number;
+};
+
 export type LibraryResource = {
   id?: string;
   slug: string;
@@ -48,7 +55,9 @@ export type LibraryResource = {
   ogImage?: string;
   favicon?: string;
   status?: "approved" | "pending" | "rejected";
-};
+  linkStatus?: "ok" | "broken" | "unknown";
+  linkCheckedAt?: string;
+} & ScholarshipFields;
 
 export type LibrarySubmission = LibraryResource & {
   status: "pending" | "approved" | "rejected" | "duplicate";
@@ -104,6 +113,7 @@ export function normalizeLibraryResource(data: Record<string, unknown>, id?: str
     id: id ?? slug,
     slug,
     url,
+    urlNormalized: typeof data.urlNormalized === "string" ? data.urlNormalized : undefined,
     title,
     description,
     categories: Array.isArray(data.categories) ? (data.categories as LibraryCategory[]) : [],
@@ -115,6 +125,18 @@ export function normalizeLibraryResource(data: Record<string, unknown>, id?: str
     featured: Boolean(data.featured),
     educationalScore:
       typeof data.educationalScore === "number" ? data.educationalScore : undefined,
+    safetyScore: typeof data.safetyScore === "number" ? data.safetyScore : undefined,
+    visitCount: typeof data.visitCount === "number" ? data.visitCount : undefined,
+    reportCount: typeof data.reportCount === "number" ? data.reportCount : undefined,
+    ogImage: typeof data.ogImage === "string" ? data.ogImage : undefined,
+    favicon: typeof data.favicon === "string" ? data.favicon : undefined,
+    status: data.status as LibraryResource["status"],
+    eligibility: typeof data.eligibility === "string" ? data.eligibility : undefined,
+    deadline: typeof data.deadline === "string" ? data.deadline : undefined,
+    ageMin: typeof data.ageMin === "number" ? data.ageMin : undefined,
+    ageMax: typeof data.ageMax === "number" ? data.ageMax : undefined,
+    linkStatus: data.linkStatus as LibraryResource["linkStatus"],
+    linkCheckedAt: typeof data.linkCheckedAt === "string" ? data.linkCheckedAt : undefined,
   };
 }
 

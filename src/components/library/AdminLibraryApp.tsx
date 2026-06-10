@@ -20,13 +20,16 @@ import {
   getFirebaseAuth,
   getFirebaseConfig,
   getFirebaseDb,
+  LIBRARY_REPORTS_COLLECTION,
   LIBRARY_RESOURCES_COLLECTION,
+  LIBRARY_SEARCH_EVENTS_COLLECTION,
   LIBRARY_SUBMISSIONS_COLLECTION,
 } from "@/lib/firebase";
 import { seedLibraryResources } from "@/lib/library-seed";
 import {
   isLibraryAdmin,
   normalizeLibraryResource,
+  type LibraryResource,
   type LibrarySubmission,
 } from "@/lib/library";
 import { normalizeLibraryUrl, slugFromUrl } from "@/lib/library-url";
@@ -58,6 +61,11 @@ export default function AdminLibraryApp() {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState("");
   const [seeding, setSeeding] = useState(false);
+  const [topVisited, setTopVisited] = useState<LibraryResource[]>([]);
+  const [topSearches, setTopSearches] = useState<{ query: string; count: number }[]>([]);
+  const [openReports, setOpenReports] = useState(0);
+  const [linkCheckResult, setLinkCheckResult] = useState<string>("");
+  const [checkingLinks, setCheckingLinks] = useState(false);
 
   const isAdmin = isLibraryAdmin(user?.email);
 
@@ -86,13 +94,59 @@ export default function AdminLibraryApp() {
 
     const unsubResources = onSnapshot(collection(db, LIBRARY_RESOURCES_COLLECTION), (snap) => {
       setResourceCount(snap.size);
+      const list = snap.docs
+        .map((d) => normalizeLibraryResource(d.data() as Record<string, unknown>, d.id))
+        .filter((r): r is LibraryResource => r !== null);
+      list.sort((a, b) => (b.visitCount ?? 0) - (a.visitCount ?? 0));
+      setTopVisited(list.slice(0, 5));
+    });
+
+    const unsubSearch = onSnapshot(collection(db, LIBRARY_SEARCH_EVENTS_COLLECTION), (snap) => {
+      const counts = new Map<string, number>();
+      snap.docs.forEach((d) => {
+        const q = (d.data().query as string)?.toLowerCase();
+        if (q) counts.set(q, (counts.get(q) ?? 0) + 1);
+      });
+      const sorted = [...counts.entries()]
+        .map(([query, count]) => ({ query, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+      setTopSearches(sorted);
+    });
+
+    const unsubReports = onSnapshot(collection(db, LIBRARY_REPORTS_COLLECTION), (snap) => {
+      setOpenReports(snap.docs.filter((d) => d.data().status === "open").length);
     });
 
     return () => {
       unsubPending();
       unsubResources();
+      unsubSearch();
+      unsubReports();
     };
   }, [db, isAdmin]);
+
+  async function handleLinkCheck() {
+    setCheckingLinks(true);
+    setLinkCheckResult("");
+    try {
+      const res = await fetch("/api/library/check-links");
+      const data = await res.json();
+      if (!res.ok) {
+        setLinkCheckResult(data.error ?? "Link check failed.");
+        return;
+      }
+      setLinkCheckResult(
+        data.broken === 0
+          ? `All ${data.checked} seed links OK (checked ${new Date(data.checkedAt).toLocaleString("en-IN")}).`
+          : `${data.broken} broken of ${data.checked}: ${data.brokenLinks.map((b: { slug: string }) => b.slug).join(", ")}`
+      );
+    } catch {
+      setLinkCheckResult("Link check failed.");
+    } finally {
+      setCheckingLinks(false);
+    }
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -144,6 +198,10 @@ export default function AdminLibraryApp() {
         module: sub.module,
         safetyScore: sub.safetyScore ?? 80,
         educationalScore: sub.educationalScore ?? 70,
+        eligibility: sub.eligibility ?? null,
+        deadline: sub.deadline ?? null,
+        ageMin: sub.ageMin ?? null,
+        ageMax: sub.ageMax ?? null,
         featured: false,
         status: "approved",
         visitCount: 0,
@@ -249,6 +307,14 @@ export default function AdminLibraryApp() {
           </button>
           <button
             type="button"
+            onClick={handleLinkCheck}
+            disabled={checkingLinks}
+            className="px-4 py-2 rounded-lg border border-laf-border text-sm font-medium text-laf-navy hover:bg-laf-cream disabled:opacity-60"
+          >
+            {checkingLinks ? "Checking…" : "Check seed links"}
+          </button>
+          <button
+            type="button"
             onClick={() => signOut(auth)}
             className="px-4 py-2 rounded-lg text-sm text-laf-muted hover:text-laf-navy"
           >
@@ -262,6 +328,50 @@ export default function AdminLibraryApp() {
           {msg}
         </p>
       )}
+
+      {linkCheckResult && (
+        <p className="text-sm text-laf-muted bg-white border border-laf-border rounded-lg px-4 py-3">
+          {linkCheckResult}
+        </p>
+      )}
+
+      <section className="grid md:grid-cols-3 gap-4">
+        <div className="rounded-2xl border border-laf-border bg-white p-5">
+          <h2 className="font-semibold text-laf-navy">Top visits</h2>
+          <ul className="mt-3 space-y-2 text-sm text-laf-muted">
+            {topVisited.length === 0 ? (
+              <li>No visit data yet</li>
+            ) : (
+              topVisited.map((r) => (
+                <li key={r.slug} className="flex justify-between gap-2">
+                  <span className="truncate">{r.title}</span>
+                  <span className="shrink-0 tabular-nums">{r.visitCount ?? 0}</span>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-laf-border bg-white p-5">
+          <h2 className="font-semibold text-laf-navy">Top searches</h2>
+          <ul className="mt-3 space-y-2 text-sm text-laf-muted">
+            {topSearches.length === 0 ? (
+              <li>No searches logged yet</li>
+            ) : (
+              topSearches.map((s) => (
+                <li key={s.query} className="flex justify-between gap-2">
+                  <span className="truncate">{s.query}</span>
+                  <span className="shrink-0 tabular-nums">{s.count}</span>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-laf-border bg-white p-5">
+          <h2 className="font-semibold text-laf-navy">Open reports</h2>
+          <p className="mt-3 text-3xl font-bold text-laf-gold tabular-nums">{openReports}</p>
+          <p className="text-xs text-laf-muted mt-1">User-flagged resources</p>
+        </div>
+      </section>
 
       <section>
         <h2 className="text-xl font-bold text-laf-navy mb-4">Pending submissions</h2>

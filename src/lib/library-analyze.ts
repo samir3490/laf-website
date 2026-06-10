@@ -22,6 +22,10 @@ export type LibraryAnalysis = {
   educationalScore: number;
   rejected: boolean;
   rejectReason: string | null;
+  eligibility?: string;
+  deadline?: string;
+  ageMin?: number;
+  ageMax?: number;
 };
 
 const CATEGORY_KEYWORDS: Record<LibraryCategory, string[]> = {
@@ -92,6 +96,18 @@ function classifyHeuristic(meta: PageMetadata): Omit<LibraryAnalysis, "rejected"
 
   const safety = evaluateSafety(meta.url, meta.title, meta.description, meta.textSnippet);
 
+  const scholarshipExtras =
+    module === "scholarships"
+      ? {
+          eligibility: "See official website for eligibility criteria",
+          deadline: /deadline|apply by|last date/i.test(text)
+            ? "See website for current deadlines"
+            : "Varies — check website",
+          ageMin: 13,
+          ageMax: 25,
+        }
+      : {};
+
   return {
     title: meta.title,
     description: meta.description || `Educational resource at ${meta.url}`,
@@ -103,6 +119,7 @@ function classifyHeuristic(meta: PageMetadata): Omit<LibraryAnalysis, "rejected"
     module,
     safetyScore: safety.safetyScore,
     educationalScore,
+    ...scholarshipExtras,
   };
 }
 
@@ -121,6 +138,10 @@ async function classifyWithGemini(meta: PageMetadata): Promise<LibraryAnalysis |
   "safetyScore": 0-100,
   "educationalScore": 0-100,
   "summary": "2-3 sentence student-friendly description",
+  "eligibility": "if scholarship site, brief eligibility or null",
+  "deadline": "if known, deadline text or 'Varies' or null",
+  "ageMin": null,
+  "ageMax": null,
   "reject": false,
   "rejectReason": null
 }
@@ -183,6 +204,10 @@ Content snippet: ${meta.textSnippet.slice(0, 1200)}`;
       educationalScore: parsed.educationalScore ?? 75,
       rejected: false,
       rejectReason: null,
+      eligibility: parsed.eligibility ?? undefined,
+      deadline: parsed.deadline ?? undefined,
+      ageMin: typeof parsed.ageMin === "number" ? parsed.ageMin : undefined,
+      ageMax: typeof parsed.ageMax === "number" ? parsed.ageMax : undefined,
     };
   } catch {
     return null;

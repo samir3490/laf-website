@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   addDoc,
   collection,
@@ -80,7 +81,9 @@ export default function ResourceCard({ resource, trackClicks = true }: ResourceC
         />
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold text-laf-navy leading-snug line-clamp-2">
-            {resource.title}
+            <Link href={`/library/${resource.slug}`} className="hover:text-laf-gold transition-colors">
+              {resource.title}
+            </Link>
           </h3>
           <p className="mt-1 text-xs text-laf-muted truncate">{resource.url}</p>
         </div>
@@ -101,6 +104,12 @@ export default function ResourceCard({ resource, trackClicks = true }: ResourceC
             </span>
           ))}
         </div>
+
+        {resource.module === "scholarships" && resource.deadline && (
+          <p className="mt-3 text-xs text-laf-muted">
+            <strong className="text-laf-navy">Deadline:</strong> {resource.deadline}
+          </p>
+        )}
 
         <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-laf-muted">
           <span className="px-2 py-0.5 rounded bg-laf-cream border border-laf-border">

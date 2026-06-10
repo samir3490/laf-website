@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { addDoc, collection, onSnapshot, serverTimestamp } from "firebase/firestore";
 import ResourceCard from "@/components/library/ResourceCard";
 import {
   DEFAULT_LIBRARY_FILTERS,
@@ -20,7 +21,14 @@ import {
   getFirebaseConfig,
   getFirebaseDb,
   LIBRARY_RESOURCES_COLLECTION,
+  LIBRARY_SEARCH_EVENTS_COLLECTION,
 } from "@/lib/firebase";
+
+const MODULE_PAGES: Partial<Record<string, string>> = {
+  robotics: "/library/robotics",
+  scholarships: "/library/scholarships",
+  volunteer: "/library/volunteer-training",
+};
 
 type LibraryBrowserProps = {
   seedResources: LibraryResource[];
@@ -48,6 +56,24 @@ export default function LibraryBrowser({
     ...DEFAULT_LIBRARY_FILTERS,
     module: initialModule,
   });
+  const lastLoggedQuery = useRef("");
+
+  useEffect(() => {
+    if (!db) return;
+    const q = filters.query.trim().toLowerCase();
+    if (q.length < 2 || q === lastLoggedQuery.current) return;
+
+    const timer = setTimeout(() => {
+      lastLoggedQuery.current = q;
+      addDoc(collection(db, LIBRARY_SEARCH_EVENTS_COLLECTION), {
+        query: q,
+        module: filters.module || null,
+        createdAt: serverTimestamp(),
+      }).catch(() => {});
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [db, filters.query, filters.module]);
 
   useEffect(() => {
     if (!db) {
@@ -108,20 +134,34 @@ export default function LibraryBrowser({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {MODULE_TABS.map((tab) => (
-            <button
-              key={tab.value || "all"}
-              type="button"
-              onClick={() => updateFilter("module", tab.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                filters.module === tab.value
-                  ? "bg-laf-navy text-white"
-                  : "bg-laf-cream text-laf-muted hover:text-laf-navy border border-laf-border"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {MODULE_TABS.map((tab) => {
+            const page = MODULE_PAGES[tab.value];
+            if (page && filters.module !== tab.value) {
+              return (
+                <Link
+                  key={tab.value}
+                  href={page}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium bg-laf-cream text-laf-muted hover:text-laf-navy border border-laf-border transition-colors"
+                >
+                  {tab.label} →
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={tab.value || "all"}
+                type="button"
+                onClick={() => updateFilter("module", tab.value)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  filters.module === tab.value
+                    ? "bg-laf-navy text-white"
+                    : "bg-laf-cream text-laf-muted hover:text-laf-navy border border-laf-border"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">

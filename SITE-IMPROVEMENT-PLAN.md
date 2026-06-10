@@ -70,8 +70,9 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [ ] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
   - [x] Phase 0: Seed 58 resources, browse + search at `/library`
   - [x] Phase 1 (core): Submit at `/library/submit`, admin at `/admin/library`, robotics page, report + clicks
-  - [ ] Phase 1 follow-up: Re-publish Firestore rules, import seed via admin, optional Gemini API key
-  - [ ] Phase 2: Detail pages, scholarships module, analytics, dead-link checks
+  - [x] Phase 1 follow-up: Gemini API key configured
+  - [x] Phase 2 (core): Detail pages, scholarships/volunteer modules, search analytics, dead-link checks
+  - [ ] Phase 2 follow-up: Re-publish rules (`library_search_events`), optional `CRON_SECRET`
   - [ ] Phase 3: Learning paths, AI assistant, gamification
 
 ## Performance

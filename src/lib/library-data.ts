@@ -9,3 +9,7 @@ export function getSeedLibraryResources(): LibraryResource[] {
     .map((item) => normalizeLibraryResource(item))
     .filter((r): r is LibraryResource => r !== null);
 }
+
+export function getSeedResourceBySlug(slug: string): LibraryResource | undefined {
+  return getSeedLibraryResources().find((r) => r.slug === slug);
+}

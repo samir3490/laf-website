@@ -256,7 +256,11 @@
     "languages": ["English", "Hindi"],
     "module": "scholarships",
     "featured": true,
-    "educationalScore": 95
+    "educationalScore": 95,
+    "eligibility": "Indian students — criteria vary by scholarship scheme (income, category, course level)",
+    "deadline": "Varies by scheme — check portal for open applications",
+    "ageMin": 13,
+    "ageMax": 25
   },
   {
     "slug": "buddy4study",
@@ -269,7 +273,11 @@
     "cost": "Free",
     "languages": ["English", "Hindi"],
     "module": "scholarships",
-    "educationalScore": 88
+    "educationalScore": 88,
+    "eligibility": "Students across India — filters by class, state, gender, and category",
+    "deadline": "Rolling — multiple scholarships with different deadlines",
+    "ageMin": 13,
+    "ageMax": 25
   },
   {
     "slug": "vidyasaarathi",
@@ -282,7 +290,11 @@
     "cost": "Free",
     "languages": ["English", "Hindi"],
     "module": "scholarships",
-    "educationalScore": 86
+    "educationalScore": 86,
+    "eligibility": "Students seeking scholarships or education loans in India",
+    "deadline": "Varies by program",
+    "ageMin": 16,
+    "ageMax": 28
   },
   {
     "slug": "freecodecamp",

@@ -1,6 +1,6 @@
 # LAF Learning Resource Library — Implementation Plan
 
-**Status:** Phase 1 shipped (submit + admin review); Phase 0 complete  
+**Status:** Phase 2 shipped (detail pages, analytics, scholarships); Phase 0–1 complete  
 **Last updated:** June 2026  
 **Stack:** Next.js 16 (Vercel) · Firestore (`lata-agrawal-foundation`) · Firebase Auth · AI via server API only
 
@@ -278,7 +278,7 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] Dedup check against existing `library_resources` by `urlNormalized`
 - [x] Admin review queue at `/admin/library`
 - [x] Approve → public `library_resources` catalog
-- [ ] Resource detail pages `/library/[slug]` (deferred to Phase 2)
+- [x] Resource detail pages `/library/[slug]`
 - [x] Visit click tracking on “Visit Website”
 - [x] Report Resource button
 - [x] Firestore rules for `library_submissions` + `library_reports` — **re-publish rules** (see `firebase-laf/firestore.rules`)
@@ -287,14 +287,17 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 **Success metric:** 10 community submissions processed; 0 unsafe publishes; &lt; 5 min admin time per submission.
 
-### Phase 2 — Discovery & scholarships (3–4 weeks)
+### Phase 2 — Discovery & scholarships ✅ shipped (core)
 
-- [ ] Search log aggregates + simple admin stats (top searches, top clicks)
-- [ ] Scholarship module: extra fields (`eligibility`, `deadline`, `ageMin`/`ageMax`) — AI suggests, admin confirms
-- [ ] Dead link checker (weekly cron on Vercel)
-- [ ] Bookmarks (Firebase Auth)
-- [ ] `/library/scholarships`, `/library/volunteer-training` when content ready
-- [ ] “Notify me when approved” for submitters
+- [x] Search log (`library_search_events`) + admin stats (top searches, top visits, open reports)
+- [x] Scholarship fields (`eligibility`, `deadline`, `ageMin`/`ageMax`) on seed data + AI/heuristics on submit
+- [x] Dead link checker — weekly Vercel cron + manual “Check seed links” in admin
+- [ ] Bookmarks (Firebase Auth) — deferred
+- [x] `/library/scholarships`, `/library/volunteer-training`
+- [x] Resource detail pages `/library/[slug]` with share + JSON-LD
+- [ ] “Notify me when approved” for submitters — deferred
+- [ ] Re-publish Firestore rules (`library_search_events`) in Firebase Console
+- [ ] Optional: set `CRON_SECRET` on Vercel for weekly link checks
 
 **Success metric:** 200+ resources; search used 100+ times/month.
 
@@ -339,11 +342,12 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 ## Technical checklist (when build starts)
 
 - [x] Firebase vars on Vercel (LAF Website app)
-- [ ] Optional: `LIBRARY_AI_API_KEY` or `GEMINI_API_KEY` on Vercel for richer AI metadata
+- [x] `LIBRARY_AI_API_KEY` or `GEMINI_API_KEY` on Vercel (user configured)
 - [ ] Optional: `TURNSTILE_SECRET` for captcha on submit form
 - [x] Extend `firebase-laf/firestore.rules` for `library_*` collections — re-publish after Phase 1
 - [x] Add `/library`, `/library/submit`, `/library/robotics` to sitemap and nav
-- [ ] JSON-LD `WebSite` + `ItemList` for SEO
+- [x] JSON-LD `WebPage` on resource detail pages
+- [ ] JSON-LD `ItemList` on main `/library` page
 - [ ] Privacy policy line: “We fetch public metadata from URLs you submit”
 
 ---
@@ -377,8 +381,8 @@ Tracked under **Features not yet migrated** in `SITE-IMPROVEMENT-PLAN.md`.
 ---
 
 **Next step for you:**
-1. Re-publish Firestore rules (includes `library_submissions` + `library_reports`)
-2. Sign in at `/admin/library` → click **Import 58 seed resources**
-3. Test a submission at `/library/submit`
+1. Re-publish Firestore rules (adds `library_search_events`)
+2. Optional: add `CRON_SECRET` on Vercel for weekly dead-link cron
+3. Re-import seed if you want scholarship fields on existing Firestore docs (or edit in console)
 
-**Next build (Phase 2):** Resource detail pages, search analytics, scholarship fields, dead-link checker.
+**Next build (Phase 3):** AI search assistant, learning paths, gamification.

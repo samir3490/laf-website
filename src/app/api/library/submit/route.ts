@@ -66,6 +66,10 @@ export async function POST(req: Request) {
       educationalScore: analysis.educationalScore,
       rejected: analysis.rejected,
       rejectReason: analysis.rejectReason,
+      eligibility: analysis.eligibility ?? null,
+      deadline: analysis.deadline ?? null,
+      ageMin: analysis.ageMin ?? null,
+      ageMax: analysis.ageMax ?? null,
     });
   } catch {
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });

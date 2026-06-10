@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts, getSite } from "@/lib/content";
+import { getSeedLibraryResources } from "@/lib/library-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const site = getSite();
@@ -17,6 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/library",
     "/library/submit",
     "/library/robotics",
+    "/library/scholarships",
+    "/library/volunteer-training",
     "/ways-to-help",
     "/community-scratch-games",
     "/privacy-policy",
@@ -30,6 +33,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.7,
   }));
 
+  const libraryResources: MetadataRoute.Sitemap = getSeedLibraryResources().map((r) => ({
+    url: `${base}/library/${r.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
   const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
     url: `${base}/blog/${post.slug}`,
     lastModified: new Date(post.date),
@@ -37,5 +47,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...pages, ...posts];
+  return [...pages, ...libraryResources, ...posts];
 }
