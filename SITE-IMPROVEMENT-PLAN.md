@@ -17,7 +17,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] New square logo (`public/logo-square.png`)
 - [x] Wider page container (less side whitespace)
 - [x] Navbar logo sizing + contrast on dark header
-- [x] Horizontal logo on mobile (`logo.png`); square logo on desktop
+- [x] Horizontal logo in navbar and footer (`logo.png` — gold emblem + navy wordmark, larger on desktop)
 - [x] Footer logo update to match new brand
 - [x] Social media links (Facebook, Instagram, LinkedIn, YouTube)
 
@@ -79,6 +79,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 3 optional (partial): Top contributors, monthly metadata refresh cron, Turnstile captcha, notify flag on submit
   - [x] Phase 3 env setup: `FIREBASE_SERVICE_ACCOUNT_JSON`, Turnstile keys on Vercel
   - [x] Phase 3 optional: Automated approval emails (when submitter opts in + GMAIL_* on Vercel)
+  - [x] Admin email on new library submission (`/api/library/notify-submission`)
   - [ ] Phase 3 optional: Gamification
 
 ## Performance
@@ -92,7 +93,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus:** Cancel BigRock WordPress hosting when ready. Optional: add `GMAIL_USER` + `GMAIL_APP_PASSWORD` on Vercel for library approval emails (same as donor portal).
+**Current focus:** Cancel BigRock WordPress hosting when ready. Set `GMAIL_*` on Vercel (same as donor portal — run `npm run sync:gmail-env` locally, then add to Vercel Production).
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

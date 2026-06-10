@@ -138,6 +138,22 @@ export default function SubmitResourceForm() {
         createdAt: serverTimestamp(),
       });
 
+      try {
+        await fetch("/api/library/notify-submission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: analysis.url,
+            title: analysis.title,
+            submitterEmail: email.trim() || null,
+            contributorDisplayName: displayName.trim() || null,
+            turnstileToken: turnstileToken || undefined,
+          }),
+        });
+      } catch {
+        // Submission saved; admin email is best-effort.
+      }
+
       setDone(true);
       setUrl("");
       setEmail("");

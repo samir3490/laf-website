@@ -13,11 +13,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <Image
-              src="/logo-square.png"
+              src="/logo.png"
               alt="Lata Agrawal Foundation"
-              width={80}
-              height={80}
-              className="h-16 w-16 object-contain rounded-lg bg-laf-cream p-1"
+              width={280}
+              height={70}
+              className="h-14 w-auto max-w-[240px] object-contain rounded-lg bg-laf-cream p-2"
             />
             <p className="mt-4 text-white/75 text-sm leading-relaxed">{site.tagline}</p>
             <SocialLinks variant="footer" className="mt-5" />

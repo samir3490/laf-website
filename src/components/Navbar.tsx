@@ -44,22 +44,14 @@ export default function Navbar() {
     >
       <PageContainer className="!px-4 sm:!px-6 lg:!px-10">
         <div className="flex items-center justify-between h-[4.25rem] lg:h-[5rem] gap-4">
-          <Link href="/" className="flex items-center shrink-0">
-            <span className="rounded-lg bg-laf-cream px-2 py-1 shadow-sm">
+          <Link href="/" className="flex items-center shrink-0 min-w-0">
+            <span className="rounded-lg bg-laf-cream px-2.5 py-1.5 shadow-sm">
               <Image
                 src="/logo.png"
                 alt="Lata Agrawal Foundation"
-                width={160}
-                height={40}
-                className="h-9 w-auto max-w-[140px] object-contain lg:hidden"
-                priority
-              />
-              <Image
-                src="/logo-square.png"
-                alt="Lata Agrawal Foundation"
-                width={56}
-                height={56}
-                className="hidden lg:block h-11 w-11 lg:h-12 lg:w-12 object-contain"
+                width={320}
+                height={80}
+                className="h-10 sm:h-11 lg:h-14 w-auto max-w-[200px] sm:max-w-[240px] lg:max-w-[300px] object-contain"
                 priority
               />
             </span>

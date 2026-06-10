@@ -12,6 +12,7 @@
     "localize:unsplash": "node scripts/localize-unsplash.mjs",
     "seed:library": "node scripts/seed-library.mjs",
     "clean:blog-top10": "node scripts/clean-blog-posts.mjs",
+    "sync:gmail-env": "node scripts/sync-gmail-env.mjs",
     "clean:blog-posts": "node scripts/clean-blog-posts.mjs --all"
   },
   "dependencies": {

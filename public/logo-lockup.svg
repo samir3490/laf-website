@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 88" role="img" aria-label="Lata Agrawal Foundation">
+  <defs>
+    <linearGradient id="lafGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e4b85c"/>
+      <stop offset="100%" stop-color="#c19a4b"/>
+    </linearGradient>
+  </defs>
+  <!-- Emblem: laurel wreath + open book -->
+  <g transform="translate(4 4)">
+    <ellipse cx="40" cy="44" rx="34" ry="36" fill="none" stroke="url(#lafGold)" stroke-width="2.2"/>
+    <path d="M12 52c8-18 22-28 28-28s20 10 28 28" fill="none" stroke="url(#lafGold)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M68 52c-8-18-22-28-28-28S20 34 12 52" fill="none" stroke="url(#lafGold)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M28 38h24v28H28z" fill="none" stroke="#0a1f30" stroke-width="2"/>
+    <path d="M40 38v28" stroke="#0a1f30" stroke-width="1.5"/>
+    <path d="M30 44h18M30 50h18M30 56h18" stroke="url(#lafGold)" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="92" y="38" fill="#0a1f30" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" letter-spacing="0.06em">LATA AGRAWAL</text>
+  <text x="92" y="62" fill="#0a1f30" font-family="Georgia, 'Times New Roman', serif" font-size="17" font-weight="700" letter-spacing="0.22em">FOUNDATION</text>
+</svg>
