@@ -24,12 +24,12 @@ export default function AboutPage() {
             <p className="text-lg text-laf-muted leading-relaxed">{about.intro}</p>
             <p className="text-laf-muted leading-relaxed">{about.belief}</p>
           </div>
-          <div className="relative aspect-square max-w-sm mx-auto lg:mx-0 lg:ml-auto w-full rounded-2xl overflow-hidden border border-laf-border shadow-md bg-laf-cream">
+          <div className="relative aspect-[4/3] max-w-sm mx-auto lg:mx-0 lg:ml-auto w-full rounded-2xl overflow-hidden border border-laf-border shadow-md">
             <Image
-              src="/images/2025/09/clenched-fist-xxl-removebg-preview.png"
-              alt="Lata Agrawal Foundation community impact"
+              src="/images/2024/12/mission-ngo-lata.webp"
+              alt="Lata Agrawal Foundation supporting education and community programs"
               fill
-              className="object-contain p-6"
+              className="object-cover"
               sizes="(max-width: 1024px) 80vw, 380px"
             />
           </div>
@@ -41,7 +41,7 @@ export default function AboutPage() {
             <div className="w-12 h-1 bg-laf-gold mt-3 mb-5 rounded-full" />
             <p className="text-laf-muted leading-relaxed">{about.mission.body}</p>
           </section>
-          <section className="rounded-2xl border border-laf-border bg-laf-cream/60 p-8">
+          <section className="rounded-2xl border border-laf-border bg-white p-8">
             <h2 className="text-2xl font-bold text-laf-navy">{about.vision.title}</h2>
             <div className="w-12 h-1 bg-laf-gold mt-3 mb-5 rounded-full" />
             <p className="text-laf-muted leading-relaxed">{about.vision.body}</p>

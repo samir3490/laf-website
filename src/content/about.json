@@ -10,12 +10,12 @@
     "body": "We envision a world where every child has access to quality education, empowering them to realize their potential and contribute meaningfully to society. We strive for an inclusive educational ecosystem that nurtures curiosity, creativity, and critical thinking."
   },
   "impact": [
-    { "value": "1+", "label": "Computer Centers Opened" },
-    { "value": "1+", "label": "Food Donation Drives" },
-    { "value": "1+", "label": "Computers Donated" },
-    { "value": "1+", "label": "Hygiene Essentials Kit Donation Drives" },
-    { "value": "1+", "label": "Kids Supported with Education & Career Guidance" },
-    { "value": "1+", "label": "Eye Checkup Camps Organized" }
+    { "value": "5+", "label": "Computer Centers Opened" },
+    { "value": "1000+", "label": "Food Donation Drives" },
+    { "value": "25+", "label": "Computers Donated" },
+    { "value": "1000+", "label": "Hygiene Essential Kits" },
+    { "value": "1000+", "label": "Kids Supported" },
+    { "value": "20+", "label": "Medical Checkup Camps" }
   ],
   "team": {
     "title": "Our Team",
