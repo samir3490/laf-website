@@ -346,8 +346,8 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 - [x] Firebase vars on Vercel (LAF Website app)
 - [x] `LIBRARY_AI_API_KEY` or `GEMINI_API_KEY` on Vercel (user configured)
-- [ ] Optional: `TURNSTILE_SECRET` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` for captcha on submit form
-- [ ] Optional: `FIREBASE_SERVICE_ACCOUNT_JSON` on Vercel for metadata refresh + Firestore link checks in cron
+- [x] Optional: `TURNSTILE_SECRET` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` for captcha on submit form (configured Jun 2026)
+- [x] Optional: `FIREBASE_SERVICE_ACCOUNT_JSON` on Vercel for metadata refresh + Firestore link checks in cron (configured Jun 2026)
 - [x] Extend `firebase-laf/firestore.rules` for `library_*` collections — re-publish after Phase 1
 - [x] Add `/library`, `/library/submit`, `/library/robotics` to sitemap and nav
 - [x] JSON-LD `WebPage` on resource detail pages

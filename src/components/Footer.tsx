@@ -26,6 +26,7 @@ export default function Footer() {
             <p className="font-semibold text-laf-gold mb-3">Quick Links</p>
             <ul className="space-y-2 text-sm text-white/80">
               <li><Link href="/about" className="hover:text-white">About</Link></li>
+              <li><Link href="/gallery" className="hover:text-white">Gallery</Link></li>
               <li><Link href="/donate" className="hover:text-white">Donate</Link></li>
               <li><Link href="/volunteer" className="hover:text-white">Volunteer</Link></li>
               <li><Link href="/faq" className="hover:text-white">FAQs</Link></li>

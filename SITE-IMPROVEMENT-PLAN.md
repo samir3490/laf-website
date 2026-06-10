@@ -64,10 +64,10 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [ ] Migrate existing WordPress-published games to Firestore (if any)
   - [x] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — LAF Website web app)
   - [x] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
-- [ ] Photo gallery (`/gallery`)
+- [x] Photo gallery (`/gallery`)
 - [ ] Google Reviews QR / testimonial page
 - [ ] Donor dashboard (if still needed)
-- [ ] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
+- [x] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
   - [x] Phase 0: Seed 58 resources, browse + search at `/library`
   - [x] Phase 1 (core): Submit at `/library/submit`, admin at `/admin/library`, robotics page, report + clicks
   - [x] Phase 1 follow-up: Gemini API key configured
@@ -76,6 +76,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 3 (core): Learning paths + AI “Ask the library” smart search
   - [x] Phase 3 follow-up: Wide sidebar layout, Gemini JSON fix, `/library/ngo` module
   - [x] Phase 3 optional (partial): Top contributors, monthly metadata refresh cron, Turnstile captcha, notify flag on submit
+  - [x] Phase 3 env setup: `FIREBASE_SERVICE_ACCOUNT_JSON`, Turnstile keys on Vercel
   - [ ] Phase 3 optional: Gamification, automated approval emails
 
 ## Performance
@@ -89,7 +90,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus:** Monitor site stability for 1–2 weeks, then cancel BigRock WordPress hosting. Optional: blog performance tuning (Perf 65), photo gallery, top-10 blog review.
+**Current focus:** Monitor site stability for 1–2 weeks, then cancel BigRock WordPress hosting. Optional: Google Reviews page, blog performance tuning (Perf 65), top-10 blog review.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
