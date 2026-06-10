@@ -64,6 +64,8 @@ export type LibrarySubmission = LibraryResource & {
   rejectReason?: string;
   submittedBy?: string;
   submitterEmail?: string;
+  contributorDisplayName?: string;
+  notifyOnApproval?: boolean;
   createdAt?: { toDate?: () => Date };
   reviewedAt?: { toDate?: () => Date };
   reviewedBy?: string;

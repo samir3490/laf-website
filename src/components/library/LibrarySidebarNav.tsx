@@ -8,6 +8,7 @@ const MODULE_LINKS = [
   { href: "/library/volunteer-training", label: "Volunteer training" },
   { href: "/library/ngo", label: "NGO knowledge" },
   { href: "/library/paths", label: "Learning paths" },
+  { href: "/library/contributors", label: "Top contributors" },
   { href: "/library/submit", label: "Suggest a site" },
 ];
 

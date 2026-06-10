@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { analyzeResource } from "@/lib/library-analyze";
 import { fetchPageMetadata, normalizeLibraryUrl } from "@/lib/library-url";
+import { isTurnstileEnabled, verifyTurnstileToken } from "@/lib/turnstile";
 
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 10;
@@ -29,6 +30,15 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    if (isTurnstileEnabled()) {
+      const token = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+      const valid = await verifyTurnstileToken(token, ip);
+      if (!valid) {
+        return NextResponse.json({ error: "Captcha verification failed. Please try again." }, { status: 403 });
+      }
+    }
+
     const rawUrl = typeof body.url === "string" ? body.url.trim() : "";
     if (!rawUrl) {
       return NextResponse.json({ error: "URL is required." }, { status: 400 });

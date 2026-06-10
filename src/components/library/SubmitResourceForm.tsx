@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   addDoc,
   collection,
@@ -10,12 +10,15 @@ import {
   where,
 } from "firebase/firestore";
 import Link from "next/link";
+import TurnstileWidget from "@/components/library/TurnstileWidget";
 import {
   getFirebaseConfig,
   getFirebaseDb,
   LIBRARY_RESOURCES_COLLECTION,
   LIBRARY_SUBMISSIONS_COLLECTION,
 } from "@/lib/firebase";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 type AnalysisResult = {
   url: string;
@@ -46,15 +49,27 @@ export default function SubmitResourceForm() {
 
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [notifyOnApproval, setNotifyOnApproval] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [rejected, setRejected] = useState(false);
 
+  const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
+  const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!db) {
       setError("Library is not configured yet. Please try again later.");
+      return;
+    }
+
+    if (turnstileRequired && !turnstileToken) {
+      setError("Please complete the captcha.");
       return;
     }
 
@@ -67,7 +82,10 @@ export default function SubmitResourceForm() {
       const res = await fetch("/api/library/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({
+          url,
+          turnstileToken: turnstileToken || undefined,
+        }),
       });
       const data = await res.json();
 
@@ -111,6 +129,8 @@ export default function SubmitResourceForm() {
         educationalScore: analysis.educationalScore,
         status: "pending",
         submitterEmail: email.trim() || null,
+        contributorDisplayName: displayName.trim() || null,
+        notifyOnApproval: notifyOnApproval && Boolean(email.trim()),
         eligibility: analysis.eligibility ?? null,
         deadline: analysis.deadline ?? null,
         ageMin: analysis.ageMin ?? null,
@@ -121,6 +141,9 @@ export default function SubmitResourceForm() {
       setDone(true);
       setUrl("");
       setEmail("");
+      setDisplayName("");
+      setNotifyOnApproval(false);
+      setTurnstileToken("");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -172,6 +195,28 @@ export default function SubmitResourceForm() {
       </div>
 
       <div>
+        <label htmlFor="submitter-name" className="block text-sm font-medium text-laf-navy mb-2">
+          Your name (optional)
+        </label>
+        <input
+          id="submitter-name"
+          type="text"
+          placeholder="First name or nickname"
+          maxLength={40}
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
+        />
+        <p className="mt-1 text-xs text-laf-muted">
+          Shown on the{" "}
+          <Link href="/library/contributors" className="text-laf-gold hover:underline">
+            contributors page
+          </Link>{" "}
+          if your suggestion is approved.
+        </p>
+      </div>
+
+      <div>
         <label htmlFor="submitter-email" className="block text-sm font-medium text-laf-navy mb-2">
           Your email (optional)
         </label>
@@ -183,7 +228,26 @@ export default function SubmitResourceForm() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
         />
+        {email.trim() && (
+          <label className="mt-3 flex items-start gap-2 text-sm text-laf-muted cursor-pointer">
+            <input
+              type="checkbox"
+              checked={notifyOnApproval}
+              onChange={(e) => setNotifyOnApproval(e.target.checked)}
+              className="mt-0.5 rounded border-laf-border"
+            />
+            <span>Remind our team to email me when this resource is reviewed (manual follow-up)</span>
+          </label>
+        )}
       </div>
+
+      {turnstileRequired && (
+        <TurnstileWidget
+          siteKey={TURNSTILE_SITE_KEY}
+          onToken={handleTurnstileToken}
+          onExpire={handleTurnstileExpire}
+        />
+      )}
 
       {error && (
         <p className={`text-sm ${rejected ? "text-amber-800" : "text-red-600"}`} role="alert">
@@ -193,7 +257,7 @@ export default function SubmitResourceForm() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (turnstileRequired && !turnstileToken)}
         className="px-6 py-3 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright transition-colors disabled:opacity-60"
       >
         {loading ? "Analyzing website…" : "Submit Resource"}

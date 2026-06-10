@@ -75,7 +75,8 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 2 follow-up: Firestore rules + seed import verified; `CRON_SECRET` on Vercel
   - [x] Phase 3 (core): Learning paths + AI “Ask the library” smart search
   - [x] Phase 3 follow-up: Wide sidebar layout, Gemini JSON fix, `/library/ngo` module
-  - [ ] Phase 3 optional: Gamification, metadata refresh, top contributors
+  - [x] Phase 3 optional (partial): Top contributors, monthly metadata refresh cron, Turnstile captcha, notify flag on submit
+  - [ ] Phase 3 optional: Gamification, automated approval emails
 
 ## Performance
 

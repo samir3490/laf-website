@@ -273,7 +273,7 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 ### Phase 1 — MVP community pipeline ✅ shipped (core)
 
 - [x] Public submit form at `/library/submit` + API rate limit (10/day per IP)
-- [ ] Turnstile captcha (deferred — optional `TURNSTILE_SECRET`)
+- [x] Turnstile captcha (optional — `TURNSTILE_SECRET` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY`)
 - [x] Analyze API (`/api/library/submit`) — fetch metadata + safety filter + Gemini/heuristics
 - [x] Dedup check against existing `library_resources` by `urlNormalized`
 - [x] Admin review queue at `/admin/library`
@@ -295,7 +295,7 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [ ] Bookmarks (Firebase Auth) — deferred
 - [x] `/library/scholarships`, `/library/volunteer-training`
 - [x] Resource detail pages `/library/[slug]` with share + JSON-LD
-- [ ] “Notify me when approved” for submitters — deferred
+- [x] “Notify me when approved” — checkbox on submit; admin sees email follow-up flag (manual email until transactional provider added)
 - [x] Re-publish Firestore rules (`library_search_events`) in Firebase Console
 - [x] `CRON_SECRET` set on Vercel (not in GitHub — secrets stay in Vercel only)
 
@@ -309,8 +309,8 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] Learning paths — 5 curated paths at `/library/paths` + “Next in path” on resource pages
 - [x] `/library/ngo` — NGO knowledge module page (mirrors scholarships/volunteer pattern)
 - [ ] Gamification (points, badges) — deferred until submission volume grows
-- [ ] Monthly metadata refresh job — deferred
-- [ ] Top contributors page — deferred
+- [x] Monthly metadata refresh job — cron `0 7 1 * *` on `/api/library/refresh-metadata` (needs `FIREBASE_SERVICE_ACCOUNT_JSON` on Vercel)
+- [x] Top contributors page — `/library/contributors` + `library_contributors` stats on approve
 - [ ] NGO Knowledge module content partnership — deferred
 
 **Success metric:** Learning paths drive 20%+ of outbound clicks.
@@ -346,7 +346,8 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 - [x] Firebase vars on Vercel (LAF Website app)
 - [x] `LIBRARY_AI_API_KEY` or `GEMINI_API_KEY` on Vercel (user configured)
-- [ ] Optional: `TURNSTILE_SECRET` for captcha on submit form
+- [ ] Optional: `TURNSTILE_SECRET` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` for captcha on submit form
+- [ ] Optional: `FIREBASE_SERVICE_ACCOUNT_JSON` on Vercel for metadata refresh + Firestore link checks in cron
 - [x] Extend `firebase-laf/firestore.rules` for `library_*` collections — re-publish after Phase 1
 - [x] Add `/library`, `/library/submit`, `/library/robotics` to sitemap and nav
 - [x] JSON-LD `WebPage` on resource detail pages

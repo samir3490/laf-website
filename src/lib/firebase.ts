@@ -60,3 +60,5 @@ export const LIBRARY_RESOURCES_COLLECTION = "library_resources";
 export const LIBRARY_SUBMISSIONS_COLLECTION = "library_submissions";
 export const LIBRARY_REPORTS_COLLECTION = "library_reports";
 export const LIBRARY_SEARCH_EVENTS_COLLECTION = "library_search_events";
+export const LIBRARY_CONTRIBUTORS_COLLECTION = "library_contributors";
+export const LIBRARY_SETTINGS_COLLECTION = "library_settings";

@@ -10,6 +10,7 @@ import {
 import {
   collection,
   doc,
+  increment,
   onSnapshot,
   serverTimestamp,
   setDoc,
@@ -17,9 +18,14 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import {
+  contributorDisplayLabel,
+  contributorDocId,
+} from "@/lib/library-contributors";
+import {
   getFirebaseAuth,
   getFirebaseConfig,
   getFirebaseDb,
+  LIBRARY_CONTRIBUTORS_COLLECTION,
   LIBRARY_REPORTS_COLLECTION,
   LIBRARY_RESOURCES_COLLECTION,
   LIBRARY_SEARCH_EVENTS_COLLECTION,
@@ -43,6 +49,9 @@ function toSubmission(snap: QueryDocumentSnapshot): LibrarySubmission | null {
     status: (data.status as LibrarySubmission["status"]) ?? "pending",
     rejectReason: typeof data.rejectReason === "string" ? data.rejectReason : undefined,
     submitterEmail: typeof data.submitterEmail === "string" ? data.submitterEmail : undefined,
+    contributorDisplayName:
+      typeof data.contributorDisplayName === "string" ? data.contributorDisplayName : undefined,
+    notifyOnApproval: data.notifyOnApproval === true,
     createdAt: data.createdAt as LibrarySubmission["createdAt"],
   };
 }
@@ -216,7 +225,21 @@ export default function AdminLibraryApp() {
         reviewedBy: user.email,
       });
 
-      setMsg(`Approved: ${sub.title}`);
+      const contributorId = contributorDocId(sub);
+      await setDoc(
+        doc(db, LIBRARY_CONTRIBUTORS_COLLECTION, contributorId),
+        {
+          displayName: contributorDisplayLabel(sub),
+          contributionCount: increment(1),
+          lastContributedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      const notifyNote = sub.notifyOnApproval && sub.submitterEmail
+        ? ` Email follow-up requested: ${sub.submitterEmail}`
+        : "";
+      setMsg(`Approved: ${sub.title}.${notifyNote}`);
     } catch {
       setMsg(`Failed to approve ${sub.title}.`);
     } finally {
@@ -402,6 +425,12 @@ export default function AdminLibraryApp() {
                       <span>Safety: {sub.safetyScore ?? "—"}</span>
                       <span>Educational: {sub.educationalScore ?? "—"}</span>
                       <span>{sub.categories?.join(", ")}</span>
+                      {sub.submitterEmail && (
+                        <span>Email: {sub.submitterEmail}</span>
+                      )}
+                      {sub.notifyOnApproval && (
+                        <span className="text-amber-700 font-medium">Wants email when reviewed</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
