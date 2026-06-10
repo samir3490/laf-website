@@ -61,7 +61,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Copy embed code for own sites
   - [x] Edit / delete own games only
   - [ ] Migrate existing WordPress-published games to Firestore (if any)
-  - [ ] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — see README)
+  - [x] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — LAF Website web app)
   - [ ] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
 - [ ] Photo gallery (`/gallery`)
 - [ ] Google Reviews QR / testimonial page
