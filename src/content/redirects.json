@@ -1,0 +1,26 @@
+[
+  {
+    "from": "/about-us",
+    "to": "/about"
+  },
+  {
+    "from": "/donate-now",
+    "to": "/donate"
+  },
+  {
+    "from": "/contact-us",
+    "to": "/contact"
+  },
+  {
+    "from": "/become-a-volunteer",
+    "to": "/volunteer"
+  },
+  {
+    "from": "/news-2",
+    "to": "/blog"
+  },
+  {
+    "from": "/faqs",
+    "to": "/faq"
+  }
+]

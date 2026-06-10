@@ -1,0 +1,40 @@
+{
+  "hero": {
+    "title": "Empowering Education for All",
+    "subtitle": "Transforming lives through education and opportunities. Together, we can make a difference.",
+    "body": "We believe that education is the key to breaking the cycle of poverty. Our mission is to ensure that every child, regardless of their background, has access to quality education, resources, and opportunities to thrive.",
+    "image": "/images/2024/12/mission-ngo-lata.webp",
+    "backgroundImage": "/images/2025/08/salah-darwish-6hl__HAWP4w-unsplash-scaled.jpg"
+  },
+  "impact": [
+    {
+      "title": "500+ children educated",
+      "description": "We provide quality education to underprivileged children, giving them the knowledge and skills to build a better future.",
+      "image": "/images/2024/12/homebannerngo-1024x585.webp"
+    },
+    {
+      "title": "1,000+ volunteers",
+      "description": "Passionate individuals dedicate their time and expertise to mentor, teach, and support our programs.",
+      "image": "/images/2025/02/an-animated-image-of-a-diverse-group-of-_2RVM6y9kQQ2mf-J1c4Jf4g_Ty-zR8HhQqiObl6dd2zDfA-1024x574.jpeg"
+    },
+    {
+      "title": "10,000+ essential items donated",
+      "description": "Books, clothes, and learning tools have been provided to ensure children have the resources they need to succeed.",
+      "image": "/images/2025/02/an-animated-image-of-a-young-boy-studyin.jpeg"
+    }
+  ],
+  "help": [
+    {
+      "title": "Volunteer",
+      "description": "Offer your time and skills to mentor, teach, or assist in our programs, helping children gain knowledge, confidence, and a brighter future."
+    },
+    {
+      "title": "Donate",
+      "description": "Make a lasting impact by contributing funds, books, clothes, or essential learning tools that support a child's education and well-being."
+    },
+    {
+      "title": "Spread the Word",
+      "description": "Share our work with friends, family, and community. Raising awareness helps us reach more people who can change lives through education."
+    }
+  ]
+}

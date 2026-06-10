@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-laf-navy: #0a1f30;
+  --color-laf-navy-soft: #1a3348;
+  --color-laf-gold: #c19a4b;
+  --color-laf-gold-bright: #e4b85c;
+  --color-laf-cream: #faf8f4;
+  --color-laf-text: #2c3e50;
+  --color-laf-muted: #4a5568;
+  --color-laf-border: #d4cfc4;
+}
+
+:root {
+  --laf-navy: #0a1f30;
+  --laf-gold: #c19a4b;
+  --laf-cream: #faf8f4;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--laf-cream);
+  color: var(--color-laf-text);
+}
+
+::selection {
+  background-color: var(--laf-gold);
+  color: #fff;
+}
+
+.laf-prose h1,
+.laf-prose h2,
+.laf-prose h3 {
+  color: var(--laf-navy);
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.laf-prose p,
+.laf-prose li {
+  line-height: 1.75;
+  margin-bottom: 1rem;
+  color: var(--color-laf-text);
+}
+
+.laf-prose a {
+  color: var(--laf-gold);
+  text-decoration: underline;
+}
+
+.laf-prose img {
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  height: auto;
+}
+
+.laf-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.laf-impact-card {
+  background: white;
+  border: 1px solid var(--laf-navy);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.laf-impact-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--laf-gold);
+}
+
+.laf-impact-label {
+  font-size: 0.9rem;
+  color: var(--color-laf-muted);
+}
