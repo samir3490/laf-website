@@ -19,6 +19,6 @@ export function parseThemeParam(value: string | null | undefined): SiteTheme | n
 }
 
 export function themeLabel(theme: SiteTheme): string {
-  if (normalizeTheme(theme) === "playful") return "Colorful learning theme";
+  if (normalizeTheme(theme) === "playful") return "Warm learning theme";
   return "Classic";
 }
