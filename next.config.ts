@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
       { source: "/mission", destination: "/about", permanent: true },
       { source: "/our-causes", destination: "/ways-to-help", permanent: true },
       { source: "/gallery", destination: "/about", permanent: true },
+      { source: "/news", destination: "/blog", permanent: true },
+      { source: "/category/:path*", destination: "/blog", permanent: true },
+      { source: "/tag/:path*", destination: "/blog", permanent: true },
+      { source: "/author/:path*", destination: "/blog", permanent: true },
     ];
     return redirects;
   },

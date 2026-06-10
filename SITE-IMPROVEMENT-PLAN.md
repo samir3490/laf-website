@@ -9,7 +9,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Razorpay donate page
 - [x] DNS fully propagated — `agrawalfoundation.org` shows new site
 - [ ] Confirm Google email still works after DNS change (send/receive test)
-- [ ] Submit sitemap in Google Search Console (`/sitemap.xml` — see SEO section)
+- [x] Submit sitemap in Google Search Console (`/sitemap.xml` — see SEO section)
 - [ ] Cancel BigRock WordPress hosting (after 1–2 weeks stable)
 
 ## Branding & layout
@@ -48,8 +48,8 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Organization JSON-LD on all pages
 - [x] Google Ads tag (`AW-17149139381`) from old site
 - [x] Google Search Console — property already added (clicks/impressions showing)
-- [ ] Submit sitemap in GSC: `https://www.agrawalfoundation.org/sitemap.xml`
-- [ ] Rank Math redirects audit — any high-traffic URLs still 404?
+- [x] Submit sitemap in GSC: `https://www.agrawalfoundation.org/sitemap.xml`
+- [x] Rank Math redirects audit — legacy blog URLs → `/blog/[slug]` middleware + page redirects
 - [x] Local SEO: address/phone schema on Contact page
 - [x] Social preview image (`og:image`) — create 1200×630 banner
 
@@ -76,7 +76,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus (in progress):** GSC sitemap submit, email test, Lighthouse audit, redirect audit.
+**Current focus (in progress):** Email test (Google Workspace), Lighthouse audit, cancel WP hosting after 2 weeks stable.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
