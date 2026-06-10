@@ -17,7 +17,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] New square logo (`public/logo-square.png`)
 - [x] Wider page container (less side whitespace)
 - [x] Navbar logo sizing + contrast on dark header
-- [ ] Optional: horizontal logo variant for mobile (if square feels too tall)
+- [x] Horizontal logo on mobile (`logo.png`); square logo on desktop
 - [x] Footer logo update to match new brand
 - [x] Social media links (Facebook, Instagram, LinkedIn, YouTube)
 
@@ -37,6 +37,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] SEO metadata per post (description, canonical, Open Graph)
 - [x] JSON-LD Article schema on blog posts
 - [x] Review top 10 posts manually for accuracy / tone (Jun 2026 — rewrote 3 AI-hallucinated posts; LAF intro on all 10 recent)
+- [x] Blog cleanup pass on remaining 82 posts (LAF intros, 3 more full rewrites; preserved real photo posts)
 - [x] Add featured images where missing (many use Unsplash hotlinks)
 - [x] Pagination or “load more” if listing all 92 posts
 - [x] Internal links to /donate and /volunteer in key posts
@@ -66,7 +67,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
 - [x] Photo gallery (`/gallery`)
 - [x] Google Reviews page (`/reviews` — Maps embed, single QR, public metadata sync, nav link)
-- [ ] Donor dashboard (if still needed)
+- [x] Donor dashboard — live at [portal.agrawalfoundation.org](https://portal.agrawalfoundation.org) (linked from site footer)
 - [x] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
   - [x] Phase 0: Seed 58 resources, browse + search at `/library`
   - [x] Phase 1 (core): Submit at `/library/submit`, admin at `/admin/library`, robotics page, report + clicks
@@ -77,7 +78,8 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 3 follow-up: Wide sidebar layout, Gemini JSON fix, `/library/ngo` module
   - [x] Phase 3 optional (partial): Top contributors, monthly metadata refresh cron, Turnstile captcha, notify flag on submit
   - [x] Phase 3 env setup: `FIREBASE_SERVICE_ACCOUNT_JSON`, Turnstile keys on Vercel
-  - [ ] Phase 3 optional: Gamification, automated approval emails
+  - [x] Phase 3 optional: Automated approval emails (when submitter opts in + GMAIL_* on Vercel)
+  - [ ] Phase 3 optional: Gamification
 
 ## Performance
 
@@ -90,7 +92,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus:** Cancel BigRock WordPress hosting after 1–2 weeks stable on the new site. Optional: donor dashboard if still needed.
+**Current focus:** Cancel BigRock WordPress hosting when ready. Optional: add `GMAIL_USER` + `GMAIL_APP_PASSWORD` on Vercel for library approval emails (same as donor portal).
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

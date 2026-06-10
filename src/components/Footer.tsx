@@ -34,6 +34,13 @@ export default function Footer() {
               <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
               <li><Link href="/library" className="hover:text-white">Learning Library</Link></li>
               <li><Link href="/community-scratch-games" className="hover:text-white">Scratch Games</Link></li>
+              {site.portalUrl && (
+                <li>
+                  <a href={site.portalUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                    Partner Portal
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
           <div className="md:col-span-2">

@@ -236,9 +236,30 @@ export default function AdminLibraryApp() {
         { merge: true }
       );
 
-      const notifyNote = sub.notifyOnApproval && sub.submitterEmail
-        ? ` Email follow-up requested: ${sub.submitterEmail}`
-        : "";
+      let notifyNote = "";
+      if (sub.notifyOnApproval && sub.submitterEmail) {
+        try {
+          const idToken = await user.getIdToken();
+          const res = await fetch("/api/library/notify-approval", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              to: sub.submitterEmail,
+              resourceTitle: sub.title,
+              resourceSlug: slug,
+            }),
+          });
+          notifyNote = res.ok
+            ? ` Email sent to ${sub.submitterEmail}.`
+            : ` Could not send email (check GMAIL_* on Vercel).`;
+        } catch {
+          notifyNote = " Email notification failed.";
+        }
+      }
+
       setMsg(`Approved: ${sub.title}.${notifyNote}`);
     } catch {
       setMsg(`Failed to approve ${sub.title}.`);

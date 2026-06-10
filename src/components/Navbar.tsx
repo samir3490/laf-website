@@ -47,11 +47,19 @@ export default function Navbar() {
           <Link href="/" className="flex items-center shrink-0">
             <span className="rounded-lg bg-laf-cream px-2 py-1 shadow-sm">
               <Image
+                src="/logo.png"
+                alt="Lata Agrawal Foundation"
+                width={160}
+                height={40}
+                className="h-9 w-auto max-w-[140px] object-contain lg:hidden"
+                priority
+              />
+              <Image
                 src="/logo-square.png"
                 alt="Lata Agrawal Foundation"
                 width={56}
                 height={56}
-                className="h-11 w-11 lg:h-12 lg:w-12 object-contain"
+                className="hidden lg:block h-11 w-11 lg:h-12 lg:w-12 object-contain"
                 priority
               />
             </span>
