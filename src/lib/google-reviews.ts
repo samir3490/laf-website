@@ -8,7 +8,7 @@ export type GoogleReviewRecord = {
   text: string;
   relativeTime?: string;
   publishedAt?: string;
-  source: "google_business" | "places_api";
+  source: "google_business" | "places_api" | "public_maps";
 };
 
 export type GoogleReviewsMeta = {
@@ -17,6 +17,7 @@ export type GoogleReviewsMeta = {
   totalReviewCount?: number;
   reviewWriteUrl: string;
   googleMapsUrl?: string;
+  mapsEmbedUrl?: string;
   placeId?: string;
   lastSyncedAt?: string;
   syncSource?: string;
@@ -27,15 +28,18 @@ export function getGoogleBusinessConfig() {
     businessName: string;
     address: string;
     googleShareUrl: string;
+    placeId?: string;
+    placeHex?: string;
     qrImage: string;
     textSearchQuery: string;
   };
 }
 
 export function reviewWriteUrl(placeId?: string): string {
-  const shareUrl = getGoogleBusinessConfig().googleShareUrl;
+  const config = getGoogleBusinessConfig();
+  const shareUrl = config.googleShareUrl;
   const envPlaceId = process.env.GOOGLE_PLACE_ID?.trim();
-  const id = placeId || envPlaceId;
+  const id = placeId || envPlaceId || config.placeId;
   if (id) {
     return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(id)}`;
   }
