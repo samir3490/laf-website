@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./playful-theme.css";
 
 @theme inline {
   --color-laf-navy: #0a1f30;
