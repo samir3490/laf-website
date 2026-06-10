@@ -8,7 +8,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] HubSpot contact + volunteer forms
 - [x] Razorpay donate page
 - [x] DNS fully propagated — `agrawalfoundation.org` shows new site
-- [ ] Confirm Google email still works after DNS change (send/receive test)
+- [x] Confirm Google email still works after DNS change (send/receive test)
 - [x] Submit sitemap in Google Search Console (`/sitemap.xml` — see SEO section)
 - [ ] Cancel BigRock WordPress hosting (after 1–2 weeks stable)
 
@@ -70,13 +70,16 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ## Performance
 
-- [ ] Lighthouse audit on Home, Donate, Blog (Home: Perf 63, SEO 92, A11y 96 — Jun 2026)
+- [x] Lighthouse audit on Home, Donate, Blog (Jun 2026)
+  - Home: Perf 63, SEO 92, A11y 96
+  - Donate: Perf 86, SEO 100
+  - Blog: Perf 65, SEO 100
 - [x] Confirm all images served from `/public/images` (no broken WP links)
-- [ ] HubSpot + gtag load `afterInteractive` only
+- [x] HubSpot + gtag load `afterInteractive` only (gtag via `Analytics.tsx`; HubSpot async on contact/volunteer only)
 
 ---
 
-**Current focus (in progress):** Email test (Google Workspace), Lighthouse audit, cancel WP hosting after 2 weeks stable.
+**Current focus:** Monitor site stability for 1–2 weeks, then cancel BigRock WordPress hosting. Optional: blog performance tuning (Perf 65), photo gallery, top-10 blog review.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
