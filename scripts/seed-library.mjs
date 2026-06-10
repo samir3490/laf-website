@@ -1,7 +1,10 @@
 /**
  * Seed library_resources in Firestore (lata-agrawal-foundation).
  *
- * Usage:
+ * Easier option (no service account): sign in at /admin/library and click
+ * "Import 58 seed resources".
+ *
+ * CLI usage:
  *   npm run seed:library
  *
  * Requires one of:

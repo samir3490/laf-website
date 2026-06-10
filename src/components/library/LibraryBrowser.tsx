@@ -24,6 +24,8 @@ import {
 
 type LibraryBrowserProps = {
   seedResources: LibraryResource[];
+  initialModule?: string;
+  showSubmitLink?: boolean;
 };
 
 const MODULE_TABS = [
@@ -31,14 +33,21 @@ const MODULE_TABS = [
   ...LIBRARY_MODULES.map((m) => ({ value: m, label: moduleLabel(m) })),
 ];
 
-export default function LibraryBrowser({ seedResources }: LibraryBrowserProps) {
+export default function LibraryBrowser({
+  seedResources,
+  initialModule = "",
+  showSubmitLink = true,
+}: LibraryBrowserProps) {
   const config = getFirebaseConfig();
   const db = getFirebaseDb();
 
   const [resources, setResources] = useState<LibraryResource[]>(seedResources);
   const [loading, setLoading] = useState(Boolean(db));
   const [source, setSource] = useState<"seed" | "firestore">("seed");
-  const [filters, setFilters] = useState<LibraryFilters>(DEFAULT_LIBRARY_FILTERS);
+  const [filters, setFilters] = useState<LibraryFilters>({
+    ...DEFAULT_LIBRARY_FILTERS,
+    module: initialModule,
+  });
 
   useEffect(() => {
     if (!db) {
@@ -183,11 +192,21 @@ export default function LibraryBrowser({ seedResources }: LibraryBrowserProps) {
             </>
           )}
         </p>
-        {!loading && source === "seed" && config && (
-          <p className="text-xs text-laf-muted/80">
-            Curated collection — community submissions coming in Phase 1
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {!loading && source === "seed" && config && (
+            <p className="text-xs text-laf-muted/80">
+              Showing curated collection — import to Firestore from admin panel
+            </p>
+          )}
+          {showSubmitLink && (
+            <a
+              href="/library/submit"
+              className="text-sm font-medium text-laf-gold hover:underline whitespace-nowrap"
+            >
+              Suggest a resource →
+            </a>
+          )}
+        </div>
       </div>
 
       {loading ? (

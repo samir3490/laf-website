@@ -15,6 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/faq",
     "/blog",
     "/library",
+    "/library/submit",
+    "/library/robotics",
     "/ways-to-help",
     "/community-scratch-games",
     "/privacy-policy",

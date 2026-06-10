@@ -1,6 +1,6 @@
 # LAF Learning Resource Library — Implementation Plan
 
-**Status:** Phase 0 in progress (browse + search live)  
+**Status:** Phase 1 shipped (submit + admin review); Phase 0 complete  
 **Last updated:** June 2026  
 **Stack:** Next.js 16 (Vercel) · Firestore (`lata-agrawal-foundation`) · Firebase Auth · AI via server API only
 
@@ -266,21 +266,24 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] Public page at `/library` with search + filters
 - [x] Nav + footer + sitemap links
 - [x] Firestore `library_resources` rules + `npm run seed:library` script
-- [ ] Publish updated Firestore rules in Firebase Console
-- [ ] Run `npm run seed:library` (optional — site works from JSON until seeded)
-- **Success metric:** 50 resources live, pages indexed in sitemap
+- [x] Publish Firestore rules in Firebase Console (Phase 0 `library_resources`)
+- [ ] Import seed to Firestore — use **Admin → Import 58 seed resources** at `/admin/library` (no service account needed)
+- **Success metric:** 50 resources live, pages indexed in sitemap ✅
 
-### Phase 1 — MVP community pipeline (4–6 weeks)
+### Phase 1 — MVP community pipeline ✅ shipped (core)
 
-- [ ] Public submit form + captcha + rate limit (3/day anonymous, 10/day logged in)
-- [ ] Analyze API (fetch + AI + dedup cache)
-- [ ] Admin review queue
-- [ ] Approve → public catalog
-- [ ] Resource detail pages + sitemap entries
-- [ ] Visit click tracking
-- [ ] Report Resource button
-- [ ] Firestore rules + nav link (“Learning Library”)
-- [ ] `/library/robotics` curated page
+- [x] Public submit form at `/library/submit` + API rate limit (10/day per IP)
+- [ ] Turnstile captcha (deferred — optional `TURNSTILE_SECRET`)
+- [x] Analyze API (`/api/library/submit`) — fetch metadata + safety filter + Gemini/heuristics
+- [x] Dedup check against existing `library_resources` by `urlNormalized`
+- [x] Admin review queue at `/admin/library`
+- [x] Approve → public `library_resources` catalog
+- [ ] Resource detail pages `/library/[slug]` (deferred to Phase 2)
+- [x] Visit click tracking on “Visit Website”
+- [x] Report Resource button
+- [x] Firestore rules for `library_submissions` + `library_reports` — **re-publish rules** (see `firebase-laf/firestore.rules`)
+- [x] Nav link (“Library”) — done in Phase 0
+- [x] `/library/robotics` curated page
 
 **Success metric:** 10 community submissions processed; 0 unsafe publishes; &lt; 5 min admin time per submission.
 
@@ -335,9 +338,11 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 ## Technical checklist (when build starts)
 
-- [ ] Env vars on Vercel: `LIBRARY_AI_API_KEY`, `TURNSTILE_SECRET`, existing Firebase vars
-- [ ] Extend `firebase-laf/firestore.rules` for `library_*` collections
-- [ ] Add `/library` to sitemap and main nav
+- [x] Firebase vars on Vercel (LAF Website app)
+- [ ] Optional: `LIBRARY_AI_API_KEY` or `GEMINI_API_KEY` on Vercel for richer AI metadata
+- [ ] Optional: `TURNSTILE_SECRET` for captcha on submit form
+- [x] Extend `firebase-laf/firestore.rules` for `library_*` collections — re-publish after Phase 1
+- [x] Add `/library`, `/library/submit`, `/library/robotics` to sitemap and nav
 - [ ] JSON-LD `WebSite` + `ItemList` for SEO
 - [ ] Privacy policy line: “We fetch public metadata from URLs you submit”
 
@@ -371,4 +376,9 @@ Tracked under **Features not yet migrated** in `SITE-IMPROVEMENT-PLAN.md`.
 
 ---
 
-**Next step when you’re ready:** Approve Phase 0 + Phase 1 scope, then we implement seed script + `/library` browse page first (no AI), then add submission pipeline.
+**Next step for you:**
+1. Re-publish Firestore rules (includes `library_submissions` + `library_reports`)
+2. Sign in at `/admin/library` → click **Import 58 seed resources**
+3. Test a submission at `/library/submit`
+
+**Next build (Phase 2):** Resource detail pages, search analytics, scholarship fields, dead-link checker.

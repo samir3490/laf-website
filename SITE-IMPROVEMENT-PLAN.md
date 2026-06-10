@@ -68,9 +68,10 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [ ] Google Reviews QR / testimonial page
 - [ ] Donor dashboard (if still needed)
 - [ ] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
-  - [x] Phase 0: Seed 58 resources, browse + search at `/library` (Firestore-ready; publish rules + run `npm run seed:library`)
-  - [ ] Phase 1: Submit URL, AI metadata, admin approve, report + click tracking
-  - [ ] Phase 2: Scholarships module, analytics, dead-link checks
+  - [x] Phase 0: Seed 58 resources, browse + search at `/library`
+  - [x] Phase 1 (core): Submit at `/library/submit`, admin at `/admin/library`, robotics page, report + clicks
+  - [ ] Phase 1 follow-up: Re-publish Firestore rules, import seed via admin, optional Gemini API key
+  - [ ] Phase 2: Detail pages, scholarships module, analytics, dead-link checks
   - [ ] Phase 3: Learning paths, AI assistant, gamification
 
 ## Performance

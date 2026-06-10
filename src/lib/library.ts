@@ -31,6 +31,7 @@ export type LibraryResource = {
   id?: string;
   slug: string;
   url: string;
+  urlNormalized?: string;
   title: string;
   description: string;
   categories: LibraryCategory[];
@@ -41,7 +42,29 @@ export type LibraryResource = {
   module: LibraryModule;
   featured?: boolean;
   educationalScore?: number;
+  safetyScore?: number;
+  visitCount?: number;
+  reportCount?: number;
+  ogImage?: string;
+  favicon?: string;
+  status?: "approved" | "pending" | "rejected";
 };
+
+export type LibrarySubmission = LibraryResource & {
+  status: "pending" | "approved" | "rejected" | "duplicate";
+  rejectReason?: string;
+  submittedBy?: string;
+  submitterEmail?: string;
+  createdAt?: { toDate?: () => Date };
+  reviewedAt?: { toDate?: () => Date };
+  reviewedBy?: string;
+};
+
+export const ADMIN_EMAIL = "admin@agrawalfoundation.org";
+
+export function isLibraryAdmin(email: string | null | undefined): boolean {
+  return email === ADMIN_EMAIL;
+}
 
 export type LibraryFilters = {
   query: string;

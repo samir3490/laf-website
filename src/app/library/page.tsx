@@ -24,8 +24,11 @@ export default function LibraryPage() {
       <PageContainer className="py-12 lg:py-16">
         <p className="mb-8 text-laf-muted leading-relaxed max-w-3xl">
           Browse trusted educational resources — from Scratch and Khan Academy to scholarships and
-          NGO guides. Search by topic, age group, difficulty, or cost. Community submissions with
-          AI review will open in a future update.
+          NGO guides. Search by topic, age group, difficulty, or cost. Know a great site?{" "}
+          <a href="/library/submit" className="text-laf-gold font-medium hover:underline">
+            Suggest a resource
+          </a>
+          .
         </p>
         <LibraryBrowser seedResources={seedResources} />
       </PageContainer>
