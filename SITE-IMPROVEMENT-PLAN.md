@@ -36,7 +36,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Blog post typography (TOC, headings, images)
 - [x] SEO metadata per post (description, canonical, Open Graph)
 - [x] JSON-LD Article schema on blog posts
-- [ ] Review top 10 posts manually for accuracy / tone
+- [x] Review top 10 posts manually for accuracy / tone (Jun 2026 — rewrote 3 AI-hallucinated posts; LAF intro on all 10 recent)
 - [x] Add featured images where missing (many use Unsplash hotlinks)
 - [x] Pagination or “load more” if listing all 92 posts
 - [x] Internal links to /donate and /volunteer in key posts
@@ -61,11 +61,11 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Publish Scratch project link — auto-embeds on public gallery
   - [x] Copy embed code for own sites
   - [x] Edit / delete own games only
-  - [ ] Migrate existing WordPress-published games to Firestore (if any)
+  - [x] Migrate existing WordPress-published games to Firestore — none in WP export (empty gallery; users publish via sign-in)
   - [x] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — LAF Website web app)
   - [x] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
 - [x] Photo gallery (`/gallery`)
-- [x] Google Reviews QR / testimonial page (`/reviews` — daily sync cron + QR code)
+- [x] Google Reviews page (`/reviews` — Maps embed, single QR, public metadata sync, nav link)
 - [ ] Donor dashboard (if still needed)
 - [x] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
   - [x] Phase 0: Seed 58 resources, browse + search at `/library`
@@ -90,7 +90,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus:** Set up Google review sync on Vercel (see `.env.example`), publish Firestore rules, then cancel BigRock WordPress after 1–2 weeks stable.
+**Current focus:** Cancel BigRock WordPress hosting after 1–2 weeks stable on the new site. Optional: donor dashboard if still needed.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

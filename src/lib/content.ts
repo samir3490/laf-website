@@ -56,6 +56,7 @@ export function sanitizeHtml(html: string): string {
 
 export function sanitizeBlogHtml(html: string): string {
   return sanitizeHtml(html)
+    .replace(/<p>\s*<meta[^>]*>\s*<\/p>/gi, "")
     .replace(/<a[^>]*articly\.ai[^>]*>[\s\S]*?<\/a>/gi, "")
     .replace(/style=['"]position:\s*absolute[^'"]*['"]/gi, "")
     .replace(/class=['']post_imgs['']/gi, 'class="laf-post-img"')

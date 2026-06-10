@@ -10,7 +10,8 @@
     "export:wp": "node scripts/export-wordpress.mjs",
     "download:images": "node scripts/download-images.mjs",
     "localize:unsplash": "node scripts/localize-unsplash.mjs",
-    "seed:library": "node scripts/seed-library.mjs"
+    "seed:library": "node scripts/seed-library.mjs",
+    "clean:blog-top10": "node scripts/clean-blog-top10.mjs"
   },
   "dependencies": {
     "firebase": "^12.14.0",
