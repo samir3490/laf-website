@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { getSite } from "@/lib/content";
+import { trackLeadConversion } from "@/lib/gtag";
 
 declare global {
   interface Window {
@@ -12,6 +13,7 @@ declare global {
           formId: string;
           region: string;
           target: string;
+          onFormSubmitted?: () => void;
         }) => void;
       };
     };
@@ -45,6 +47,9 @@ export default function HubSpotForm({
         formId,
         region,
         target: `#${id}`,
+        onFormSubmitted: () => {
+          trackLeadConversion(formKey);
+        },
       });
     };
 

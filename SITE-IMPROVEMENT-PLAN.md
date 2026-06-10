@@ -49,6 +49,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] `metadataBase` + canonical URLs
 - [x] Organization JSON-LD on all pages
 - [x] Google Ads tag (`AW-17149139381`) from old site
+- [x] GA4 linked (`G-MEYRTNH342`) + donate/lead conversion events (Jun 2026)
 - [x] Google Search Console — property already added (clicks/impressions showing)
 - [x] Submit sitemap in GSC: `https://www.agrawalfoundation.org/sitemap.xml`
 - [x] Rank Math redirects audit — legacy blog URLs → `/blog/[slug]` middleware + page redirects

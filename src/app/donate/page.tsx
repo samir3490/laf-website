@@ -3,6 +3,7 @@ import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import RazorpayDonateButton from "@/components/RazorpayDonateButton";
+import DonateAnalytics from "@/components/DonateAnalytics";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -17,6 +18,7 @@ const QR_IMAGE = "/images/2024/12/Lata-Agrawal-Foundation-QR-Code-628x1024.jpeg"
 export default function DonatePage() {
   return (
     <>
+      <DonateAnalytics />
       <PageHeader
         title="Donate Now"
         subtitle="Every contribution brings hope and change"
