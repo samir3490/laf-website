@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import LibraryBrowser from "@/components/library/LibraryBrowser";
+import LibraryPageShell from "@/components/library/LibraryPageShell";
 import { getSeedLibraryResources } from "@/lib/library-data";
 import { pageMetadata } from "@/lib/seo";
 
@@ -21,8 +22,17 @@ export default function LibraryVolunteerPage() {
         title="Volunteer Training Library"
         subtitle="Guides and courses for volunteers working with children and communities"
       />
-      <PageContainer className="py-12 lg:py-16">
-        <LibraryBrowser seedResources={seedResources} initialModule="volunteer" />
+      <PageContainer wide className="py-8 lg:py-12">
+        <LibraryPageShell
+          seedResources={seedResources}
+          intro={
+            <p className="text-sm text-laf-muted">
+              Guides and courses for volunteers working with children and communities.
+            </p>
+          }
+        >
+          <LibraryBrowser seedResources={seedResources} initialModule="volunteer" />
+        </LibraryPageShell>
       </PageContainer>
     </>
   );

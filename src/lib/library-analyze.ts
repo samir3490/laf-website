@@ -1,3 +1,4 @@
+import { geminiGenerateJson } from "@/lib/gemini-json";
 import {
   LIBRARY_CATEGORIES,
   type LibraryAgeGroup,
@@ -124,9 +125,6 @@ function classifyHeuristic(meta: PageMetadata): Omit<LibraryAnalysis, "rejected"
 }
 
 async function classifyWithGemini(meta: PageMetadata): Promise<LibraryAnalysis | null> {
-  const apiKey = process.env.LIBRARY_AI_API_KEY ?? process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
   const prompt = `Analyze this educational website and return ONLY valid JSON (no markdown):
 {
   "categories": ["up to 4 from: ${LIBRARY_CATEGORIES.join(", ")}"],
@@ -151,67 +149,47 @@ Title: ${meta.title}
 Description: ${meta.description}
 Content snippet: ${meta.textSnippet.slice(0, 1200)}`;
 
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 800 },
-        }),
-        signal: AbortSignal.timeout(20000),
-      }
-    );
+  const gemini = await geminiGenerateJson(prompt);
+  if (!gemini) return null;
 
-    if (!res.ok) return null;
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+  const parsed = gemini.data;
+  const safety = evaluateSafety(meta.url, meta.title, meta.description, meta.textSnippet);
 
-    const parsed = JSON.parse(jsonMatch[0]);
-    const safety = evaluateSafety(meta.url, meta.title, meta.description, meta.textSnippet);
-
-    if (safety.rejected || parsed.reject || (parsed.safetyScore ?? 100) < 70) {
-      return {
-        title: meta.title,
-        description: parsed.summary ?? meta.description,
-        categories: ["Education"],
-        ageGroups: ["8-12"],
-        difficulty: "Beginner",
-        cost: "Free",
-        languages: ["English"],
-        module: "general",
-        safetyScore: Math.min(safety.safetyScore, parsed.safetyScore ?? 0),
-        educationalScore: 0,
-        rejected: true,
-        rejectReason: parsed.rejectReason ?? safety.rejectReason ?? "Failed safety review",
-      };
-    }
-
+  if (safety.rejected || parsed.reject || (parsed.safetyScore as number ?? 100) < 70) {
     return {
       title: meta.title,
-      description: parsed.summary ?? meta.description,
-      categories: (parsed.categories ?? ["Education"]).slice(0, 4),
-      ageGroups: parsed.ageGroups ?? ["8-12", "13-18"],
-      difficulty: parsed.difficulty ?? "Beginner",
-      cost: parsed.cost ?? "Free",
-      languages: parsed.languages ?? ["English"],
-      module: parsed.module ?? "general",
-      safetyScore: Math.max(safety.safetyScore, parsed.safetyScore ?? 80),
-      educationalScore: parsed.educationalScore ?? 75,
-      rejected: false,
-      rejectReason: null,
-      eligibility: parsed.eligibility ?? undefined,
-      deadline: parsed.deadline ?? undefined,
-      ageMin: typeof parsed.ageMin === "number" ? parsed.ageMin : undefined,
-      ageMax: typeof parsed.ageMax === "number" ? parsed.ageMax : undefined,
+      description: String(parsed.summary ?? meta.description),
+      categories: ["Education"],
+      ageGroups: ["8-12"],
+      difficulty: "Beginner",
+      cost: "Free",
+      languages: ["English"],
+      module: "general",
+      safetyScore: Math.min(safety.safetyScore, (parsed.safetyScore as number) ?? 0),
+      educationalScore: 0,
+      rejected: true,
+      rejectReason: String(parsed.rejectReason ?? safety.rejectReason ?? "Failed safety review"),
     };
-  } catch {
-    return null;
   }
+
+  return {
+    title: meta.title,
+    description: String(parsed.summary ?? meta.description),
+    categories: ((parsed.categories as LibraryCategory[]) ?? ["Education"]).slice(0, 4),
+    ageGroups: (parsed.ageGroups as LibraryAgeGroup[]) ?? ["8-12", "13-18"],
+    difficulty: (parsed.difficulty as LibraryDifficulty) ?? "Beginner",
+    cost: (parsed.cost as LibraryCost) ?? "Free",
+    languages: (parsed.languages as string[]) ?? ["English"],
+    module: (parsed.module as LibraryModule) ?? "general",
+    safetyScore: Math.max(safety.safetyScore, (parsed.safetyScore as number) ?? 80),
+    educationalScore: (parsed.educationalScore as number) ?? 75,
+    rejected: false,
+    rejectReason: null,
+    eligibility: parsed.eligibility ? String(parsed.eligibility) : undefined,
+    deadline: parsed.deadline ? String(parsed.deadline) : undefined,
+    ageMin: typeof parsed.ageMin === "number" ? parsed.ageMin : undefined,
+    ageMax: typeof parsed.ageMax === "number" ? parsed.ageMax : undefined,
+  };
 }
 
 export async function analyzeResource(meta: PageMetadata): Promise<LibraryAnalysis> {

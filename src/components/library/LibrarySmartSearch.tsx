@@ -12,6 +12,7 @@ export default function LibrarySmartSearch({ onApply }: LibrarySmartSearchProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastSummary, setLastSummary] = useState("");
+  const [source, setSource] = useState<"gemini" | "heuristic" | null>(null);
 
   async function handleAsk(e: React.FormEvent) {
     e.preventDefault();
@@ -21,6 +22,7 @@ export default function LibrarySmartSearch({ onApply }: LibrarySmartSearchProps)
     setLoading(true);
     setError("");
     setLastSummary("");
+    setSource(null);
 
     try {
       const res = await fetch("/api/library/smart-search", {
@@ -34,6 +36,7 @@ export default function LibrarySmartSearch({ onApply }: LibrarySmartSearchProps)
         return;
       }
       setLastSummary(data.summary);
+      setSource(data.source === "gemini" ? "gemini" : "heuristic");
       onApply(data.filters, data.summary);
     } catch {
       setError("Something went wrong. Try the regular search below.");
@@ -69,7 +72,14 @@ export default function LibrarySmartSearch({ onApply }: LibrarySmartSearchProps)
       </form>
       {error && <p className="text-xs text-red-600">{error}</p>}
       {lastSummary && !error && (
-        <p className="text-xs text-laf-muted">{lastSummary}</p>
+        <p className="text-xs text-laf-muted flex flex-wrap items-center gap-2">
+          <span>{lastSummary}</span>
+          {source === "gemini" && (
+            <span className="px-1.5 py-0.5 rounded bg-laf-navy/8 text-laf-navy text-[10px] font-medium">
+              AI
+            </span>
+          )}
+        </p>
       )}
     </div>
   );

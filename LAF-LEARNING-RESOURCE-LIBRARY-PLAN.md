@@ -304,7 +304,10 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 ### Phase 3 — Knowledge network ✅ shipped (core)
 
 - [x] AI Search Assistant — “Ask the library” on `/library` (Gemini or heuristics → filters)
+- [x] Gemini fix — multi-model fallback (`gemini-2.5-flash`, `2.0-flash`, `1.5-flash`) + `responseMimeType: application/json`; API returns `source: gemini | heuristic`
+- [x] Wide library layout — sidebars (browse + learning paths left, popular resources right); resource grid higher on page
 - [x] Learning paths — 5 curated paths at `/library/paths` + “Next in path” on resource pages
+- [x] `/library/ngo` — NGO knowledge module page (mirrors scholarships/volunteer pattern)
 - [ ] Gamification (points, badges) — deferred until submission volume grows
 - [ ] Monthly metadata refresh job — deferred
 - [ ] Top contributors page — deferred

@@ -22,7 +22,11 @@ export async function POST(req: Request) {
     }
 
     const result = await parseSmartSearch(question);
-    return NextResponse.json(result);
+    return NextResponse.json({
+      filters: result.filters,
+      summary: result.summary,
+      source: result.source,
+    });
   } catch {
     return NextResponse.json({ error: "Could not process your question." }, { status: 500 });
   }

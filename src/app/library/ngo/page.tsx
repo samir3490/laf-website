@@ -7,32 +7,35 @@ import { getSeedLibraryResources } from "@/lib/library-data";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Scholarship Library",
+  title: "NGO Knowledge Library",
   description:
-    "Scholarship portals and funding resources for Indian students — eligibility, deadlines, and official application links.",
-  path: "/library/scholarships",
+    "Resources for NGOs — fundraising, compliance, transparency, and volunteer management.",
+  path: "/library/ngo",
 });
 
-export default function LibraryScholarshipsPage() {
+export default function LibraryNgoPage() {
   const seedResources = getSeedLibraryResources();
 
   return (
     <>
       <PageHeader
-        title="Scholarship Library"
-        subtitle="Find scholarships and education funding opportunities across India"
+        title="NGO Knowledge Library"
+        subtitle="Guides and tools for nonprofits, CSR partners, and community organizations"
       />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}
           intro={
             <p className="text-sm text-laf-muted">
-              Official portals and trusted platforms. Always verify eligibility and deadlines on the
-              provider&apos;s website before applying.
+              Transparency, compliance, and partnership resources for NGOs and volunteers.
             </p>
           }
         >
-          <LibraryBrowser seedResources={seedResources} initialModule="scholarships" />
+          <LibraryBrowser
+            seedResources={seedResources}
+            initialModule="ngo"
+            showSmartSearch={false}
+          />
         </LibraryPageShell>
       </PageContainer>
     </>

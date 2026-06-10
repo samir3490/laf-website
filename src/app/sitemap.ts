@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/library/robotics",
     "/library/scholarships",
     "/library/volunteer-training",
+    "/library/ngo",
     "/library/paths",
     "/ways-to-help",
     "/community-scratch-games",
