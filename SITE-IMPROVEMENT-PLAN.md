@@ -7,7 +7,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] New Next.js site on Vercel (`laf-website.vercel.app`)
 - [x] HubSpot contact + volunteer forms
 - [x] Razorpay donate page
-- [ ] DNS fully propagated — `agrawalfoundation.org` shows new site
+- [x] DNS fully propagated — `agrawalfoundation.org` shows new site
 - [ ] Confirm Google email still works after DNS change (send/receive test)
 - [ ] Submit sitemap in Google Search Console
 - [ ] Cancel BigRock WordPress hosting (after 1–2 weeks stable)
@@ -25,10 +25,10 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 - [x] Volunteer page — two-column layout (content + HubSpot form)
 - [x] Contact page — match volunteer two-column style
-- [ ] About page — impact grid styling on new width
+- [x] About page — impact grid styling on new width
 - [x] Donate page — layout pass on wide screens
-- [ ] Home hero — balance images on ultra-wide monitors
-- [ ] CSR / FAQ / Ways to help — content review
+- [x] Home hero — balance images on ultra-wide monitors
+- [x] CSR / FAQ / Ways to help — content review
 
 ## Blog
 
@@ -37,9 +37,9 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] SEO metadata per post (description, canonical, Open Graph)
 - [x] JSON-LD Article schema on blog posts
 - [ ] Review top 10 posts manually for accuracy / tone
-- [ ] Add featured images where missing (many use Unsplash hotlinks)
-- [ ] Pagination or “load more” if listing all 92 posts
-- [ ] Internal links to /donate and /volunteer in key posts
+- [x] Add featured images where missing (many use Unsplash hotlinks)
+- [x] Pagination or “load more” if listing all 92 posts
+- [x] Internal links to /donate and /volunteer in key posts
 
 ## SEO
 
@@ -50,11 +50,19 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [ ] Google Search Console verification (if you have meta tag, share it)
 - [ ] Rank Math redirects audit — any high-traffic URLs still 404?
 - [x] Local SEO: address/phone schema on Contact page
-- [ ] Social preview image (`og:image`) — create 1200×630 banner
+- [x] Social preview image (`og:image`) — create 1200×630 banner
 
 ## Features not yet migrated
 
-- [ ] Community Scratch Games (`/community-scratch-games`)
+- [x] Community Scratch Games (`/community-scratch-games`)
+  - [x] Public gallery — browse and play without login
+  - [x] Sign up / sign in (Firebase Auth, email + password)
+  - [x] Publish Scratch project link — auto-embeds on public gallery
+  - [x] Copy embed code for own sites
+  - [x] Edit / delete own games only
+  - [ ] Migrate existing WordPress-published games to Firestore (if any)
+  - [ ] Add Firebase env vars in Vercel production (see `.env.example`)
+  - [ ] Deploy Firestore rules (`firebase-agrasen` → `scratchGames` collection)
 - [ ] Photo gallery (`/gallery`)
 - [ ] Google Reviews QR / testimonial page
 - [ ] Donor dashboard (if still needed)
@@ -62,12 +70,12 @@ Track progress here while giving instructions in chat. Check items off as they c
 ## Performance
 
 - [ ] Lighthouse audit on Home, Donate, Blog
-- [ ] Confirm all images served from `/public/images` (no broken WP links)
+- [x] Confirm all images served from `/public/images` (no broken WP links)
 - [ ] HubSpot + gtag load `afterInteractive` only
 
 ---
 
-**Current focus (in progress):** About page polish, blog featured images, `og:image` banner, DNS propagation.
+**Current focus (in progress):** Scratch Games Vercel env + Firestore rules deploy, Search Console, email test, Lighthouse audit.
 
-**Live preview:** https://laf-website.vercel.app  
-**After DNS:** https://www.agrawalfoundation.org
+**Live site:** https://www.agrawalfoundation.org  
+**Vercel preview:** https://laf-website.vercel.app

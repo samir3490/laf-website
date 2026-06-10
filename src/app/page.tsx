@@ -18,8 +18,8 @@ export default function HomePage() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-laf-navy/75" />
-        <PageContainer className="relative py-20 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="text-white">
+        <PageContainer className="relative py-16 lg:py-20 grid lg:grid-cols-2 xl:grid-cols-[1.15fr_0.85fr] gap-10 xl:gap-16 items-center">
+          <div className="text-white max-w-2xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               {hero.title}
             </h1>
@@ -33,13 +33,13 @@ export default function HomePage() {
               </Button>
             </div>
           </div>
-          <div className="hidden lg:block relative h-[420px] rounded-2xl overflow-hidden shadow-2xl border border-white/20">
+          <div className="hidden lg:block relative h-[380px] xl:h-[440px] max-w-xl xl:max-w-none xl:ml-auto w-full rounded-2xl overflow-hidden shadow-2xl border border-white/20">
             <Image
               src={hero.image}
               alt="Lata Agrawal Foundation community mission"
               fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 0vw, 50vw"
+              className="object-cover object-center"
+              sizes="(max-width: 1280px) 45vw, 520px"
             />
           </div>
         </PageContainer>

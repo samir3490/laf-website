@@ -1,0 +1,26 @@
+{
+  "tagline": "Empowering communities, transforming lives through education, healthcare, and support for a brighter future.",
+  "ways": [
+    {
+      "title": "Donate",
+      "description": "Support our mission financially or with essential resources like books, clothes, and technology. Every contribution helps underprivileged communities build a better future.",
+      "image": "/images/2025/09/premium_photo-1663089162887-403fb53108cd-1-1024x683.jpg",
+      "href": "/donate",
+      "cta": "Donate Now"
+    },
+    {
+      "title": "Volunteer",
+      "description": "Share your time and skills to teach, mentor, or support our initiatives. Your involvement helps shape the future for children and families in need.",
+      "image": "/images/2025/09/premium_photo-1681195079271-cbfd9ba1cbc7-2-1024x683.jpg",
+      "href": "/volunteer",
+      "cta": "Become a Volunteer"
+    },
+    {
+      "title": "Spread the Word",
+      "description": "Help us raise awareness by sharing our mission on social media and with your network. Together we can reach more people and amplify our impact.",
+      "image": "/images/2025/09/premium_photo-1682310558560-d4219a34bb7d-2.jpg",
+      "href": "/contact",
+      "cta": "Get in Touch"
+    }
+  ]
+}

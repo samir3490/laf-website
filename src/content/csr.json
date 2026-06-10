@@ -1,0 +1,32 @@
+{
+  "intro": "Partner with Lata Agrawal Foundation to create measurable impact through education, healthcare, and essential resource programs for underprivileged communities.",
+  "whyPartner": [
+    "Transparent, outcome-driven programs",
+    "Local execution with community involvement",
+    "Regular updates: photos, utilization reports, and impact summaries"
+  ],
+  "programs": [
+    {
+      "title": "Education support",
+      "description": "Learning materials, scholarships, and digital learning access."
+    },
+    {
+      "title": "Nutrition & essentials",
+      "description": "Food drives, hygiene kits, and basic supplies."
+    },
+    {
+      "title": "Health camps",
+      "description": "Eye checkups and preventive care support."
+    },
+    {
+      "title": "Volunteer engagement",
+      "description": "Employee volunteering opportunities with our programs."
+    }
+  ],
+  "process": [
+    { "step": "Discovery call", "detail": "Understand your CSR goals and priorities." },
+    { "step": "Program proposal", "detail": "Timelines, budget, and measurable outcomes." },
+    { "step": "Execution", "detail": "On-ground delivery with approvals and milestone updates." },
+    { "step": "Reporting", "detail": "Photos, utilization reports, and impact summary." }
+  ]
+}

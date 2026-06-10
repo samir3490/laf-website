@@ -30,6 +30,7 @@ export default function Footer() {
               <li><Link href="/volunteer" className="hover:text-white">Volunteer</Link></li>
               <li><Link href="/faq" className="hover:text-white">FAQs</Link></li>
               <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+              <li><Link href="/community-scratch-games" className="hover:text-white">Scratch Games</Link></li>
             </ul>
           </div>
           <div className="md:col-span-2">

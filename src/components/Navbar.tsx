@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/volunteer", label: "Volunteer" },
   { href: "/csr", label: "CSR" },
   { href: "/blog", label: "Blog" },
+  { href: "/community-scratch-games", label: "Scratch Games" },
   { href: "/contact", label: "Contact" },
 ];
 

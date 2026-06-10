@@ -1,0 +1,24 @@
+{
+  "intro": "The Lata Agrawal Foundation is a nonprofit organization dedicated to making a lasting impact on society by addressing critical issues such as hunger, education, healthcare, and social empowerment. Founded on the principles of compassion and service, we work to uplift underprivileged communities and equip them with the resources and opportunities needed for a better future.",
+  "belief": "At the core of our mission is the belief that every individual deserves access to basic necessities and the chance to thrive. Through innovative programs and strategic partnerships, we are committed to fighting hunger, promoting education, improving healthcare access, and empowering women and children.",
+  "mission": {
+    "title": "Our Mission",
+    "body": "We aim to bridge the education gap by providing essential resources, mentorship, and opportunities to underprivileged children, empowering them to achieve their full potential. Education is the cornerstone of progress and a fundamental right that transforms lives and communities."
+  },
+  "vision": {
+    "title": "Our Vision",
+    "body": "We envision a world where every child has access to quality education, empowering them to realize their potential and contribute meaningfully to society. We strive for an inclusive educational ecosystem that nurtures curiosity, creativity, and critical thinking."
+  },
+  "impact": [
+    { "value": "1+", "label": "Computer Centers Opened" },
+    { "value": "1+", "label": "Food Donation Drives" },
+    { "value": "1+", "label": "Computers Donated" },
+    { "value": "1+", "label": "Hygiene Essentials Kit Donation Drives" },
+    { "value": "1+", "label": "Kids Supported with Education & Career Guidance" },
+    { "value": "1+", "label": "Eye Checkup Camps Organized" }
+  ],
+  "team": {
+    "title": "Our Team",
+    "body": "Behind every initiative is a dedicated team of educators, volunteers, and supporters united by a shared commitment to uplifting underprivileged communities. Together, we are a community of changemakers working towards a brighter, more equitable future."
+  }
+}

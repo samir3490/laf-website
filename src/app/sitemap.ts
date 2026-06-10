@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/faq",
     "/blog",
     "/ways-to-help",
+    "/community-scratch-games",
     "/privacy-policy",
     "/terms-conditions",
   ];

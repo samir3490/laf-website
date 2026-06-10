@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import WpContent from "@/components/WpContent";
 import JsonLd from "@/components/JsonLd";
 import Link from "next/link";
-import { getAllPosts, getPost, stripHtml } from "@/lib/content";
-import { articleJsonLd, pageMetadata } from "@/lib/seo";
+import { getAllPosts, getPost, getPostBodyHtml, getPostFeaturedImage } from "@/lib/content";
+import { articleJsonLd, postMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -18,18 +19,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return { title: "Post Not Found" };
-  const description = stripHtml(post.excerpt).slice(0, 160);
-  return pageMetadata({
-    title: post.title,
-    description,
-    path: `/blog/${post.slug}`,
-  });
+  return postMetadata(post);
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
+
+  const featuredImage = getPostFeaturedImage(post);
 
   return (
     <>
@@ -49,8 +47,18 @@ export default async function BlogPostPage({ params }: Props) {
             ← All posts
           </Link>
         </div>
+        <div className="relative aspect-[2/1] max-h-80 rounded-2xl overflow-hidden mb-8 border border-laf-border">
+          <Image
+            src={featuredImage}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 768px"
+            priority
+          />
+        </div>
         <article>
-          <WpContent html={post.html} blog className="mt-2" />
+          <WpContent html={getPostBodyHtml(post)} blog className="mt-2" />
         </article>
         <aside className="mt-14 rounded-2xl bg-laf-navy text-white p-8 text-center">
           <h2 className="text-xl font-bold">Support Our Mission</h2>

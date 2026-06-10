@@ -33,11 +33,33 @@ npm run download:images
 
 Content JSON then references local paths like `/images/2024/12/mission-ngo-lata.webp`.
 
+## Community Scratch Games
+
+Route: `/community-scratch-games` — public gallery of MIT Scratch embeds; signed-in users can publish, edit, and delete their own games (Firebase Auth + Firestore, project `agrasen-technologies`).
+
+**Vercel environment variables** (Settings → Environment Variables — copy from `.env.example`):
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+Enable **Email/Password** in Firebase Console → Authentication. Deploy Firestore rules from `firebase-agrasen`:
+
+```bash
+cd firebase-agrasen
+firebase use agrasen-technologies
+firebase deploy --only firestore:rules
+```
+
 ## Deploy to Vercel
 
 1. Push this folder to GitHub (or import directly in Vercel).
 2. In [Vercel Dashboard](https://vercel.com) → **Add New Project** → import `laf-website`.
 3. Framework preset: **Next.js** (auto-detected). Root directory: `laf-website` if the repo is the parent folder.
+4. Add Firebase env vars above for Scratch Games.
 4. Click **Deploy**. You will get a URL like `laf-website-xxx.vercel.app`.
 
 ## Custom domain (later — BigRock DNS)

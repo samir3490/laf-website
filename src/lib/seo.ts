@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSite, stripHtml } from "@/lib/content";
+import { getPostFeaturedImage, getSite, stripHtml, type WpPost } from "@/lib/content";
 
 export function siteUrl(path = ""): string {
   const base = getSite().url.replace(/\/$/, "");
@@ -27,11 +27,30 @@ export function pageMetadata({
       siteName: getSite().name,
       type: "website",
       locale: "en_IN",
+      images: [{ url: siteUrl("/opengraph-image"), width: 1200, height: 630, alt: getSite().name }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+    },
+  };
+}
+
+export function postMetadata(post: WpPost): Metadata {
+  const description = stripHtml(post.excerpt).slice(0, 160);
+  const featured = getPostFeaturedImage(post);
+  const base = pageMetadata({
+    title: post.title,
+    description,
+    path: `/blog/${post.slug}`,
+  });
+  return {
+    ...base,
+    openGraph: {
+      ...base.openGraph,
+      type: "article",
+      images: [{ url: siteUrl(featured), width: 1200, height: 630, alt: post.title }],
     },
   };
 }
