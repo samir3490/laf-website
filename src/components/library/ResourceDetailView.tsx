@@ -22,6 +22,7 @@ import {
   LIBRARY_RESOURCES_COLLECTION,
 } from "@/lib/firebase";
 import { normalizeLibraryResource } from "@/lib/library";
+import { getPathsForResource } from "@/lib/library-paths";
 
 type ResourceDetailViewProps = {
   slug: string;
@@ -111,6 +112,7 @@ export default function ResourceDetailView({ slug, seedResource }: ResourceDetai
   }
 
   const isScholarship = resource.module === "scholarships";
+  const pathContinuations = getPathsForResource(resource.slug);
 
   return (
     <article className="max-w-3xl">
@@ -195,6 +197,33 @@ export default function ResourceDetailView({ slug, seedResource }: ResourceDetai
             <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
               This link was flagged as possibly broken. If it does not work, please report it.
             </p>
+          )}
+
+          {pathContinuations.length > 0 && (
+            <div className="rounded-xl border border-laf-border bg-laf-cream/40 p-5 space-y-4">
+              {pathContinuations.map(({ path, nextSteps }) => (
+                <div key={path.id}>
+                  <p className="text-sm font-semibold text-laf-navy">
+                    Next in{" "}
+                    <Link href={`/library/paths/${path.id}`} className="text-laf-gold hover:underline">
+                      {path.title}
+                    </Link>
+                  </p>
+                  <ul className="mt-2 space-y-1.5">
+                    {nextSteps.map((step) => (
+                      <li key={step.slug}>
+                        <Link
+                          href={`/library/${step.slug}`}
+                          className="text-sm text-laf-muted hover:text-laf-gold"
+                        >
+                          → {step.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           )}
 
           <div className="flex flex-wrap gap-3 pt-2">

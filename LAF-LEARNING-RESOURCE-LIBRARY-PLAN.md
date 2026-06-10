@@ -1,6 +1,6 @@
 # LAF Learning Resource Library — Implementation Plan
 
-**Status:** Phase 2 shipped (detail pages, analytics, scholarships); Phase 0–1 complete  
+**Status:** Phase 3 shipped (learning paths, smart search); Phases 0–2 complete  
 **Last updated:** June 2026  
 **Stack:** Next.js 16 (Vercel) · Firestore (`lata-agrawal-foundation`) · Firebase Auth · AI via server API only
 
@@ -301,14 +301,14 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 
 **Success metric:** 200+ resources; search used 100+ times/month.
 
-### Phase 3 — Knowledge network (later, 6+ weeks)
+### Phase 3 — Knowledge network ✅ shipped (core)
 
-- [ ] AI Search Assistant (natural language → filter query, not open-ended chat)
-- [ ] Learning paths (manual first: 5 paths × 5 steps; auto-suggest later)
-- [ ] Gamification (points, badges) — only if submission volume justifies it
-- [ ] Monthly metadata refresh job
-- [ ] Top contributors page
-- [ ] NGO Knowledge module content partnership
+- [x] AI Search Assistant — “Ask the library” on `/library` (Gemini or heuristics → filters)
+- [x] Learning paths — 5 curated paths at `/library/paths` + “Next in path” on resource pages
+- [ ] Gamification (points, badges) — deferred until submission volume grows
+- [ ] Monthly metadata refresh job — deferred
+- [ ] Top contributors page — deferred
+- [ ] NGO Knowledge module content partnership — deferred
 
 **Success metric:** Learning paths drive 20%+ of outbound clicks.
 
@@ -347,8 +347,8 @@ Protected route: Firebase Auth + `isAdmin` (same as existing Firestore rules pat
 - [x] Extend `firebase-laf/firestore.rules` for `library_*` collections — re-publish after Phase 1
 - [x] Add `/library`, `/library/submit`, `/library/robotics` to sitemap and nav
 - [x] JSON-LD `WebPage` on resource detail pages
-- [ ] JSON-LD `ItemList` on main `/library` page
-- [ ] Privacy policy line: “We fetch public metadata from URLs you submit”
+- [x] JSON-LD `ItemList` on main `/library` page
+- [x] Privacy policy line: “We fetch public metadata from URLs you submit”
 
 ---
 
@@ -380,9 +380,6 @@ Tracked under **Features not yet migrated** in `SITE-IMPROVEMENT-PLAN.md`.
 
 ---
 
-**Next step for you:**
-1. Re-publish Firestore rules (adds `library_search_events`)
-2. Optional: add `CRON_SECRET` on Vercel for weekly dead-link cron
-3. Re-import seed if you want scholarship fields on existing Firestore docs (or edit in console)
+**Try Phase 3:** https://www.agrawalfoundation.org/library — use “Ask the library” or browse Learning paths.
 
-**Next build (Phase 3):** AI search assistant, learning paths, gamification.
+**Future (optional):** Gamification, monthly metadata refresh, top contributors page.

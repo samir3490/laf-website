@@ -1,0 +1,66 @@
+[
+  {
+    "id": "robotics",
+    "title": "Robotics Journey",
+    "description": "From Scratch blocks to Arduino and 3D design — a step-by-step path for young makers.",
+    "module": "robotics",
+    "steps": [
+      { "slug": "scratch", "label": "Visual coding with Scratch" },
+      { "slug": "code-org", "label": "Broader coding foundations" },
+      { "slug": "tinkercad", "label": "3D design and circuits" },
+      { "slug": "microbit", "label": "Program a micro:bit board" },
+      { "slug": "arduino-project-hub", "label": "Hands-on Arduino projects" },
+      { "slug": "mit-app-inventor", "label": "Build mobile apps" }
+    ]
+  },
+  {
+    "id": "coding",
+    "title": "Learn to Code",
+    "description": "Beginner-friendly coding websites from block-based tools to real programming.",
+    "module": "general",
+    "steps": [
+      { "slug": "code-org", "label": "Hour of Code and courses" },
+      { "slug": "scratch", "label": "Create games and stories" },
+      { "slug": "blockly-games", "label": "Puzzle-based programming" },
+      { "slug": "cs-first-google", "label": "Themed Scratch clubs" },
+      { "slug": "grasshopper", "label": "JavaScript on mobile" },
+      { "slug": "freecodecamp", "label": "Free web development certs" }
+    ]
+  },
+  {
+    "id": "english",
+    "title": "English Learning Path",
+    "description": "Stories, grammar, and practice for improving English at any level.",
+    "module": "general",
+    "steps": [
+      { "slug": "pratham-storyweaver", "label": "Free storybooks in Indian languages" },
+      { "slug": "british-council-learn-english", "label": "Grammar and skills" },
+      { "slug": "bbc-learning-english", "label": "Courses and videos" },
+      { "slug": "duolingo", "label": "Daily practice app" }
+    ]
+  },
+  {
+    "id": "scholarships",
+    "title": "Find Scholarships",
+    "description": "Official portals and trusted platforms to discover funding for school and college.",
+    "module": "scholarships",
+    "steps": [
+      { "slug": "national-scholarship-portal", "label": "Government of India portal" },
+      { "slug": "buddy4study", "label": "Search by eligibility" },
+      { "slug": "vidyasaarathi", "label": "Scholarships and education loans" }
+    ]
+  },
+  {
+    "id": "science",
+    "title": "Explore Science",
+    "description": "Interactive simulations, space, and math for curious learners.",
+    "module": "general",
+    "steps": [
+      { "slug": "khan-academy", "label": "Math and science lessons" },
+      { "slug": "phet-simulations", "label": "Interactive physics and chemistry" },
+      { "slug": "nasa-space-place", "label": "Space games and activities" },
+      { "slug": "national-geographic-kids", "label": "Animals and geography" },
+      { "slug": "mathigon", "label": "Beautiful math courses" }
+    ]
+  }
+]

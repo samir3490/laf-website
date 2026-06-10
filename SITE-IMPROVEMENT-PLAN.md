@@ -73,7 +73,8 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 1 follow-up: Gemini API key configured
   - [x] Phase 2 (core): Detail pages, scholarships/volunteer modules, search analytics, dead-link checks
   - [x] Phase 2 follow-up: Firestore rules + seed import verified; `CRON_SECRET` on Vercel
-  - [ ] Phase 3: Learning paths, AI assistant, gamification
+  - [x] Phase 3 (core): Learning paths + AI “Ask the library” smart search
+  - [ ] Phase 3 optional: Gamification, metadata refresh, top contributors
 
 ## Performance
 

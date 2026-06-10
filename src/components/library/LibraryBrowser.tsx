@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { addDoc, collection, onSnapshot, serverTimestamp } from "firebase/firestore";
+import LibrarySmartSearch from "@/components/library/LibrarySmartSearch";
 import ResourceCard from "@/components/library/ResourceCard";
 import {
   DEFAULT_LIBRARY_FILTERS,
@@ -34,6 +35,7 @@ type LibraryBrowserProps = {
   seedResources: LibraryResource[];
   initialModule?: string;
   showSubmitLink?: boolean;
+  showSmartSearch?: boolean;
 };
 
 const MODULE_TABS = [
@@ -45,6 +47,7 @@ export default function LibraryBrowser({
   seedResources,
   initialModule = "",
   showSubmitLink = true,
+  showSmartSearch = true,
 }: LibraryBrowserProps) {
   const config = getFirebaseConfig();
   const db = getFirebaseDb();
@@ -116,8 +119,19 @@ export default function LibraryBrowser({
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
+  function applySmartSearch(next: LibraryFilters, _summary: string) {
+    setFilters({
+      ...DEFAULT_LIBRARY_FILTERS,
+      ...next,
+      module: next.module || initialModule,
+    });
+    lastLoggedQuery.current = "";
+  }
+
   return (
     <div className="space-y-8">
+      {showSmartSearch && <LibrarySmartSearch onApply={applySmartSearch} />}
+
       <div className="rounded-2xl border border-laf-border bg-white p-6 lg:p-8 space-y-5">
         <div>
           <label htmlFor="library-search" className="sr-only">
