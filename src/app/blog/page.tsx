@@ -43,8 +43,10 @@ export default async function BlogPage({ searchParams }: Props) {
                     src={image}
                     alt=""
                     fill
+                    quality={75}
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    loading="lazy"
                   />
                 </Link>
                 <div className="p-6 flex flex-col flex-1">

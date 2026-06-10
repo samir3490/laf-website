@@ -384,6 +384,4 @@ Tracked under **Features not yet migrated** in `SITE-IMPROVEMENT-PLAN.md`.
 
 ---
 
-**Try Phase 3:** https://www.agrawalfoundation.org/library — use “Ask the library” or browse Learning paths.
-
-**Future (optional):** Gamification, monthly metadata refresh, top contributors page.
+**Current focus:** Site is feature-complete. Ongoing: library submission reviews, GSC monitoring. Gamification deferred.

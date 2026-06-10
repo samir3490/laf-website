@@ -14,6 +14,7 @@ export default function HomePage() {
           alt=""
           fill
           priority
+          quality={80}
           className="object-cover"
           sizes="100vw"
         />
@@ -38,6 +39,7 @@ export default function HomePage() {
               src={hero.image}
               alt="Lata Agrawal Foundation community mission"
               fill
+              quality={80}
               className="object-cover object-center"
               sizes="(max-width: 1280px) 45vw, 520px"
             />
@@ -56,7 +58,15 @@ export default function HomePage() {
                 className="rounded-2xl border border-laf-navy overflow-hidden bg-laf-cream hover:shadow-lg transition-shadow"
               >
                 <div className="relative h-44">
-                  <Image src={item.image} alt="" fill className="object-cover" sizes="33vw" />
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    quality={75}
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-laf-navy">{item.title}</h3>

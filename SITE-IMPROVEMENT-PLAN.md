@@ -10,7 +10,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] DNS fully propagated — `agrawalfoundation.org` shows new site
 - [x] Confirm Google email still works after DNS change (send/receive test)
 - [x] Submit sitemap in Google Search Console (`/sitemap.xml` — see SEO section)
-- [ ] Cancel BigRock WordPress hosting (after 1–2 weeks stable)
+- [x] BigRock WordPress hosting — **keeping** (not cancelling; WP remains available as backup)
 
 ## Branding & layout
 
@@ -80,20 +80,23 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Phase 3 env setup: `FIREBASE_SERVICE_ACCOUNT_JSON`, Turnstile keys on Vercel
   - [x] Phase 3 optional: Automated approval emails (when submitter opts in + GMAIL_* on Vercel)
   - [x] Admin email on new library submission (`/api/library/notify-submission`)
-  - [ ] Phase 3 optional: Gamification
+  - [x] Gmail on Vercel (same credentials as donor portal — configured Jun 2026)
+  - [ ] Phase 3 optional: Gamification — deferred until submission volume grows
 
 ## Performance
 
-- [x] Lighthouse audit on Home, Donate, Blog (Jun 2026)
+- [x] Lighthouse audit on Home, Donate, Blog (Jun 2026 baseline)
   - Home: Perf 63, SEO 92, A11y 96
   - Donate: Perf 86, SEO 100
   - Blog: Perf 65, SEO 100
 - [x] Confirm all images served from `/public/images` (no broken WP links)
 - [x] HubSpot + gtag load `afterInteractive` only (gtag via `Analytics.tsx`; HubSpot async on contact/volunteer only)
+- [x] Home hero — lighter WebP background + tuned image sizes (Jun 2026)
+- [ ] Re-run Lighthouse after deploy and note updated scores
 
 ---
 
-**Current focus:** Cancel BigRock WordPress hosting when ready. Set `GMAIL_*` on Vercel (same as donor portal — run `npm run sync:gmail-env` locally, then add to Vercel Production).
+**Current focus:** Site is feature-complete for launch. Ongoing: review library submissions, monitor GSC, optional gamification later.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
