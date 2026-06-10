@@ -1,6 +1,7 @@
 import Image from "next/image";
 import home from "@/content/home.json";
 import Button from "@/components/Button";
+import PageContainer from "@/components/PageContainer";
 
 export default function HomePage() {
   const { hero, impact, help } = home;
@@ -17,7 +18,7 @@ export default function HomePage() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-laf-navy/75" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-2 gap-12 items-center">
+        <PageContainer className="relative py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-white">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               {hero.title}
@@ -41,11 +42,11 @@ export default function HomePage() {
               sizes="(max-width: 1024px) 0vw, 50vw"
             />
           </div>
-        </div>
+        </PageContainer>
       </section>
 
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <h2 className="text-3xl md:text-4xl font-bold text-laf-navy text-center">Our Impact</h2>
           <div className="w-16 h-1 bg-laf-gold mx-auto mt-4 mb-12 rounded-full" />
           <div className="grid md:grid-cols-3 gap-8">
@@ -64,11 +65,11 @@ export default function HomePage() {
               </article>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </section>
 
       <section className="py-20 bg-laf-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <h2 className="text-3xl md:text-4xl font-bold text-laf-navy text-center">How You Can Help</h2>
           <div className="w-16 h-1 bg-laf-gold mx-auto mt-4 mb-12 rounded-full" />
           <div className="grid md:grid-cols-3 gap-6">
@@ -82,11 +83,11 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </section>
 
       <section className="py-20 bg-laf-navy text-white text-center">
-        <div className="max-w-3xl mx-auto px-4">
+        <PageContainer narrow className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold">Join Our Movement</h2>
           <p className="mt-4 text-white/85 leading-relaxed">
             Your support helps shape the future of children in need. Together, we can empower the next generation.
@@ -97,7 +98,7 @@ export default function HomePage() {
               Volunteer
             </Button>
           </div>
-        </div>
+        </PageContainer>
       </section>
     </>
   );

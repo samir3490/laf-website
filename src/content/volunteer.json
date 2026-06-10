@@ -1,0 +1,42 @@
+{
+  "whyTitle": "Why Volunteer?",
+  "whyIntro": "Volunteering with the Lata Agrawal Foundation is an opportunity to make a real difference in the lives of those in need. By contributing your time, skills, and passion, you become an essential part of our mission to uplift underprivileged communities.",
+  "benefits": [
+    {
+      "title": "Impact Lives",
+      "description": "Help provide food, education, healthcare, and support to those who need it most."
+    },
+    {
+      "title": "Develop Skills",
+      "description": "Gain valuable experience in community service, project management, and leadership."
+    },
+    {
+      "title": "Build Connections",
+      "description": "Work alongside like-minded individuals who share your commitment to social change."
+    },
+    {
+      "title": "Inspire Hope",
+      "description": "Be a source of encouragement and positivity for the people we serve."
+    }
+  ],
+  "howTitle": "How to Get Involved",
+  "howIntro": "Whether you want to volunteer, donate, or support our initiatives, your contribution can make a meaningful impact.",
+  "ways": [
+    {
+      "title": "Volunteer with Us",
+      "description": "Dedicate your time and skills — from food drives to mentoring children."
+    },
+    {
+      "title": "Make a Donation",
+      "description": "Financial support helps us provide food, education, and healthcare resources."
+    },
+    {
+      "title": "Partner with Us",
+      "description": "Corporate and community partnerships amplify our reach."
+    },
+    {
+      "title": "Spread the Word",
+      "description": "Share our mission and encourage others to get involved."
+    }
+  ]
+}

@@ -27,6 +27,22 @@ export function getPost(slug: string): WpPost | undefined {
 export function sanitizeHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<meta[^>]*>/gi, "")
     .replace(/on\w+="[^"]*"/gi, "")
     .replace(/on\w+='[^']*'/gi, "");
+}
+
+export function sanitizeBlogHtml(html: string): string {
+  return sanitizeHtml(html)
+    .replace(/<a[^>]*articly\.ai[^>]*>[\s\S]*?<\/a>/gi, "")
+    .replace(/style=['"]position:\s*absolute[^'"]*['"]/gi, "")
+    .replace(/class=['']post_imgs['']/gi, 'class="laf-post-img"');
+}
+
+export function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&[#\w]+;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }

@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
+import PageContainer from "@/components/PageContainer";
 import WpContent from "@/components/WpContent";
 import { getPage } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About Us",
-  description: "Learn about the Lata Agrawal Foundation mission, vision, and team.",
-};
+  description:
+    "Learn about the Lata Agrawal Foundation — our mission, vision, and impact in education and community programs across India.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   const page = getPage("about-us");
@@ -15,9 +19,9 @@ export default function AboutPage() {
   return (
     <>
       <PageHeader title="About Us" subtitle="Empowering smiles, changing lives" />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+      <PageContainer className="py-12 lg:py-16">
         <WpContent html={page.html} />
-      </div>
+      </PageContainer>
     </>
   );
 }

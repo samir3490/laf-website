@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import HubSpotForm from "@/components/HubSpotForm";
+import PageContainer from "@/components/PageContainer";
 import { getSite } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with the Lata Agrawal Foundation.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Contact Us",
+  description:
+    "Contact the Lata Agrawal Foundation — Wardha, Maharashtra. Email, phone, or send a message via our form.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   const site = getSite();
@@ -14,7 +18,7 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader title="Contact Us" subtitle="We would love to hear from you" />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+      <PageContainer className="py-12 lg:py-16">
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="rounded-xl border border-laf-border bg-white p-6">
             <h2 className="font-semibold text-laf-navy">Email</h2>
@@ -37,7 +41,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-bold text-laf-navy text-center mb-8">Get in Touch</h2>
           <HubSpotForm formKey="contact" />
         </section>
-      </div>
+      </PageContainer>
     </>
   );
 }

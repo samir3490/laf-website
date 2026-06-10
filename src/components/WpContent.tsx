@@ -1,15 +1,17 @@
-import { sanitizeHtml } from "@/lib/content";
+import { sanitizeBlogHtml, sanitizeHtml } from "@/lib/content";
 
 type WpContentProps = {
   html: string;
   className?: string;
+  blog?: boolean;
 };
 
-export default function WpContent({ html, className = "" }: WpContentProps) {
+export default function WpContent({ html, className = "", blog = false }: WpContentProps) {
+  const clean = blog ? sanitizeBlogHtml(html) : sanitizeHtml(html);
   return (
     <div
-      className={`laf-prose max-w-none ${className}`}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+      className={`laf-prose max-w-none ${blog ? "laf-blog-prose" : ""} ${className}`}
+      dangerouslySetInnerHTML={{ __html: clean }}
     />
   );
 }

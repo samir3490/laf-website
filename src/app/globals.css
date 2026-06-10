@@ -99,3 +99,56 @@ body {
 .hubspot-form-wrapper .hs-button:hover {
   background-color: var(--color-laf-gold-bright) !important;
 }
+
+/* Blog post cleanup (articly / WP export) */
+.laf-blog-prose .post_toc {
+  background: white;
+  border: 1px solid var(--laf-border, #d4cfc4);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.laf-blog-prose .post_toc_title {
+  font-weight: 600;
+  color: var(--laf-navy);
+  margin-bottom: 0.75rem;
+}
+
+.laf-blog-prose .post_toc_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.laf-blog-prose .post_toc_list_item {
+  margin: 0.35rem 0;
+}
+
+.laf-blog-prose .post_toc_list_item_a {
+  color: var(--laf-gold);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.laf-blog-prose .post_toc_list_item_a:hover {
+  text-decoration: underline;
+}
+
+.laf-blog-prose .post_hdline {
+  margin: 2rem 0;
+}
+
+.laf-blog-prose .laf-post-img,
+.laf-blog-prose .post_imgs {
+  border-radius: 0.75rem;
+  width: 100%;
+  height: auto;
+  margin: 1.25rem 0;
+}
+
+.laf-blog-prose .post_close {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--laf-border, #d4cfc4);
+}

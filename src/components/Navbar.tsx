@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import PageContainer from "@/components/PageContainer";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -38,25 +39,27 @@ export default function Navbar() {
           : "bg-laf-navy/95 backdrop-blur-md"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-[4.5rem]">
+      <PageContainer className="!px-4 sm:!px-6 lg:!px-10">
+        <div className="flex items-center justify-between h-[4.25rem] lg:h-[5rem] gap-4">
           <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src="/logo.png"
-              alt="Lata Agrawal Foundation"
-              width={200}
-              height={38}
-              className={`h-8 lg:h-9 w-auto ${scrolled ? "" : "brightness-0 invert"}`}
-              priority
-            />
+            <span className="rounded-lg bg-laf-cream px-2 py-1 shadow-sm">
+              <Image
+                src="/logo-square.png"
+                alt="Lata Agrawal Foundation"
+                width={56}
+                height={56}
+                className="h-11 w-11 lg:h-12 lg:w-12 object-contain"
+                priority
+              />
+            </span>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-5">
+          <div className="hidden lg:flex items-center gap-5 flex-1 justify-end">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors whitespace-nowrap ${
                   pathname === link.href
                     ? "text-laf-gold"
                     : scrolled
@@ -69,7 +72,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/donate"
-              className="px-4 py-2 rounded-lg text-sm font-semibold bg-laf-gold text-white hover:bg-laf-gold-bright transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-laf-gold text-white hover:bg-laf-gold-bright transition-colors whitespace-nowrap"
             >
               Donate Now
             </Link>
@@ -90,7 +93,7 @@ export default function Navbar() {
             </svg>
           </button>
         </div>
-      </div>
+      </PageContainer>
 
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-laf-border px-4 py-4 space-y-1">

@@ -4,7 +4,9 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Analytics from "@/components/Analytics";
+import JsonLd from "@/components/JsonLd";
 import { getSite } from "@/lib/content";
+import { organizationJsonLd, siteUrl } from "@/lib/seo";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -14,6 +16,7 @@ const jakarta = Plus_Jakarta_Sans({
 const site = getSite();
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: `${site.name} | Education & Community Programs`,
     template: `%s | ${site.name}`,
@@ -29,9 +32,10 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   icons: {
-    icon: "/favicon.jpg",
-    apple: "/favicon.jpg",
+    icon: "/favicon.png",
+    apple: "/favicon.png",
   },
+  alternates: { canonical: siteUrl() },
 };
 
 export default function RootLayout({
@@ -41,9 +45,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${jakarta.className} min-h-screen flex flex-col`}>
         <Navbar />
-        <main className="flex-1 pt-16 lg:pt-[4.5rem]">{children}</main>
+        <main className="flex-1 pt-[4.25rem] lg:pt-[5rem]">{children}</main>
         <Footer />
         <Analytics />
+        <JsonLd data={organizationJsonLd()} />
       </body>
     </html>
   );

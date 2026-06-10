@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import PageContainer from "@/components/PageContainer";
 import { getSite } from "@/lib/content";
 
 export default function Footer() {
@@ -6,15 +8,17 @@ export default function Footer() {
 
   return (
     <footer className="bg-laf-navy text-white mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div>
-            <p className="font-bold text-lg">
-              <span className="text-laf-gold">Lata Agrawal</span> Foundation
-            </p>
-            <p className="mt-3 text-white/75 text-sm leading-relaxed">
-              {site.tagline}
-            </p>
+      <PageContainer className="py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="md:col-span-1">
+            <Image
+              src="/logo-square.png"
+              alt="Lata Agrawal Foundation"
+              width={80}
+              height={80}
+              className="h-16 w-16 object-contain rounded-lg bg-laf-cream p-1"
+            />
+            <p className="mt-4 text-white/75 text-sm leading-relaxed">{site.tagline}</p>
           </div>
           <div>
             <p className="font-semibold text-laf-gold mb-3">Quick Links</p>
@@ -26,12 +30,17 @@ export default function Footer() {
               <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
             </ul>
           </div>
-          <div>
+          <div className="md:col-span-2">
             <p className="font-semibold text-laf-gold mb-3">Contact</p>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <a href={`mailto:${site.contact.email}`} className="hover:text-white">
                   {site.contact.email}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${site.contact.phone.replace(/\s/g, "")}`} className="hover:text-white">
+                  {site.contact.phone}
                 </a>
               </li>
               <li>{site.contact.address}</li>
@@ -45,7 +54,7 @@ export default function Footer() {
             <Link href="/terms-conditions" className="hover:text-white">Terms</Link>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </footer>
   );
 }
