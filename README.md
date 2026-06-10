@@ -37,7 +37,7 @@ Content JSON then references local paths like `/images/2024/12/mission-ngo-lata.
 
 Route: `/community-scratch-games` — public gallery of MIT Scratch embeds; signed-in users can publish, edit, and delete their own games (Firebase Auth + Firestore, project **`lata-agrawal-foundation`** — same as 80G Receipts, Donor Transparency, Social Media Hub).
 
-**Vercel environment variables** — see values in `.env.example` / project README section “Vercel Firebase env vars”.
+**Vercel environment variables** — copy all `NEXT_PUBLIC_FIREBASE_*` values from `.env.example` (LAF Website web app: `8de8c027a5fe7bd46107ad`).
 
 Enable **Email/Password** in Firebase Console → Authentication (`lata-agrawal-foundation`). Deploy Firestore rules:
 
