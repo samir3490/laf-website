@@ -1,26 +1,28 @@
 import { NextResponse } from "next/server";
 import seedResources from "@/content/library-resources.json";
+import { verifyLibraryAdminRequest } from "@/lib/firebase-admin-auth";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
+import { isLibraryAdmin } from "@/lib/library";
 import { checkLibraryUrl } from "@/lib/library-link-check";
 import { normalizeLibraryUrl } from "@/lib/library-url";
 
-const rateMap = new Map<string, number>();
-
 export const maxDuration = 60;
 
-export async function GET(req: Request) {
+async function isAuthorized(req: Request): Promise<boolean> {
   const cronSecret = process.env.CRON_SECRET;
   const auth = req.headers.get("authorization");
-  const isCron = Boolean(cronSecret && auth === `Bearer ${cronSecret}`);
+  if (cronSecret && auth === `Bearer ${cronSecret}`) return true;
 
-  if (!isCron) {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-    const count = rateMap.get(ip) ?? 0;
-    if (count >= 3) {
-      return NextResponse.json({ error: "Rate limit exceeded." }, { status: 429 });
-    }
-    rateMap.set(ip, count + 1);
+  const email = await verifyLibraryAdminRequest(req);
+  return Boolean(email && isLibraryAdmin(email));
+}
+
+export async function GET(req: Request) {
+  if (!(await isAuthorized(req))) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
+
+  const isCron = req.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`;
 
   const results: {
     slug: string;
@@ -39,7 +41,7 @@ export async function GET(req: Request) {
     seen.add(item.slug);
   }
 
-  const adminDb = isCron ? getFirebaseAdminDb() : null;
+  const adminDb = getFirebaseAdminDb();
   if (adminDb) {
     const snap = await adminDb.collection("library_resources").get();
     for (const doc of snap.docs) {

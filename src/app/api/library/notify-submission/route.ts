@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSite } from "@/lib/content";
-import { ADMIN_EMAIL } from "@/lib/library";
-import { sendFoundationEmail, isMailConfigured } from "@/lib/mail";
-import { isTurnstileEnabled, verifyTurnstileToken } from "@/lib/turnstile";
+import { notifyAdminOfLibrarySubmission } from "@/lib/library-notify-submission";
+import { normalizeLibraryUrl } from "@/lib/library-url";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
+import { isMailConfigured } from "@/lib/mail";
+import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
 
 export const maxDuration = 30;
 
@@ -14,8 +15,18 @@ type NotifySubmissionBody = {
   turnstileToken?: string;
 };
 
+/** Legacy endpoint — prefer /api/library/submit which saves and notifies in one step. */
 export async function POST(req: Request) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = clientIp(req);
+
+  if (!checkRateLimit(`library-notify:${ip}`, 5, 60 * 60 * 1000)) {
+    return NextResponse.json({ error: "Rate limit exceeded." }, { status: 429 });
+  }
+
+  const turnstileError = requireTurnstileInProduction();
+  if (turnstileError) {
+    return NextResponse.json({ error: turnstileError }, { status: 503 });
+  }
 
   let body: NotifySubmissionBody;
   try {
@@ -32,8 +43,8 @@ export async function POST(req: Request) {
     }
   }
 
-  const url = typeof body.url === "string" ? body.url.trim() : "";
-  const title = typeof body.title === "string" ? body.title.trim() : "";
+  const url = normalizeLibraryUrl(typeof body.url === "string" ? body.url : "") ?? "";
+  const title = typeof body.title === "string" ? body.title.trim().slice(0, 200) : "";
   if (!url || !title) {
     return NextResponse.json({ error: "Missing url or title." }, { status: 400 });
   }
@@ -45,39 +56,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const site = getSite();
-  const adminUrl = `${site.url.replace(/\/$/, "")}/admin/library`;
-  const submitter = body.contributorDisplayName?.trim();
-  const email = body.submitterEmail?.trim();
-
-  const detailLines = [
-    `Title: ${title}`,
-    `URL: ${url}`,
-    submitter ? `Submitted by: ${submitter}` : null,
-    email ? `Contact email: ${email}` : null,
-  ].filter(Boolean);
-
-  const sent = await sendFoundationEmail({
-    to: ADMIN_EMAIL,
-    subject: `New library submission for review — ${title}`,
-    text: [
-      `A new learning resource was submitted on ${site.name}.`,
-      "",
-      ...detailLines,
-      "",
-      `Review in admin: ${adminUrl}`,
-    ].join("\n"),
-    html: [
-      `<p>A new learning resource was submitted on <strong>${site.name}</strong>.</p>`,
-      "<ul>",
-      `<li><strong>Title:</strong> ${title}</li>`,
-      `<li><strong>URL:</strong> <a href="${url}">${url}</a></li>`,
-      submitter ? `<li><strong>Submitted by:</strong> ${submitter}</li>` : "",
-      email ? `<li><strong>Contact email:</strong> <a href="mailto:${email}">${email}</a></li>` : "",
-      "</ul>",
-      `<p><a href="${adminUrl}">Open admin queue</a></p>`,
-    ].join(""),
-    replyTo: email || undefined,
+  const sent = await notifyAdminOfLibrarySubmission({
+    url,
+    title,
+    submitterEmail: body.submitterEmail,
+    contributorDisplayName: body.contributorDisplayName,
   });
 
   if (!sent) {

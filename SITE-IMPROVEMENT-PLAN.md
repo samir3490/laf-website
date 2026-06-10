@@ -95,9 +95,21 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Home hero — lighter WebP background + tuned image sizes (Jun 2026)
 - [ ] Re-run Lighthouse after deploy and note updated scores
 
+## Security (Jun 2026)
+
+- [x] SSRF protection on library URL fetches (DNS + private IP blocklist, safe redirects)
+- [x] Library submissions via server API only — Firestore client create disabled
+- [x] `/api/library/check-links` — cron secret or admin Firebase token only
+- [x] Security headers (HSTS, X-Frame-Options, nosniff, Referrer-Policy)
+- [x] Rate limits on submit + notify-submission; HTML-escaped admin emails
+- [x] `scratchUsers` read restricted to owner
+- [x] `robots.txt` disallows `/admin`
+- [ ] **Re-publish Firestore rules** in Firebase Console (`firebase-laf/firestore.rules`)
+- [ ] Firebase App Check (optional — reduces scripted Firestore abuse)
+
 ---
 
-**Current focus:** Site is feature-complete for launch. Ongoing: review library submissions, monitor GSC, optional gamification later.
+**Current focus:** Re-publish Firestore rules after security update. Ongoing: library submission reviews, GSC monitoring.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

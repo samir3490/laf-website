@@ -136,10 +136,14 @@ export default function AdminLibraryApp() {
   }, [db, isAdmin]);
 
   async function handleLinkCheck() {
+    if (!auth || !user) return;
     setCheckingLinks(true);
     setLinkCheckResult("");
     try {
-      const res = await fetch("/api/library/check-links");
+      const token = await user.getIdToken();
+      const res = await fetch("/api/library/check-links", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (!res.ok) {
         setLinkCheckResult(data.error ?? "Link check failed.");

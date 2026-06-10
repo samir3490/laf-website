@@ -65,18 +65,24 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+import { safeFetch } from "@/lib/safe-fetch-url";
+
 export async function fetchPageMetadata(rawUrl: string): Promise<PageMetadata | null> {
   const url = normalizeLibraryUrl(rawUrl);
   if (!url) return null;
 
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "LAF-Library-Bot/1.0 (+https://www.agrawalfoundation.org/library)",
-      Accept: "text/html,application/xhtml+xml",
-    },
-    signal: AbortSignal.timeout(15000),
-    redirect: "follow",
-  });
+  let res: Response;
+  try {
+    res = await safeFetch(url, {
+      headers: {
+        "User-Agent": "LAF-Library-Bot/1.0 (+https://www.agrawalfoundation.org/library)",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch {
+    return null;
+  }
 
   if (!res.ok) return null;
 

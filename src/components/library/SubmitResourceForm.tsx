@@ -1,51 +1,14 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import {
-  addDoc,
-  collection,
-  getDocs,
-  query,
-  serverTimestamp,
-  where,
-} from "firebase/firestore";
 import Link from "next/link";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
-import {
-  getFirebaseConfig,
-  getFirebaseDb,
-  LIBRARY_RESOURCES_COLLECTION,
-  LIBRARY_SUBMISSIONS_COLLECTION,
-} from "@/lib/firebase";
+import { getFirebaseConfig } from "@/lib/firebase";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
-type AnalysisResult = {
-  url: string;
-  urlNormalized: string;
-  title: string;
-  description: string;
-  ogImage?: string;
-  favicon?: string;
-  categories: string[];
-  ageGroups: string[];
-  difficulty: string;
-  cost: string;
-  languages: string[];
-  module: string;
-  safetyScore: number;
-  educationalScore: number;
-  rejected: boolean;
-  rejectReason: string | null;
-  eligibility?: string | null;
-  deadline?: string | null;
-  ageMin?: number | null;
-  ageMax?: number | null;
-};
-
 export default function SubmitResourceForm() {
   const config = getFirebaseConfig();
-  const db = getFirebaseDb();
 
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
@@ -63,10 +26,6 @@ export default function SubmitResourceForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!db) {
-      setError("Library is not configured yet. Please try again later.");
-      return;
-    }
 
     if (turnstileRequired && !turnstileToken) {
       setError("Please complete the captcha.");
@@ -85,73 +44,21 @@ export default function SubmitResourceForm() {
         body: JSON.stringify({
           url,
           turnstileToken: turnstileToken || undefined,
+          submitterEmail: email.trim() || undefined,
+          contributorDisplayName: displayName.trim() || undefined,
+          notifyOnApproval: notifyOnApproval && Boolean(email.trim()),
         }),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Submission failed.");
+        if (data.rejected) {
+          setRejected(true);
+          setError(data.rejectReason ?? "This website did not pass our safety review.");
+        } else {
+          setError(data.error ?? "Submission failed.");
+        }
         return;
-      }
-
-      const analysis = data as AnalysisResult;
-
-      if (analysis.rejected) {
-        setRejected(true);
-        setError(analysis.rejectReason ?? "This website did not pass our safety review.");
-        return;
-      }
-
-      const dupQuery = query(
-        collection(db, LIBRARY_RESOURCES_COLLECTION),
-        where("urlNormalized", "==", analysis.urlNormalized)
-      );
-      const dupSnap = await getDocs(dupQuery);
-      if (!dupSnap.empty) {
-        setError("This website is already in our library.");
-        return;
-      }
-
-      await addDoc(collection(db, LIBRARY_SUBMISSIONS_COLLECTION), {
-        url: analysis.url,
-        urlNormalized: analysis.urlNormalized,
-        title: analysis.title,
-        description: analysis.description,
-        ogImage: analysis.ogImage ?? "",
-        favicon: analysis.favicon ?? "",
-        categories: analysis.categories,
-        ageGroups: analysis.ageGroups,
-        difficulty: analysis.difficulty,
-        cost: analysis.cost,
-        languages: analysis.languages,
-        module: analysis.module,
-        safetyScore: analysis.safetyScore,
-        educationalScore: analysis.educationalScore,
-        status: "pending",
-        submitterEmail: email.trim() || null,
-        contributorDisplayName: displayName.trim() || null,
-        notifyOnApproval: notifyOnApproval && Boolean(email.trim()),
-        eligibility: analysis.eligibility ?? null,
-        deadline: analysis.deadline ?? null,
-        ageMin: analysis.ageMin ?? null,
-        ageMax: analysis.ageMax ?? null,
-        createdAt: serverTimestamp(),
-      });
-
-      try {
-        await fetch("/api/library/notify-submission", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            url: analysis.url,
-            title: analysis.title,
-            submitterEmail: email.trim() || null,
-            contributorDisplayName: displayName.trim() || null,
-            turnstileToken: turnstileToken || undefined,
-          }),
-        });
-      } catch {
-        // Submission saved; admin email is best-effort.
       }
 
       setDone(true);
@@ -167,7 +74,7 @@ export default function SubmitResourceForm() {
     }
   }
 
-  if (!config || !db) {
+  if (!config) {
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
         <p className="text-laf-navy font-semibold">Library setup required</p>

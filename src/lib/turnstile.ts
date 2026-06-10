@@ -1,6 +1,6 @@
 export async function verifyTurnstileToken(token: string, ip?: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET;
-  if (!secret) return true;
+  if (!secret) return false;
 
   if (!token) return false;
 
@@ -25,4 +25,14 @@ export async function verifyTurnstileToken(token: string, ip?: string): Promise<
 
 export function isTurnstileEnabled(): boolean {
   return Boolean(process.env.TURNSTILE_SECRET && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+}
+
+/** Fail closed when the public site key is set but the server secret is missing. */
+export function requireTurnstileInProduction(): string | null {
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const secret = process.env.TURNSTILE_SECRET;
+  if (process.env.NODE_ENV === "production" && siteKey && !secret) {
+    return "Captcha is misconfigured on the server. Please contact the site administrator.";
+  }
+  return null;
 }
