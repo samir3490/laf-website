@@ -70,7 +70,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ## Performance
 
-- [ ] Lighthouse audit on Home, Donate, Blog
+- [ ] Lighthouse audit on Home, Donate, Blog (Home: Perf 63, SEO 92, A11y 96 — Jun 2026)
 - [x] Confirm all images served from `/public/images` (no broken WP links)
 - [ ] HubSpot + gtag load `afterInteractive` only
 
