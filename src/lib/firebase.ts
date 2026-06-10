@@ -62,3 +62,5 @@ export const LIBRARY_REPORTS_COLLECTION = "library_reports";
 export const LIBRARY_SEARCH_EVENTS_COLLECTION = "library_search_events";
 export const LIBRARY_CONTRIBUTORS_COLLECTION = "library_contributors";
 export const LIBRARY_SETTINGS_COLLECTION = "library_settings";
+export const GOOGLE_REVIEWS_COLLECTION = "google_reviews";
+export const GOOGLE_REVIEWS_META_COLLECTION = "google_reviews_meta";

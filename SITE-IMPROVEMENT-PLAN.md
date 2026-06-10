@@ -65,7 +65,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — LAF Website web app)
   - [x] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
 - [x] Photo gallery (`/gallery`)
-- [ ] Google Reviews QR / testimonial page
+- [x] Google Reviews QR / testimonial page (`/reviews` — daily sync cron + QR code)
 - [ ] Donor dashboard (if still needed)
 - [x] **Learning Resource Library** — see [`LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md`](./LAF-LEARNING-RESOURCE-LIBRARY-PLAN.md)
   - [x] Phase 0: Seed 58 resources, browse + search at `/library`
@@ -90,7 +90,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus:** Monitor site stability for 1–2 weeks, then cancel BigRock WordPress hosting. Optional: Google Reviews page, blog performance tuning (Perf 65), top-10 blog review.
+**Current focus:** Set up Google review sync on Vercel (see `.env.example`), publish Firestore rules, then cancel BigRock WordPress after 1–2 weeks stable.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app
