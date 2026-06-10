@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Analytics from "@/components/Analytics";
 import JsonLd from "@/components/JsonLd";
+import { ThemeShell } from "@/components/theme/ThemeShell";
 import { getSite } from "@/lib/content";
 import { organizationJsonLd, siteUrl } from "@/lib/seo";
 
@@ -45,15 +46,33 @@ export const metadata: Metadata = {
     : {}),
 };
 
+const themeFlashScript = `
+try {
+  var p = new URLSearchParams(location.search);
+  var q = p.get('theme');
+  var stored = localStorage.getItem('laf-theme');
+  var theme = q === 'playful' || q === 'classic' ? q : (stored === 'playful' ? 'playful' : 'classic');
+  if (theme === 'playful') {
+    document.documentElement.dataset.theme = 'playful';
+    document.documentElement.classList.add('theme-playful');
+  }
+} catch (e) {}
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeFlashScript }} />
+      </head>
       <body className={`${jakarta.className} min-h-screen flex flex-col`}>
-        <Navbar />
-        <main className="flex-1 pt-[4.25rem] lg:pt-[5rem]">{children}</main>
-        <Footer />
+        <ThemeShell>
+          <Navbar />
+          <main className="flex-1 pt-[4.25rem] lg:pt-[5rem]">{children}</main>
+          <Footer />
+        </ThemeShell>
         <Analytics />
         <JsonLd data={organizationJsonLd()} />
       </body>

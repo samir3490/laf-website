@@ -18,6 +18,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 - [x] Wider page container (less side whitespace)
 - [x] Navbar logo sizing + contrast on dark header
 - [x] Horizontal logo in navbar and footer (`logo.png` — gold emblem + navy wordmark, larger on desktop)
+- [ ] Playful learning theme — **preview only** at `/preview/learning-theme` (classic remains default; revert anytime)
 - [x] Footer logo update to match new brand
 - [x] Social media links (Facebook, Instagram, LinkedIn, YouTube)
 

@@ -1,0 +1,192 @@
+/* Playful learning theme — only active when html[data-theme="playful"] */
+
+html[data-theme="playful"] {
+  --color-laf-cream: #fff9f0;
+  --color-laf-navy: #0f3d5c;
+  --color-laf-gold: #e8a317;
+  --color-laf-gold-bright: #f5c542;
+  --laf-cream: #fff9f0;
+  --laf-navy: #0f3d5c;
+  --laf-gold: #e8a317;
+}
+
+html[data-theme="playful"] body {
+  background: linear-gradient(165deg, #fff9f0 0%, #fef3c7 35%, #e0f2fe 100%);
+  background-attachment: fixed;
+}
+
+/* Floating animations */
+@keyframes playful-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--playful-rotate, 0deg));
+  }
+  50% {
+    transform: translateY(-12px) rotate(calc(var(--playful-rotate, 0deg) + 3deg));
+  }
+}
+
+@keyframes playful-float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes playful-spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes playful-wiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+html[data-theme="playful"] .playful-float {
+  animation: playful-float 6s ease-in-out infinite;
+}
+
+html[data-theme="playful"] .playful-float-slow {
+  animation: playful-float-slow 8s ease-in-out infinite;
+}
+
+html[data-theme="playful"] .playful-spin-slow {
+  animation: playful-spin-slow 40s linear infinite;
+}
+
+html[data-theme="playful"] .playful-hand {
+  animation-name: playful-wiggle;
+  animation-duration: 4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+html[data-theme="playful"] .playful-backdrop-grid {
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+}
+
+html[data-theme="playful"] .playful-doodle {
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Navbar */
+html[data-theme="playful"] nav {
+  background: linear-gradient(90deg, #0f3d5c 0%, #1e5a7a 50%, #0f4c5c 100%) !important;
+  border-bottom: 3px solid transparent !important;
+  border-image: linear-gradient(90deg, #facc15, #4ade80, #38bdf8, #f472b6) 1 !important;
+}
+
+html[data-theme="playful"] nav a[class*="text-laf-gold"] {
+  color: #fde047 !important;
+}
+
+/* Page headers — rainbow underline */
+html[data-theme="playful"] section.bg-laf-navy {
+  background: linear-gradient(135deg, #0f3d5c 0%, #155e75 50%, #0f3d5c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+html[data-theme="playful"] section.bg-laf-navy::before {
+  content: "✋ 📐 🔬 🐘 📚";
+  position: absolute;
+  inset: 0;
+  font-size: 2rem;
+  opacity: 0.08;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  pointer-events: none;
+}
+
+html[data-theme="playful"] section.bg-laf-navy .bg-laf-gold,
+html[data-theme="playful"] section.bg-laf-navy [class*="bg-laf-gold"] {
+  background: linear-gradient(90deg, #facc15, #4ade80, #38bdf8) !important;
+  height: 4px !important;
+}
+
+/* Cards & sections */
+html[data-theme="playful"] .rounded-2xl.border {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+html[data-theme="playful"] .rounded-2xl.border:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 61, 92, 0.12);
+}
+
+html[data-theme="playful"] .laf-impact-card,
+html[data-theme="playful"] article.rounded-2xl {
+  border-color: #7dd3fc !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%) !important;
+}
+
+html[data-theme="playful"] .laf-impact-number {
+  background: linear-gradient(135deg, #e8a317, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Primary buttons */
+html[data-theme="playful"] a.bg-laf-gold,
+html[data-theme="playful"] button.bg-laf-gold {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+}
+
+html[data-theme="playful"] a.bg-laf-gold:hover,
+html[data-theme="playful"] button.bg-laf-gold:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%) !important;
+}
+
+/* Footer accent */
+html[data-theme="playful"] footer.bg-laf-navy {
+  background: linear-gradient(180deg, #0f3d5c 0%, #0c2a3e 100%);
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, #facc15, #4ade80, #38bdf8) 1;
+}
+
+/* Extra bottom padding when preview bar visible */
+html[data-theme="playful"] body {
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 640px) {
+  html[data-theme="playful"] body {
+    padding-bottom: 4rem;
+  }
+}
+
+/* Home hero playful tint */
+html[data-theme="playful"] section.min-h-\[70vh\] .bg-laf-navy\/75 {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 61, 92, 0.82) 0%,
+    rgba(21, 94, 117, 0.75) 50%,
+    rgba(180, 83, 9, 0.35) 100%
+  ) !important;
+}
+
+html[data-theme="playful"] ::selection {
+  background-color: #38bdf8;
+  color: #0f3d5c;
+}
