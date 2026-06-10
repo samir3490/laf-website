@@ -1,12 +1,12 @@
 "use client";
 
 import { PlayfulBackdrop } from "@/components/theme/PlayfulBackdrop";
-import { PlayfulBackdropSoft } from "@/components/theme/PlayfulBackdropSoft";
 import { ThemePreviewBar } from "@/components/theme/ThemePreviewBar";
 import {
   THEME_PREVIEW_KEY,
   THEME_STORAGE_KEY,
   isPreviewTheme,
+  normalizeTheme,
   parseThemeParam,
   type SiteTheme,
 } from "@/lib/theme";
@@ -16,14 +16,16 @@ import { useEffect, useState } from "react";
 function readStoredTheme(): SiteTheme {
   if (typeof window === "undefined") return "classic";
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (stored === "playful-soft" || stored === "playful") return stored;
+  if (stored === "playful-soft" || stored === "playful") return normalizeTheme(stored);
+  if (stored === "classic") return "classic";
   return "classic";
 }
 
 function applyTheme(theme: SiteTheme) {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.classList.toggle("theme-playful", theme === "playful");
-  document.documentElement.classList.toggle("theme-playful-soft", theme === "playful-soft");
+  const active = normalizeTheme(theme);
+  document.documentElement.dataset.theme = active;
+  document.documentElement.classList.toggle("theme-playful", active === "playful");
+  document.documentElement.classList.remove("theme-playful-soft");
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -35,34 +37,40 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const paramTheme = parseThemeParam(searchParams.get("theme"));
     const stored = readStoredTheme();
-    const nextTheme = paramTheme ?? stored;
+    const nextTheme = normalizeTheme(paramTheme ?? stored);
 
     applyTheme(nextTheme);
     setTheme(nextTheme);
 
     if (isPreviewTheme(nextTheme)) {
       sessionStorage.setItem(THEME_PREVIEW_KEY, "1");
+      if (searchParams.get("theme") === "playful-soft") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("theme", "playful");
+        window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+      }
     }
 
     setReady(true);
   }, [searchParams, pathname]);
 
   const setSiteTheme = (next: SiteTheme) => {
-    if (next === "classic") {
+    const active = normalizeTheme(next);
+    if (active === "classic") {
       localStorage.setItem(THEME_STORAGE_KEY, "classic");
       sessionStorage.removeItem(THEME_PREVIEW_KEY);
     } else {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
+      localStorage.setItem(THEME_STORAGE_KEY, active);
       sessionStorage.setItem(THEME_PREVIEW_KEY, "1");
     }
-    applyTheme(next);
-    setTheme(next);
+    applyTheme(active);
+    setTheme(active);
 
     const url = new URL(window.location.href);
-    if (next === "classic") {
+    if (active === "classic") {
       url.searchParams.delete("theme");
     } else {
-      url.searchParams.set("theme", next);
+      url.searchParams.set("theme", active);
     }
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
   };
@@ -70,7 +78,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {ready && theme === "playful" && <PlayfulBackdrop />}
-      {ready && theme === "playful-soft" && <PlayfulBackdropSoft />}
       <div className="relative z-[1] flex min-h-screen flex-col">{children}</div>
       {ready && (
         <ThemePreviewBar theme={theme} onThemeChange={setSiteTheme} pathname={pathname} />

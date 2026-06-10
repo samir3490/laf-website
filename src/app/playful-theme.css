@@ -74,17 +74,96 @@ html[data-theme="playful"] .playful-hand {
   animation-iteration-count: infinite;
 }
 
-html[data-theme="playful"] .playful-backdrop-grid {
-  background-image:
-    linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+/* Side gutters only — decorations stay out of the reading column */
+.playful-gutter {
+  position: fixed;
+  top: 5rem;
+  bottom: 4.5rem;
+  width: max(0px, calc((100vw - 1480px) / 2));
+  max-width: 280px;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-html[data-theme="playful"] .playful-doodle {
+.playful-gutter-left {
+  left: 0;
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.55) 0%, transparent 100%);
+}
+
+.playful-gutter-right {
+  right: 0;
+  background: linear-gradient(270deg, rgba(224, 242, 254, 0.55) 0%, transparent 100%);
+}
+
+@media (max-width: 1499px) {
+  .playful-gutter {
+    display: none;
+  }
+}
+
+html[data-theme="playful"] .playful-gutter-grid {
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.7;
+}
+
+@keyframes playful-drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+html[data-theme="playful"] .playful-drift {
+  animation: playful-drift 10s ease-in-out infinite;
+}
+
+html[data-theme="playful"] .playful-label {
   font-family: Georgia, "Times New Roman", serif;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+html[data-theme="playful"] .playful-label-math {
+  color: #6366f1;
+}
+
+html[data-theme="playful"] .playful-label-science {
+  color: #0ea5e9;
+}
+
+html[data-theme="playful"] .playful-label-chem {
+  color: #059669;
+}
+
+html[data-theme="playful"] .playful-label-bio {
+  color: #16a34a;
+}
+
+html[data-theme="playful"] .playful-label-career {
+  color: #d97706;
+}
+
+html[data-theme="playful"] .playful-label-english {
+  color: #db2777;
+}
+
+/* Solid reading surfaces — gradient shows only in side margins */
+html[data-theme="playful"] main > section:not(.bg-laf-navy):not(.min-h-\[70vh\]) {
+  background-color: #fffef9;
+}
+
+html[data-theme="playful"] main > section.bg-white {
+  background-color: #ffffff !important;
+}
+
+html[data-theme="playful"] main > section.bg-laf-cream {
+  background-color: var(--color-laf-cream) !important;
 }
 
 /* Navbar */
@@ -103,18 +182,6 @@ html[data-theme="playful"] section.bg-laf-navy {
   background: linear-gradient(135deg, #0f3d5c 0%, #155e75 50%, #0f3d5c 100%);
   position: relative;
   overflow: hidden;
-}
-
-html[data-theme="playful"] section.bg-laf-navy::before {
-  content: "✋ 📐 🔬 🐘 📚";
-  position: absolute;
-  inset: 0;
-  font-size: 2rem;
-  opacity: 0.08;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  pointer-events: none;
 }
 
 html[data-theme="playful"] section.bg-laf-navy .bg-laf-gold,

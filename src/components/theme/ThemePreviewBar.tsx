@@ -38,15 +38,6 @@ export function ThemePreviewBar({ theme, onThemeChange, pathname }: ThemePreview
           >
             Revert to classic
           </button>
-          {theme !== "playful-soft" && (
-            <button
-              type="button"
-              onClick={() => onThemeChange("playful-soft")}
-              className="rounded-lg bg-sky-100 text-sky-900 px-4 py-2 text-sm font-semibold hover:bg-sky-200 transition-colors"
-            >
-              Try soft white
-            </button>
-          )}
           <Link
             href="/"
             className="rounded-lg bg-laf-gold px-4 py-2 text-sm font-semibold text-white hover:bg-laf-gold-bright transition-colors"

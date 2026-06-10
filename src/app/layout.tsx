@@ -51,12 +51,12 @@ try {
   var p = new URLSearchParams(location.search);
   var q = p.get('theme');
   var stored = localStorage.getItem('laf-theme');
-  var theme = q === 'playful' || q === 'playful-soft' || q === 'classic'
-    ? q
-    : (stored === 'playful-soft' || stored === 'playful' ? stored : 'classic');
-  if (theme === 'playful' || theme === 'playful-soft') {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.classList.add(theme === 'playful-soft' ? 'theme-playful-soft' : 'theme-playful');
+  var theme = q === 'playful' || q === 'playful-soft' ? 'playful'
+    : q === 'classic' ? 'classic'
+    : (stored === 'playful-soft' || stored === 'playful' ? 'playful' : 'classic');
+  if (theme === 'playful') {
+    document.documentElement.dataset.theme = 'playful';
+    document.documentElement.classList.add('theme-playful');
   }
 } catch (e) {}
 `;
