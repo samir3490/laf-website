@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   alternates: { canonical: siteUrl() },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({

@@ -62,7 +62,7 @@ Track progress here while giving instructions in chat. Check items off as they c
   - [x] Edit / delete own games only
   - [ ] Migrate existing WordPress-published games to Firestore (if any)
   - [x] Add Firebase env vars in Vercel production (`lata-agrawal-foundation` — LAF Website web app)
-  - [ ] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
+  - [x] Deploy Firestore rules (`firebase-laf` → `lata-agrawal-foundation`)
 - [ ] Photo gallery (`/gallery`)
 - [ ] Google Reviews QR / testimonial page
 - [ ] Donor dashboard (if still needed)
@@ -75,7 +75,7 @@ Track progress here while giving instructions in chat. Check items off as they c
 
 ---
 
-**Current focus (in progress):** Scratch Games Vercel env + Firestore rules deploy, Search Console, email test, Lighthouse audit.
+**Current focus (in progress):** Search Console verify + submit sitemap, email test, Lighthouse audit.
 
 **Live site:** https://www.agrawalfoundation.org  
 **Vercel preview:** https://laf-website.vercel.app

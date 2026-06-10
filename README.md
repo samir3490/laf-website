@@ -47,6 +47,13 @@ firebase use lata-agrawal-foundation
 firebase deploy --only firestore:rules
 ```
 
+## Google Search Console
+
+1. Open [Google Search Console](https://search.google.com/search-console) → add property `https://www.agrawalfoundation.org`
+2. Choose **HTML tag** verification → copy the `content="..."` value (not the whole meta tag)
+3. Vercel → **Environment Variables** → `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` = that value → redeploy
+4. Back in GSC → **Verify** → then **Sitemaps** → submit `https://www.agrawalfoundation.org/sitemap.xml`
+
 ## Deploy to Vercel
 
 1. Push this folder to GitHub (or import directly in Vercel).
