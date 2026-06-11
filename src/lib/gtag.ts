@@ -10,11 +10,11 @@ declare global {
 export const GOOGLE_ADS_ID =
   process.env.NEXT_PUBLIC_GOOGLE_ADS_ID?.trim() || "AW-17149139381";
 
-/** LAF Website Firebase / GA4 property (from Firebase console). */
+/** LAF Website GA4 property (Admin → Data streams). */
 export const GA4_MEASUREMENT_ID =
   process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID?.trim() ||
   process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID?.trim() ||
-  "G-MEYRTNH342";
+  "G-6QNYDWN2HK";
 
 function gtag(...args: unknown[]) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
