@@ -1,7 +1,6 @@
 /**
- * Rewrite all blog posts with original NGO-focused content.
- * Preserves: id, slug, date, link, featuredMedia (if set).
- * Updates: title, excerpt, html, featuredImage.
+ * Rewrite blog posts: unique titles, slugs matching titles, topic hero images,
+ * unique inline images, and SEO redirects from old URLs.
  *
  *   node scripts/rewrite-blog-posts.mjs
  *   node scripts/rewrite-blog-posts.mjs --dry-run
@@ -20,11 +19,34 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const postsPath = join(root, "src/content/posts.json");
+const redirectsPath = join(root, "src/content/blog-redirects.json");
 const blogImgDir = join(root, "public/images/blog");
 const dryRun = process.argv.includes("--dry-run");
 
 const SITE = "https://agrawalfoundation.org";
 const LAF = "Lata Agrawal Foundation";
+
+/** One custom AI hero image per topic (8 total — not 87). */
+const TOPIC_HEROES = {
+  education: "/images/blog/heroes/education-hero.png",
+  career: "/images/blog/heroes/career-hero.png",
+  "digital-literacy": "/images/blog/heroes/digital-literacy-hero.png",
+  "women-empowerment": "/images/blog/heroes/women-empowerment-hero.png",
+  "medical-checkups": "/images/blog/heroes/medical-checkups-hero.png",
+  "food-donation": "/images/blog/heroes/food-donation-hero.png",
+  volunteering: "/images/blog/heroes/volunteering-hero.png",
+  community: "/images/blog/heroes/community-hero.png",
+};
+
+const SLUG_FILLER = new Set([
+  "indian", "indias", "india", "kids", "kid", "children", "child", "village", "villages",
+  "food", "donation", "donations", "donate", "drive", "drives", "support", "help", "feed",
+  "feeding", "hunger", "hungry", "platform", "website", "today", "now", "through", "with",
+  "for", "the", "a", "an", "and", "in", "on", "of", "by", "from", "join", "movement", "urgent",
+  "call", "ways", "way", "can", "you", "how", "what", "empower", "empowering", "future",
+  "community", "communities", "our", "their", "those", "need", "needs", "giving", "back",
+  "make", "makes", "success", "story", "stories", "young", "village", "indian", "laf",
+]);
 
 const SEO_FOOTER = `
 <div class="laf-seo-footer laf-blog-footer">
@@ -42,10 +64,9 @@ const SEO_FOOTER = `
 const EXTRA_IMAGES = [
   "/images/2024/12/homebannerngo-1024x585.webp",
   "/images/2024/12/mission-ngo-lata.webp",
-  "/images/2026/03/1000518338-1024x683.png",
 ];
 
-function loadBlogImages() {
+function loadInlineImagePool() {
   const imgs = [];
   if (existsSync(blogImgDir)) {
     for (const f of readdirSync(blogImgDir)) {
@@ -56,15 +77,68 @@ function loadBlogImages() {
   return imgs.length ? imgs : EXTRA_IMAGES;
 }
 
-function hash(s) {
-  return s.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+function slugify(title) {
+  return title
+    .replace(/&[^;]+;/g, " ")
+    .replace(/['']/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 90);
 }
 
-function pickImages(slug, count, pool) {
-  const start = hash(slug) % pool.length;
-  const out = [];
-  for (let i = 0; i < count; i++) out.push(pool[(start + i * 7) % pool.length]);
-  return out;
+function capitalize(w) {
+  return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+}
+
+function slugAngle(slug) {
+  const words = slug.split("-").filter((w) => w.length > 2 && !SLUG_FILLER.has(w.toLowerCase()));
+  if (words.length < 2) return null;
+  return words.slice(0, 5).map(capitalize).join(" ");
+}
+
+function makeUniqueTitle(baseTitle, oldSlug, usedTitles) {
+  let title = baseTitle;
+  if (!usedTitles.has(title.toLowerCase())) {
+    usedTitles.add(title.toLowerCase());
+    return title;
+  }
+  const angle = slugAngle(oldSlug);
+  if (angle) {
+    title = `${baseTitle}: ${angle}`;
+  } else {
+    title = `${baseTitle} in Wardha`;
+  }
+  let n = 2;
+  while (usedTitles.has(title.toLowerCase())) {
+    title = angle ? `${baseTitle}: ${angle} (${n})` : `${baseTitle} (${n})`;
+    n++;
+  }
+  usedTitles.add(title.toLowerCase());
+  return title;
+}
+
+function makeUniqueSlug(title, usedSlugs) {
+  let slug = slugify(title);
+  if (!slug) slug = "laf-impact-story";
+  let n = 2;
+  let candidate = slug;
+  while (usedSlugs.has(candidate)) {
+    candidate = `${slug}-${n}`;
+    n++;
+  }
+  usedSlugs.add(candidate);
+  return candidate;
+}
+
+function assignInlineImages(index, pool) {
+  if (pool.length === 0) return [null, null];
+  const a = pool[index % pool.length];
+  let b = pool[(index + Math.floor(pool.length / 2)) % pool.length];
+  if (b === a && pool.length > 1) {
+    b = pool[(index + Math.floor(pool.length / 3) + 1) % pool.length];
+  }
+  return [a, b];
 }
 
 function stripHtml(html) {
@@ -80,30 +154,15 @@ function fill(text, vars) {
 }
 
 function imgTag(src, alt) {
+  if (!src) return "";
   return `<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}" class="laf-post-img wp-image" width="1024" height="683" loading="lazy" decoding="async" /></figure>`;
 }
 
-function uniqueTitle(base, used, post) {
-  let t = base;
-  if (used.has(t.toLowerCase())) {
-    const d = new Date(post.date);
-    const label = d.toLocaleString("en-IN", { month: "long", year: "numeric", timeZone: "UTC" });
-    t = `${base} — ${label}`;
-  }
-  let n = 2;
-  while (used.has(t.toLowerCase())) {
-    t = `${base} (${n})`;
-    n++;
-  }
-  used.add(t.toLowerCase());
-  return t;
-}
-
-function buildArticleHtml({ title, intro, sections, resources, images, imageAlt, postUrl, topicLabel }) {
+function buildArticleHtml({ title, intro, sections, resources, hero, inlineImages, imageAlt, postUrl, topicLabel }) {
   const vars = { laf: LAF, url: postUrl, topic: topicLabel };
   const parts = [];
 
-  parts.push(imgTag(images[0], `${imageAlt} — ${title}`));
+  parts.push(imgTag(hero, `${imageAlt} — ${title}`));
   parts.push(`<p class="wp-block-paragraph">${fill(intro, vars)}</p>`);
   parts.push(
     `<p class="wp-block-paragraph"><em>Published by the ${LAF} in Wardha, Maharashtra. Read more at <a href="${postUrl}">${postUrl}</a>.</em></p>`
@@ -114,8 +173,8 @@ function buildArticleHtml({ title, intro, sections, resources, images, imageAlt,
     sec.paragraphs.forEach((p) => {
       parts.push(`<p class="wp-block-paragraph">${fill(p, vars)}</p>`);
     });
-    if (i === 0 && images[1]) {
-      parts.push(imgTag(images[1], `${imageAlt} — ${fill(sec.heading, vars)}`));
+    if (i === 0 && inlineImages[0]) {
+      parts.push(imgTag(inlineImages[0], `${imageAlt} — ${fill(sec.heading, vars)}`));
     }
   });
 
@@ -129,8 +188,8 @@ function buildArticleHtml({ title, intro, sections, resources, images, imageAlt,
   }
   parts.push("</ul>");
 
-  if (images[2]) {
-    parts.push(imgTag(images[2], `${LAF} community program in Wardha`));
+  if (inlineImages[1]) {
+    parts.push(imgTag(inlineImages[1], `${LAF} community program in Wardha — ${title}`));
   }
 
   parts.push(`<h2 class="wp-block-heading">Support ${LAF}</h2>`);
@@ -142,12 +201,12 @@ function buildArticleHtml({ title, intro, sections, resources, images, imageAlt,
   return parts.join("\n\n");
 }
 
-function enhancePreservedPost(post) {
+function enhancePreservedPost(post, postUrl) {
   let html = post.html;
-  const postUrl = `${SITE}/blog/${post.slug}/`;
   if (!html.includes("laf-seo-footer")) {
     html = `${html.trim()}\n${SEO_FOOTER}\n`;
   }
+  html = html.replace(/https?:\/\/(?:www\.)?agrawalfoundation\.org\/blog\/[^/"']+\/?/g, postUrl);
   if (!html.includes(postUrl)) {
     const note = `<p class="wp-block-paragraph"><em>Originally published at <a href="${postUrl}">${postUrl}</a>.</em></p>`;
     html = html.replace(SEO_FOOTER, `${note}\n${SEO_FOOTER}`);
@@ -160,59 +219,83 @@ function introPlain(intro) {
 }
 
 const posts = JSON.parse(readFileSync(postsPath, "utf8"));
-const imagePool = loadBlogImages();
+const inlinePool = loadInlineImagePool();
 const usedTitles = new Set();
+const usedSlugs = new Set();
+const redirects = {};
+const topicVariantIndex = {};
+
 let rewritten = 0;
 let preserved = 0;
 
 for (let index = 0; index < posts.length; index++) {
   const post = posts[index];
+  const oldSlug = post.slug;
 
-  if (PRESERVE_SLUGS.has(post.slug)) {
-    post.html = enhancePreservedPost(post);
+  if (PRESERVE_SLUGS.has(oldSlug)) {
+    const newSlug = makeUniqueSlug(post.title, usedSlugs);
+    const postUrl = `${SITE}/blog/${newSlug}/`;
+    if (oldSlug !== newSlug) redirects[oldSlug] = newSlug;
+    post.slug = newSlug;
+    post.link = postUrl;
+    post.html = enhancePreservedPost(post, postUrl);
+    if (!post.featuredImage?.includes("2026/03")) {
+      post.featuredImage = TOPIC_HEROES["medical-checkups"];
+    }
     if (!post.excerpt || post.excerpt.length < 40) {
       post.excerpt = stripHtml(post.html).slice(0, 320);
     }
-    usedTitles.add(post.title.toLowerCase());
     preserved++;
     continue;
   }
 
-  const topic = pickTopic(index, post.slug);
+  const topic = pickTopic(index, oldSlug);
   const meta = TOPIC_META[topic];
   const variants = ARTICLE_VARIANTS[topic] ?? ARTICLE_VARIANTS.community;
-  const variant = variants[hash(post.slug) % variants.length];
-  const postUrl = `${SITE}/blog/${post.slug}/`;
-  const images = pickImages(post.slug, 3, imagePool);
+  topicVariantIndex[topic] = topicVariantIndex[topic] ?? 0;
+  const variant = variants[topicVariantIndex[topic] % variants.length];
+  topicVariantIndex[topic]++;
 
-  const title = uniqueTitle(variant.title, usedTitles, post);
-  const html = buildArticleHtml({
+  const title = makeUniqueTitle(variant.title, oldSlug, usedTitles);
+  const newSlug = makeUniqueSlug(title, usedSlugs);
+  const postUrl = `${SITE}/blog/${newSlug}/`;
+  const hero = TOPIC_HEROES[topic] ?? TOPIC_HEROES.community;
+  const inlineImages = assignInlineImages(index, inlinePool);
+
+  if (oldSlug !== newSlug) redirects[oldSlug] = newSlug;
+
+  post.title = title;
+  post.slug = newSlug;
+  post.link = postUrl;
+  post.html = buildArticleHtml({
     title,
     intro: variant.intro,
     sections: variant.sections,
     resources: meta.resources,
-    images,
+    hero,
+    inlineImages,
     imageAlt: meta.imageAlt,
     postUrl,
     topicLabel: meta.label,
   });
-
-  post.title = title;
-  post.html = html;
   post.excerpt = stripHtml(`${introPlain(variant.intro)} ${variant.sections[0]?.paragraphs[0] ?? ""}`).slice(0, 320);
-  post.featuredImage = images[0];
+  post.featuredImage = hero;
   rewritten++;
 }
 
 console.log(`Rewrote ${rewritten} posts, preserved ${preserved} real stories (${posts.length} total)`);
-console.log(`Image pool: ${imagePool.length} files`);
+console.log(`Unique titles: ${usedTitles.size + preserved}, unique slugs: ${usedSlugs.size}`);
+console.log(`301 redirects: ${Object.keys(redirects).length}`);
+console.log(`Inline image pool: ${inlinePool.length} photos`);
 
 if (dryRun) {
-  console.log("\nSample titles:");
-  posts.slice(0, 8).forEach((p) => console.log(`  • ${p.title}`));
-  console.log("\n(dry run — no file written)");
+  console.log("\nSample slug → title:");
+  posts.slice(0, 6).forEach((p) => console.log(`  /blog/${p.slug}\n    ${p.title}\n`));
+  console.log("(dry run — no files written)");
   process.exit(0);
 }
 
 writeFileSync(postsPath, JSON.stringify(posts, null, 2) + "\n", "utf8");
+writeFileSync(redirectsPath, JSON.stringify(redirects, null, 2) + "\n", "utf8");
 console.log(`Wrote ${postsPath}`);
+console.log(`Wrote ${redirectsPath}`);
