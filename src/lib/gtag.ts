@@ -69,3 +69,11 @@ export function trackDonateSuccess(amount?: number) {
     currency: "INR",
   });
 }
+
+export function trackDrawingSubmit(entryId: string) {
+  trackGa4Event("drawing_submit", { entry_id: entryId, page_path: "/drawing-competition/submit" });
+}
+
+export function trackDrawingVote(entryId: string) {
+  trackGa4Event("drawing_vote", { entry_id: entryId, page_path: "/drawing-competition" });
+}

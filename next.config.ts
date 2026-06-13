@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
         hostname: "s3.us-west-2.amazonaws.com",
         pathname: "/images.unsplash.com/**",
       },
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {

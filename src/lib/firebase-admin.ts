@@ -1,8 +1,10 @@
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { getStorage, type Storage } from "firebase-admin/storage";
 
 let adminApp: App | undefined;
 let adminDb: Firestore | undefined;
+let adminStorage: Storage | undefined;
 
 export function getFirebaseAdminDb(): Firestore | null {
   if (adminDb) return adminDb;
@@ -28,4 +30,23 @@ export function getFirebaseAdminDb(): Firestore | null {
   } catch {
     return null;
   }
+}
+
+export function getFirebaseAdminStorage(): Storage | null {
+  if (adminStorage) return adminStorage;
+  if (!getFirebaseAdminDb()) return null;
+  try {
+    adminStorage = getStorage();
+    return adminStorage;
+  } catch {
+    return null;
+  }
+}
+
+export function getDrawingStorageBucketName(): string {
+  return (
+    process.env.FIREBASE_STORAGE_BUCKET?.trim() ??
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim() ??
+    "lata-agrawal-foundation.firebasestorage.app"
+  );
 }

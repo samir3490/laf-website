@@ -64,3 +64,7 @@ export const LIBRARY_CONTRIBUTORS_COLLECTION = "library_contributors";
 export const LIBRARY_SETTINGS_COLLECTION = "library_settings";
 export const GOOGLE_REVIEWS_COLLECTION = "google_reviews";
 export const GOOGLE_REVIEWS_META_COLLECTION = "google_reviews_meta";
+export const DRAWING_ENTRIES_COLLECTION = "drawing_entries";
+export const DRAWING_VOTES_COLLECTION = "drawing_votes";
+export const DRAWING_COMPETITION_COLLECTION = "drawing_competition";
+export const DRAWING_REPORTS_COLLECTION = "drawing_reports";

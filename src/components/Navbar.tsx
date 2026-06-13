@@ -14,6 +14,7 @@ const navLinks = [
   { href: "/csr", label: "CSR" },
   { href: "/blog", label: "Blog" },
   { href: "/library", label: "Library" },
+  { href: "/drawing-competition", label: "Drawing" },
   { href: "/reviews", label: "Reviews" },
   { href: "/community-scratch-games", label: "Scratch Games" },
   { href: "/contact", label: "Contact" },

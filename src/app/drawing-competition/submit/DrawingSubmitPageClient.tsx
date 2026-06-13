@@ -1,0 +1,41 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import PageHeader from "@/components/PageHeader";
+import PageContainer from "@/components/PageContainer";
+import SubmitDrawingForm from "@/components/drawing/SubmitDrawingForm";
+import {
+  competitionPhase,
+  DRAWING_COMPETITION_COLLECTION,
+  DRAWING_META_DOC_ID,
+  normalizeCompetitionMeta,
+} from "@/lib/drawing";
+import { getFirebaseConfig, getFirebaseDb } from "@/lib/firebase";
+
+export default function DrawingSubmitPageClient() {
+  const db = getFirebaseDb();
+  const config = getFirebaseConfig();
+  const [submissionsAllowed, setSubmissionsAllowed] = useState(true);
+
+  useEffect(() => {
+    if (!db) return;
+    return onSnapshot(doc(db, DRAWING_COMPETITION_COLLECTION, DRAWING_META_DOC_ID), (snap) => {
+      const meta = normalizeCompetitionMeta(snap.data() as Record<string, unknown> | undefined);
+      setSubmissionsAllowed(competitionPhase(meta).submissionsAllowed);
+    });
+  }, [db]);
+
+  return (
+    <>
+      <PageHeader title="Submit Artwork" subtitle="Upload your painting or drawing to the competition" />
+      <PageContainer className="py-12 lg:py-16">
+        {!config ? (
+          <p className="text-sm text-laf-muted">Firebase setup required.</p>
+        ) : (
+          <SubmitDrawingForm submissionsAllowed={submissionsAllowed} />
+        )}
+      </PageContainer>
+    </>
+  );
+}
