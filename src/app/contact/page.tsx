@@ -56,6 +56,16 @@ export default function ContactPage() {
                 <p className="mt-2 text-sm text-laf-muted leading-relaxed">
                   {site.contact.address}
                 </p>
+                {"googleBusiness" in site.social && site.social.googleBusiness && (
+                  <a
+                    href={site.social.googleBusiness}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-3 text-sm font-medium text-laf-gold hover:underline"
+                  >
+                    View on Google Maps / Google Business
+                  </a>
+                )}
               </div>
             </div>
 

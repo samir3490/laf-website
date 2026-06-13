@@ -15,6 +15,7 @@
     "sync:gmail-env": "node scripts/sync-gmail-env.mjs",
     "clean:blog-posts": "node scripts/clean-blog-posts.mjs --all",
     "seo:blog": "node scripts/seo-enhance-blog-posts.mjs",
+    "remove:articly-posts": "node scripts/remove-articly-posts.mjs",
     "publish:blog": "node scripts/publish-scheduled-blog.mjs"
   },
   "dependencies": {

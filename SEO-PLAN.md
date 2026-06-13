@@ -25,7 +25,7 @@
 | JSON-LD (NGO, WebSite, Article, FAQ, Library) | ✅ Most pages |
 | Google Search Console | ✅ Submitted |
 | GA4 + conversion events | ✅ |
-| Blog posts | ⚠️ 92 posts — mostly legacy Articly; cleanup in progress |
+| Blog posts | ✅ 2 real impact stories + weekly scheduled posts (Articly duplicates removed) |
 | Core Web Vitals (Home/Blog perf) | ⚠️ ~63–65 — improve images |
 | Weekly blog automation | ✅ GitHub Action (see `BLOG-AUTOMATION.md`) |
 
@@ -53,7 +53,7 @@
 - [x] **P0** Legacy WordPress URL 301 redirects (`next.config.ts`, middleware)
 - [x] **P1** Submit sitemap in Google Search Console
 - [ ] **P1** Submit sitemap in Bing Webmaster Tools
-- [ ] **P2** Google Business Profile for Wardha address
+- [ ] **P2** Google Business Profile for Wardha address — [profile link](https://share.google/sS7t8AqELTr8J5fXS) added to Contact page; verify in Search Console
 - [x] **P1** Blog pagination canonical URLs (`?page=N`)
 
 ### Structured data
@@ -93,7 +93,7 @@
 - [x] **P0** Featured image alt text = post title
 - [x] **P1** Internal link footer on posts (donate, volunteer, library, events)
 - [x] **P1** Bulk SEO pass on `posts.json` (`npm run seo:blog`)
-- [ ] **P0** Reduce duplicate/thin Articly posts (consolidate or noindex worst duplicates)
+- [x] **P0** Reduce duplicate/thin Articly posts (90 removed Jun 2026 — kept 2 Wardha camp stories)
 - [x] **P1** Related posts on article pages
 - [ ] **P2** Topic clusters: education, nutrition, Wardha impact, volunteering
 
@@ -123,6 +123,7 @@
 | Command | Purpose |
 |---------|---------|
 | `npm run seo:blog` | Internal links + strip Articly junk in all posts |
+| `npm run remove:articly-posts` | Delete Articly template duplicates (keeps real WP stories) |
 | `npm run clean:blog-posts -- --all` | Rewrite intros / known bad posts |
 | `npm run publish:blog` | Move due scheduled posts → live (local test) |
 | `npm run export:wp` | Pull from WordPress (legacy) |
@@ -135,8 +136,8 @@ See **BLOG-AUTOMATION.md** for weekly publishing workflow.
 
 | Category | Count | Action |
 |----------|-------|--------|
-| Real LAF event stories (dental/eye camp, Wardha) | ~2 | Keep, promote on home |
-| Articly template posts (food donation keywords) | ~90 | SEO pass applied; consider pruning duplicates over time |
-| Posts with off-topic AI paragraphs | ~8 | Manual review; rewrite or remove |
+| Real LAF event stories (dental/eye camp, Sewashram Wardha) | **2** | Kept — promote on home + blog |
+| Articly duplicate posts | **90 removed** | Deleted from `posts.json` via `npm run remove:articly-posts` |
+| Scheduled weekly posts | 4 queued | See `scheduled-posts.json` + GitHub Action |
 
-**Keep promoting:** posts with original Wardha photos and factual event details — these rank best for trust and local SEO.
+**Kept posts:** `more-than-a-checkup-restoring-smiles-and-confidence`, `free-eye-checkup-at-sewashram`
