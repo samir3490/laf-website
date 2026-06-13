@@ -7,14 +7,18 @@ import {
   isValidEmail,
   MAX_DRAWING_BYTES,
   MIN_DRAWING_BYTES,
-  normalizeIndiaPhone,
+  normalizeEmail,
 } from "@/lib/drawing";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
-import { isPhoneAuth, verifyFirebaseIdToken } from "@/lib/firebase-admin-auth";
+import {
+  countActiveEntriesForEmail,
+  emailDocId,
+  verifyDrawingEmailSession,
+} from "@/lib/drawing-email-otp";
 import { uploadBufferToGoogleDrive } from "@/lib/google-drive-upload";
+import { moderateDrawingImage, shouldAutoPublishEntry } from "@/lib/drawing-moderation";
 import { notifyAdminOfDrawingSubmission } from "@/lib/drawing-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
-import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
 
 const RATE_LIMIT = 3;
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -29,8 +33,10 @@ function ipHash(ip: string): string {
   return createHash("sha256").update(`drawing:${ip}`).digest("hex").slice(0, 16);
 }
 
-function phoneHash(phone: string): string {
-  return createHash("sha256").update(`drawing-phone:${phone}`).digest("hex").slice(0, 20);
+function getVerifyToken(req: Request): string | null {
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7).trim();
+  return null;
 }
 
 function detectImageMime(buffer: Buffer): string | null {
@@ -66,29 +72,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const decoded = await verifyFirebaseIdToken(req);
-    if (!decoded || !isPhoneAuth(decoded)) {
+    const verifyToken = getVerifyToken(req);
+    if (!verifyToken) {
       return NextResponse.json(
-        { error: "Please verify your mobile number with OTP before submitting." },
+        { error: "Please verify your email with the one-time code before submitting." },
         { status: 401 }
       );
     }
 
-    const turnstileError = requireTurnstileInProduction();
-    if (turnstileError) {
-      return NextResponse.json({ error: turnstileError }, { status: 503 });
-    }
-
     const formData = await req.formData();
-    const turnstileToken = formData.get("turnstileToken");
-    if (isTurnstileEnabled()) {
-      const token = typeof turnstileToken === "string" ? turnstileToken : "";
-      const valid = await verifyTurnstileToken(token, ip);
-      if (!valid) {
-        return NextResponse.json({ error: "Captcha verification failed. Please try again." }, { status: 403 });
-      }
-    }
-
     const title = String(formData.get("title") ?? "").trim();
     const artistName = String(formData.get("artistName") ?? "").trim();
     const parentName = String(formData.get("parentName") ?? "").trim();
@@ -114,6 +106,14 @@ export async function POST(req: Request) {
     }
     if (!parentEmail || !isValidEmail(parentEmail) || parentEmail.length > 120) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+
+    const session = await verifyDrawingEmailSession(verifyToken, parentEmail);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Email verification expired or does not match. Please verify your email again." },
+        { status: 401 }
+      );
     }
     if (!artistClass || artistClass.length > 20) {
       return NextResponse.json({ error: "Please enter a class or grade." }, { status: 400 });
@@ -142,11 +142,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please enter an age." }, { status: 400 });
     }
 
-    const parentPhone = normalizeIndiaPhone(decoded.phone_number ?? "");
-    if (!parentPhone) {
-      return NextResponse.json({ error: "Verified phone number is invalid." }, { status: 400 });
-    }
-
     const buffer = Buffer.from(await file.arrayBuffer());
     if (buffer.length > MAX_DRAWING_BYTES) {
       return NextResponse.json({ error: "Image must be 5 MB or smaller." }, { status: 400 });
@@ -168,18 +163,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const submitterUid = decoded.uid;
-    const existingSnap = await adminDb
-      .collection(DRAWING_ENTRIES_COLLECTION)
-      .where("submitterUid", "==", submitterUid)
-      .get();
-    const activeCount = existingSnap.docs.filter((d) => {
-      const s = d.data().status;
-      return s === "pending" || s === "active";
-    }).length;
+    const normalizedEmail = normalizeEmail(parentEmail);
+    const submitterEmailHash = emailDocId(normalizedEmail);
+    const activeCount = await countActiveEntriesForEmail(normalizedEmail);
     if (activeCount >= 3) {
       return NextResponse.json(
-        { error: "This mobile number already has the maximum number of entries for this competition." },
+        { error: "This email already has the maximum number of entries for this competition." },
         { status: 429 }
       );
     }
@@ -190,6 +179,10 @@ export async function POST(req: Request) {
 
     const driveUpload = await uploadBufferToGoogleDrive(buffer, fileName, mime);
 
+    const moderation = await moderateDrawingImage(buffer, mime);
+    const autoPublished = shouldAutoPublishEntry(moderation);
+    const status = autoPublished ? "active" : "pending";
+
     await adminDb.collection(DRAWING_ENTRIES_COLLECTION).doc(entryId).set({
       title,
       artistName,
@@ -199,31 +192,45 @@ export async function POST(req: Request) {
       artistSchool,
       artistCity,
       parentName,
-      parentEmail,
-      parentPhone,
-      submitterPhoneHash: phoneHash(parentPhone),
-      submitterUid,
+      parentEmail: normalizedEmail,
+      submitterEmailHash,
+      submitterUid: submitterEmailHash,
       imageUrl: driveUpload.url,
       driveFileId: driveUpload.fileId,
       voteCount: 0,
-      status: "pending",
+      status,
+      ...(moderation
+        ? {
+            aiModeration: {
+              approved: moderation.approved,
+              confidence: moderation.confidence,
+              reason: moderation.reason,
+              model: moderation.model ?? null,
+              at: new Date().toISOString(),
+            },
+          }
+        : {}),
       submitterIpHash: ipHash(ip),
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    void notifyAdminOfDrawingSubmission({
-      entryId,
-      title,
-      artistName,
-      imageUrl: driveUpload.url,
-    });
+    if (!autoPublished) {
+      void notifyAdminOfDrawingSubmission({
+        entryId,
+        title,
+        artistName,
+        imageUrl: driveUpload.url,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
       entryId,
-      pending: true,
-      message:
-        "Thank you! Your artwork was received and is pending LAF review before it appears in the gallery.",
+      pending: !autoPublished,
+      published: autoPublished,
+      message: autoPublished
+        ? "Thank you! Your artwork is now live in the gallery. Sign in with Google to vote."
+        : "Thank you! Your artwork was received and is pending LAF review before it appears in the gallery.",
     });
   } catch (err) {
     console.error("[drawing/submit]", err);

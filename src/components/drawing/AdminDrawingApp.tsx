@@ -17,8 +17,9 @@ import {
   setDoc,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import Image from "next/image";
+import DrawingEntryImage from "@/components/drawing/DrawingEntryImage";
 import {
+  AGE_GROUPS,
   ageGroupLabel,
   combinedEntryScore,
   DEFAULT_COMPETITION_META,
@@ -29,15 +30,25 @@ import {
   isDrawingAdmin,
   normalizeCompetitionMeta,
   normalizeDrawingEntryAdmin,
+  topCombinedInGroup,
   type AgeGroupId,
   type DrawingCompetitionMeta,
   type DrawingEntryAdmin,
+  type DrawingReportReason,
 } from "@/lib/drawing";
 import { getFirebaseAuth, getFirebaseConfig, getFirebaseDb } from "@/lib/firebase";
 
 function toEntry(snap: QueryDocumentSnapshot): DrawingEntryAdmin | null {
   return normalizeDrawingEntryAdmin(snap.data() as Record<string, unknown>, snap.id);
 }
+
+type OpenReport = {
+  id: string;
+  entryId: string;
+  reason: DrawingReportReason;
+  details?: string;
+  createdAt?: string;
+};
 
 export default function AdminDrawingApp() {
   const config = getFirebaseConfig();
@@ -54,6 +65,7 @@ export default function AdminDrawingApp() {
   const [meta, setMeta] = useState<DrawingCompetitionMeta>(DEFAULT_COMPETITION_META);
   const [entries, setEntries] = useState<DrawingEntryAdmin[]>([]);
   const [openReports, setOpenReports] = useState(0);
+  const [reports, setReports] = useState<OpenReport[]>([]);
   const [winnerPick, setWinnerPick] = useState("");
   const [winnerAgeGroup, setWinnerAgeGroup] = useState<AgeGroupId | "all">("all");
   const [judgeScores, setJudgeScores] = useState<Record<string, string>>({});
@@ -88,7 +100,21 @@ export default function AdminDrawingApp() {
     );
 
     const reportsUnsub = onSnapshot(collection(db, DRAWING_REPORTS_COLLECTION), (snap) => {
-      setOpenReports(snap.docs.filter((d) => d.data().status === "open").length);
+      const open: OpenReport[] = [];
+      for (const d of snap.docs) {
+        const data = d.data();
+        if (data.status !== "open") continue;
+        const entryId = typeof data.entryId === "string" ? data.entryId : "";
+        if (!entryId) continue;
+        open.push({
+          id: d.id,
+          entryId,
+          reason: data.reason as DrawingReportReason,
+          details: typeof data.details === "string" ? data.details : undefined,
+        });
+      }
+      setOpenReports(open.length);
+      setReports(open);
     });
 
     return () => {
@@ -228,6 +254,76 @@ export default function AdminDrawingApp() {
     }
   }
 
+  async function announceCategoryWinner(ageGroup: AgeGroupId, useTop: boolean) {
+    if (!db) return;
+    const entry = useTop
+      ? topCombinedInGroup(activeEntries, ageGroup, meta)
+      : activeEntries.find((e) => e.id === winnerPick && e.ageGroup === ageGroup);
+    if (!entry) {
+      setMsg(`No entry available for ${ageGroupLabel(ageGroup)}.`);
+      return;
+    }
+    setBusy(`winner-${ageGroup}`);
+    setMsg("");
+    try {
+      await setDoc(
+        doc(db, DRAWING_COMPETITION_COLLECTION, DRAWING_META_DOC_ID),
+        {
+          winnersByAgeGroup: { ...(meta.winnersByAgeGroup ?? {}), [ageGroup]: entry.id },
+          winnerAnnouncedAt: new Date().toISOString(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      setMsg(`Winner announced for ${ageGroupLabel(ageGroup)}.`);
+    } catch {
+      setMsg("Failed to announce category winner.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function announceAllCategoryWinners() {
+    if (!db) return;
+    setBusy("winner-all");
+    setMsg("");
+    try {
+      const winnersByAgeGroup: Partial<Record<AgeGroupId, string>> = { ...(meta.winnersByAgeGroup ?? {}) };
+      for (const group of AGE_GROUPS) {
+        const top = topCombinedInGroup(activeEntries, group.id, meta);
+        if (top) winnersByAgeGroup[group.id] = top.id;
+      }
+      await setDoc(
+        doc(db, DRAWING_COMPETITION_COLLECTION, DRAWING_META_DOC_ID),
+        {
+          winnersByAgeGroup,
+          winnerAnnouncedAt: new Date().toISOString(),
+          votingOpen: false,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      setMsg("Category winners announced and voting closed.");
+    } catch {
+      setMsg("Failed to announce category winners.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function dismissReport(reportId: string) {
+    if (!db) return;
+    setBusy(`report-${reportId}`);
+    try {
+      await setDoc(doc(db, DRAWING_REPORTS_COLLECTION, reportId), { status: "closed" }, { merge: true });
+      setMsg("Report marked as reviewed.");
+    } catch {
+      setMsg("Failed to update report.");
+    } finally {
+      setBusy("");
+    }
+  }
+
   if (!config) {
     return <p className="text-sm text-laf-muted">Firebase configuration missing.</p>;
   }
@@ -271,13 +367,57 @@ export default function AdminDrawingApp() {
 
       {msg && <p className="text-sm text-laf-navy bg-laf-cream/60 rounded-lg px-4 py-2">{msg}</p>}
 
+      {openReports > 0 && (
+        <section className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-laf-navy">
+            Open reports ({openReports})
+          </h2>
+          <div className="space-y-3">
+            {reports.map((report) => {
+              const entry = entries.find((e) => e.id === report.entryId);
+              return (
+                <div key={report.id} className="rounded-xl border border-red-200 bg-white p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm text-laf-navy">{entry?.title ?? report.entryId}</p>
+                    <p className="text-xs text-laf-muted">
+                      Reason: {report.reason}
+                      {report.details ? ` — ${report.details}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {entry && entry.status === "active" && (
+                      <button
+                        type="button"
+                        disabled={busy === entry.id}
+                        onClick={() => removeEntry(entry.id)}
+                        className="text-xs font-semibold text-red-600 hover:underline"
+                      >
+                        Remove entry
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={busy === `report-${report.id}`}
+                      onClick={() => dismissReport(report.id)}
+                      className="text-xs font-semibold text-laf-navy hover:underline"
+                    >
+                      Mark reviewed
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6 space-y-4">
         <h2 className="text-lg font-semibold text-laf-navy">
           Pending review ({pendingEntries.length})
         </h2>
         {openReports > 0 && (
           <p className="text-sm text-amber-800">
-            {openReports} open report{openReports === 1 ? "" : "s"} — review below.
+            {openReports} open report{openReports === 1 ? "" : "s"} — see the reports section above.
           </p>
         )}
         {pendingEntries.length === 0 ? (
@@ -287,7 +427,7 @@ export default function AdminDrawingApp() {
             {pendingEntries.map((entry) => (
               <div key={entry.id} className="rounded-xl border border-amber-200 bg-white overflow-hidden">
                 <div className="relative aspect-video bg-laf-cream/30">
-                  <Image src={entry.imageUrl} alt={entry.title} fill className="object-contain" unoptimized />
+                  <DrawingEntryImage entry={entry} alt={entry.title} sizes="300px" />
                 </div>
                 <div className="p-3 space-y-2 text-sm">
                   <p className="font-medium text-laf-navy">{entry.title}</p>
@@ -295,7 +435,8 @@ export default function AdminDrawingApp() {
                     {entry.artistName} · {ageGroupLabel(entry.ageGroup)}
                   </p>
                   <p className="text-xs text-laf-muted">
-                    Parent: {entry.parentName} · {entry.parentEmail} · {entry.parentPhone}
+                    Parent: {entry.parentName} · {entry.parentEmail}
+                    {entry.parentPhone ? ` · ${entry.parentPhone}` : ""}
                   </p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <button
@@ -372,7 +513,7 @@ export default function AdminDrawingApp() {
                 min={0}
                 max={1}
                 step={0.05}
-                value={meta.judgeWeight ?? 0.7}
+                value={meta.judgeWeight ?? 0}
                 onChange={(e) => setMeta({ ...meta, judgeWeight: Number(e.target.value) })}
                 className="w-full px-3 py-2 rounded-lg border border-laf-border text-sm"
               />
@@ -384,7 +525,7 @@ export default function AdminDrawingApp() {
                 min={0}
                 max={1}
                 step={0.05}
-                value={meta.publicVoteWeight ?? 0.3}
+                value={meta.publicVoteWeight ?? 1}
                 onChange={(e) => setMeta({ ...meta, publicVoteWeight: Number(e.target.value) })}
                 className="w-full px-3 py-2 rounded-lg border border-laf-border text-sm"
               />
@@ -401,10 +542,11 @@ export default function AdminDrawingApp() {
       </section>
 
       <section className="rounded-2xl border border-laf-border bg-white p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-laf-navy">Announce winner</h2>
+        <h2 className="text-lg font-semibold text-laf-navy">Announce category winners</h2>
         <p className="text-sm text-laf-muted">
-          Combined score = {(meta.judgeWeight ?? 0.7) * 100}% judge +{" "}
-          {(meta.publicVoteWeight ?? 0.3) * 100}% public votes (normalized).
+          Default ranking uses {(meta.publicVoteWeight ?? 1) * 100}% public votes
+          {(meta.judgeWeight ?? 0) > 0 ? ` + ${(meta.judgeWeight ?? 0) * 100}% judge score` : ""}. Change
+          weights above if needed.
         </p>
         {topCombined && (
           <p className="text-sm text-laf-muted">
@@ -415,6 +557,45 @@ export default function AdminDrawingApp() {
           </p>
         )}
         <div className="flex flex-wrap gap-3 items-end">
+          <button
+            type="button"
+            disabled={busy === "winner-all"}
+            onClick={() => announceAllCategoryWinners()}
+            className="px-4 py-2 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
+          >
+            Announce all category winners (auto)
+          </button>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4 pt-2">
+          {AGE_GROUPS.map((group) => {
+            const top = topCombinedInGroup(activeEntries, group.id, meta);
+            const currentWinnerId = meta.winnersByAgeGroup?.[group.id];
+            return (
+              <div key={group.id} className="rounded-xl border border-laf-border p-4 space-y-2">
+                <p className="font-semibold text-sm text-laf-navy">{group.label}</p>
+                {top ? (
+                  <p className="text-xs text-laf-muted">
+                    Top: <strong>{top.title}</strong> · {top.voteCount} votes
+                  </p>
+                ) : (
+                  <p className="text-xs text-laf-muted">No entries in this category.</p>
+                )}
+                {currentWinnerId && (
+                  <p className="text-xs text-green-700">Winner set: {entries.find((e) => e.id === currentWinnerId)?.title}</p>
+                )}
+                <button
+                  type="button"
+                  disabled={busy === `winner-${group.id}` || !top}
+                  onClick={() => announceCategoryWinner(group.id, true)}
+                  className="text-xs font-semibold text-laf-gold hover:underline disabled:opacity-50"
+                >
+                  Announce top in {group.label}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <div className="border-t border-laf-border pt-4 flex flex-wrap gap-3 items-end">
           <div>
             <label className="block text-xs text-laf-muted mb-1">Age group for auto-pick</label>
             <select
@@ -472,7 +653,7 @@ export default function AdminDrawingApp() {
             {activeEntries.map((entry) => (
               <div key={entry.id} className="rounded-xl border border-laf-border bg-white overflow-hidden">
                 <div className="relative aspect-video bg-laf-cream/30">
-                  <Image src={entry.imageUrl} alt={entry.title} fill className="object-contain" unoptimized />
+                  <DrawingEntryImage entry={entry} alt={entry.title} sizes="300px" />
                 </div>
                 <div className="p-3 space-y-2">
                   <p className="font-medium text-sm text-laf-navy">{entry.title}</p>

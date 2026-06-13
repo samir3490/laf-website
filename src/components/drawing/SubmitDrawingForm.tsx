@@ -1,15 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import DrawingPhoneAuth from "@/components/drawing/DrawingPhoneAuth";
-import TurnstileWidget from "@/components/library/TurnstileWidget";
-import { getFirebaseConfig } from "@/lib/firebase";
+import DrawingEmailOtp from "@/components/drawing/DrawingEmailOtp";
+import RequiredMark from "@/components/drawing/RequiredMark";
 import { trackDrawingSubmit } from "@/lib/gtag";
 import { MAX_DRAWING_BYTES } from "@/lib/drawing";
 
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 const GALLERY_PATH = "/events/drawing-competition";
 
 type SubmitDrawingFormProps = {
@@ -18,7 +16,6 @@ type SubmitDrawingFormProps = {
 
 export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingFormProps) {
   const router = useRouter();
-  const config = getFirebaseConfig();
 
   const [title, setTitle] = useState("");
   const [artistName, setArtistName] = useState("");
@@ -30,14 +27,10 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
   const [artistCity, setArtistCity] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [phoneToken, setPhoneToken] = useState("");
+  const [verifyToken, setVerifyToken] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
-  const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
-  const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,8 +40,8 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
       setError("Submissions are closed for this competition.");
       return;
     }
-    if (!phoneToken) {
-      setError("Please verify your mobile number with OTP before submitting.");
+    if (!verifyToken || !emailVerified) {
+      setError("Please verify your email with the one-time code before submitting.");
       return;
     }
     if (!image) {
@@ -61,10 +54,6 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
     }
     if (!termsAccepted) {
       setError("Please confirm this is your original artwork.");
-      return;
-    }
-    if (turnstileRequired && !turnstileToken) {
-      setError("Please complete the captcha.");
       return;
     }
 
@@ -81,11 +70,10 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
       formData.set("artistCity", artistCity.trim());
       formData.set("termsAccepted", "true");
       formData.set("image", image);
-      if (turnstileToken) formData.set("turnstileToken", turnstileToken);
 
       const res = await fetch("/api/drawing/submit", {
         method: "POST",
-        headers: { Authorization: `Bearer ${phoneToken}` },
+        headers: { Authorization: `Bearer ${verifyToken}` },
         body: formData,
       });
       const data = await res.json();
@@ -96,7 +84,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
       }
 
       trackDrawingSubmit(data.entryId as string);
-      router.push(`${GALLERY_PATH}?submitted=pending`);
+      router.push(data.published ? `${GALLERY_PATH}?submitted=live` : `${GALLERY_PATH}?submitted=pending`);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -104,24 +92,12 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
     }
   }
 
-  if (!config) {
-    return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
-        <p className="text-laf-navy font-semibold">Setup required</p>
-        <p className="mt-2 text-sm text-laf-muted">Firebase environment variables are missing.</p>
-      </div>
-    );
-  }
-
   if (!submissionsAllowed) {
     return (
       <div className="rounded-2xl border border-laf-border bg-white p-8 text-center max-w-xl">
         <p className="text-lg font-semibold text-laf-navy">Submissions are closed</p>
         <p className="mt-2 text-sm text-laf-muted">You can still view approved entries and vote on the gallery page.</p>
-        <Link
-          href={GALLERY_PATH}
-          className="inline-block mt-6 text-sm font-medium text-laf-gold hover:underline"
-        >
+        <Link href={GALLERY_PATH} className="inline-block mt-6 text-sm font-medium text-laf-gold hover:underline">
           View gallery
         </Link>
       </div>
@@ -135,12 +111,28 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
     >
       <p className="text-sm text-laf-muted leading-relaxed">
         For child safety, only the child&apos;s <strong>first name</strong>, age group, class, school, and city are
-        shown publicly. Parent contact details are kept private and used only for verification.
+        shown publicly. Parent email is used for verification only and is not shown on the gallery. Appropriate artwork
+        is published automatically; others are reviewed by LAF.
+      </p>
+      <p className="text-xs text-laf-muted">
+        Fields marked with <RequiredMark /> are required.
       </p>
 
-      <DrawingPhoneAuth
-        onVerified={(_user, token) => setPhoneToken(token)}
-        onClear={() => setPhoneToken("")}
+      <DrawingEmailOtp
+        email={parentEmail}
+        onEmailChange={(value) => {
+          setParentEmail(value);
+          setEmailVerified(false);
+          setVerifyToken("");
+        }}
+        onVerified={(token) => {
+          setVerifyToken(token);
+          setEmailVerified(true);
+        }}
+        onClear={() => {
+          setVerifyToken("");
+          setEmailVerified(false);
+        }}
       />
 
       <div className="border-t border-laf-border pt-5 space-y-5">
@@ -148,6 +140,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
         <div>
           <label htmlFor="parent-name" className="block text-sm font-medium text-laf-navy mb-2">
             Parent / guardian name
+            <RequiredMark />
           </label>
           <input
             id="parent-name"
@@ -159,21 +152,6 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
             className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
           />
         </div>
-        <div>
-          <label htmlFor="parent-email" className="block text-sm font-medium text-laf-navy mb-2">
-            Email
-          </label>
-          <input
-            id="parent-email"
-            type="email"
-            required
-            maxLength={120}
-            autoComplete="email"
-            value={parentEmail}
-            onChange={(e) => setParentEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
-          />
-        </div>
       </div>
 
       <div className="border-t border-laf-border pt-5 space-y-5">
@@ -181,6 +159,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
         <div>
           <label htmlFor="drawing-title" className="block text-sm font-medium text-laf-navy mb-2">
             Artwork title
+            <RequiredMark />
           </label>
           <input
             id="drawing-title"
@@ -196,6 +175,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
         <div>
           <label htmlFor="artist-name" className="block text-sm font-medium text-laf-navy mb-2">
             Child&apos;s first name
+            <RequiredMark />
           </label>
           <input
             id="artist-name"
@@ -213,6 +193,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
           <div>
             <label htmlFor="artist-age" className="block text-sm font-medium text-laf-navy mb-2">
               Age (1–18)
+              <RequiredMark />
             </label>
             <input
               id="artist-age"
@@ -228,6 +209,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
           <div>
             <label htmlFor="artist-class" className="block text-sm font-medium text-laf-navy mb-2">
               Class / grade
+              <RequiredMark />
             </label>
             <input
               id="artist-class"
@@ -259,6 +241,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
         <div>
           <label htmlFor="artist-city" className="block text-sm font-medium text-laf-navy mb-2">
             City
+            <RequiredMark />
           </label>
           <input
             id="artist-city"
@@ -274,6 +257,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
         <div>
           <label htmlFor="drawing-image" className="block text-sm font-medium text-laf-navy mb-2">
             Upload image (JPEG, PNG, or WebP — max 5 MB)
+            <RequiredMark />
           </label>
           <input
             id="drawing-image"
@@ -294,18 +278,11 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
           className="mt-0.5 rounded border-laf-border"
         />
         <span>
-          I confirm this is the child&apos;s original artwork. I understand entries are reviewed by LAF before appearing
-          in the public gallery, and that voting requires signing in with Google (one vote per account per drawing).
+          I confirm this is the child&apos;s original artwork.
+          <RequiredMark /> I understand appropriate entries appear in the gallery automatically, others are reviewed
+          by LAF, and voting requires signing in with Google (one vote per account per drawing).
         </span>
       </label>
-
-      {turnstileRequired && (
-        <TurnstileWidget
-          siteKey={TURNSTILE_SITE_KEY}
-          onToken={handleTurnstileToken}
-          onExpire={handleTurnstileExpire}
-        />
-      )}
 
       {error && (
         <p className="text-sm text-red-600" role="alert">
@@ -315,10 +292,10 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
 
       <button
         type="submit"
-        disabled={loading || !phoneToken || (turnstileRequired && !turnstileToken)}
+        disabled={loading || !emailVerified}
         className="px-6 py-3 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright transition-colors disabled:opacity-60"
       >
-        {loading ? "Uploading…" : "Submit for review"}
+        {loading ? "Uploading…" : "Submit artwork"}
       </button>
     </form>
   );

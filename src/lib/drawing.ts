@@ -33,9 +33,11 @@ export type DrawingCompetitionMeta = {
   votingEndsAt?: string | null;
   winnerEntryId?: string | null;
   winnerAnnouncedAt?: string | null;
-  /** Weight for judge score in combined ranking (0–1). Default 0.7 */
+  /** One winner per age group (entry id). */
+  winnersByAgeGroup?: Partial<Record<AgeGroupId, string>>;
+  /** Weight for judge score in combined ranking (0–1). Default 0 */
   judgeWeight?: number;
-  /** Weight for public votes in combined ranking (0–1). Default 0.3 */
+  /** Weight for public votes in combined ranking (0–1). Default 1 */
   publicVoteWeight?: number;
 };
 
@@ -82,15 +84,16 @@ export const DEFAULT_COMPETITION_META: DrawingCompetitionMeta = {
   title: "LAF Drawing Competition",
   theme: "Education, hope, and community",
   rulesHtml:
-    "<p>Submit original artwork (paintings, drawings, or digital art). A parent or guardian must verify their mobile number to upload. Entries are reviewed by LAF before appearing in the gallery. Sign in with Google to vote — one vote per account per drawing.</p>",
+    "<p>Submit original artwork (paintings, drawings, or digital art). A parent or guardian must verify their email with a one-time code to upload. Safe artwork is published automatically; others are reviewed by LAF. Sign in with Google to vote — one vote per account per drawing. You can report any entry that looks inappropriate.</p>",
   submissionOpen: true,
   votingOpen: true,
   submissionEndsAt: null,
   votingEndsAt: null,
   winnerEntryId: null,
   winnerAnnouncedAt: null,
-  judgeWeight: 0.7,
-  publicVoteWeight: 0.3,
+  winnersByAgeGroup: {},
+  judgeWeight: 0,
+  publicVoteWeight: 1,
 };
 
 export function isDrawingAdmin(email: string | null | undefined): boolean {
@@ -118,6 +121,16 @@ export function normalizeCompetitionMeta(data: Record<string, unknown> | undefin
     typeof data.publicVoteWeight === "number" && data.publicVoteWeight >= 0 && data.publicVoteWeight <= 1
       ? data.publicVoteWeight
       : DEFAULT_COMPETITION_META.publicVoteWeight!;
+
+  const winnersByAgeGroup: Partial<Record<AgeGroupId, string>> = {};
+  const rawWinners = data.winnersByAgeGroup;
+  if (rawWinners && typeof rawWinners === "object" && !Array.isArray(rawWinners)) {
+    for (const group of AGE_GROUPS) {
+      const id = (rawWinners as Record<string, unknown>)[group.id];
+      if (typeof id === "string" && id.trim()) winnersByAgeGroup[group.id] = id.trim();
+    }
+  }
+
   return {
     title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : DEFAULT_COMPETITION_META.title,
     theme: typeof data.theme === "string" ? data.theme.trim() : DEFAULT_COMPETITION_META.theme,
@@ -128,6 +141,7 @@ export function normalizeCompetitionMeta(data: Record<string, unknown> | undefin
     votingEndsAt: typeof data.votingEndsAt === "string" ? data.votingEndsAt : null,
     winnerEntryId: typeof data.winnerEntryId === "string" ? data.winnerEntryId : null,
     winnerAnnouncedAt: typeof data.winnerAnnouncedAt === "string" ? data.winnerAnnouncedAt : null,
+    winnersByAgeGroup,
     judgeWeight,
     publicVoteWeight,
   };
@@ -195,7 +209,7 @@ export function normalizeDrawingEntryAdmin(
   const parentEmail = typeof data.parentEmail === "string" ? data.parentEmail.trim() : "";
   const parentPhone = typeof data.parentPhone === "string" ? data.parentPhone.trim() : "";
   const submitterUid = typeof data.submitterUid === "string" ? data.submitterUid.trim() : "";
-  if (!parentName || !parentEmail || !parentPhone || !submitterUid) {
+  if (!parentName || !parentEmail) {
     return { ...base, parentName: parentName || "—", parentEmail, parentPhone, submitterUid };
   }
   return { ...base, parentName, parentEmail, parentPhone, submitterUid };
@@ -227,8 +241,8 @@ export function combinedEntryScore(
   meta: Pick<DrawingCompetitionMeta, "judgeWeight" | "publicVoteWeight">,
   maxVoteCount: number
 ): number {
-  const judgeWeight = meta.judgeWeight ?? 0.7;
-  const voteWeight = meta.publicVoteWeight ?? 0.3;
+  const judgeWeight = meta.judgeWeight ?? 0;
+  const voteWeight = meta.publicVoteWeight ?? 1;
   const judgeNorm = (entry.judgeScore ?? 0) / 100;
   const voteNorm = maxVoteCount > 0 ? entry.voteCount / maxVoteCount : 0;
   return judgeWeight * judgeNorm + voteWeight * voteNorm;
@@ -249,6 +263,44 @@ export function formatArtistPublicLine(
   return parts.join(" · ");
 }
 
+/** Top entries by vote count within each age group (for category leaderboards). */
+export function leaderboardByAgeGroup(
+  entries: DrawingEntry[],
+  limitPerGroup = 3
+): Record<AgeGroupId, DrawingEntry[]> {
+  const result = {} as Record<AgeGroupId, DrawingEntry[]>;
+  for (const group of AGE_GROUPS) {
+    result[group.id] = entries
+      .filter((e) => e.ageGroup === group.id)
+      .sort((a, b) => b.voteCount - a.voteCount || entryCreatedAtMs(b) - entryCreatedAtMs(a))
+      .slice(0, limitPerGroup);
+  }
+  return result;
+}
+
+/** Top entry by public votes in an age group. */
+export function topEntryByVotesInGroup(entries: DrawingEntry[], ageGroup: AgeGroupId): DrawingEntry | null {
+  const inGroup = entries.filter((e) => e.ageGroup === ageGroup);
+  if (inGroup.length === 0) return null;
+  return inGroup.sort((a, b) => b.voteCount - a.voteCount || entryCreatedAtMs(b) - entryCreatedAtMs(a))[0];
+}
+
+/** Top entry by combined score in an age group (admin winner pick). */
+export function topCombinedInGroup(
+  entries: DrawingEntry[],
+  ageGroup: AgeGroupId,
+  meta: Pick<DrawingCompetitionMeta, "judgeWeight" | "publicVoteWeight">
+): DrawingEntry | null {
+  const inGroup = entries.filter((e) => e.ageGroup === ageGroup);
+  if (inGroup.length === 0) return null;
+  const maxVotes = Math.max(1, ...inGroup.map((e) => e.voteCount));
+  return [...inGroup].sort(
+    (a, b) =>
+      combinedEntryScore(b, meta, maxVotes) - combinedEntryScore(a, meta, maxVotes) ||
+      b.voteCount - a.voteCount
+  )[0];
+}
+
 export function normalizeIndiaPhone(input: string): string | null {
   const digits = input.replace(/\D/g, "");
   if (digits.length === 10) return `+91${digits}`;
@@ -259,4 +311,8 @@ export function normalizeIndiaPhone(input: string): string | null {
 
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
 }

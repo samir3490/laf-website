@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -12,14 +11,17 @@ import {
   type User,
 } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
+import DrawingEntryImage from "@/components/drawing/DrawingEntryImage";
 import {
   AGE_GROUPS,
+  ageGroupLabel,
   competitionPhase,
   DEFAULT_COMPETITION_META,
   DRAWING_COMPETITION_COLLECTION,
   DRAWING_META_DOC_ID,
   entryCreatedAtMs,
   formatArtistPublicLine,
+  leaderboardByAgeGroup,
   normalizeCompetitionMeta,
   type AgeGroupId,
   type DrawingCompetitionMeta,
@@ -41,6 +43,7 @@ const REPORT_REASONS: { value: DrawingReportReason; label: string }[] = [
 export default function DrawingCompetitionApp() {
   const searchParams = useSearchParams();
   const submittedPending = searchParams.get("submitted") === "pending";
+  const submittedLive = searchParams.get("submitted") === "live";
   const config = getFirebaseConfig();
   const auth = getFirebaseAuth();
   const db = getFirebaseDb();
@@ -98,7 +101,7 @@ export default function DrawingCompetitionApp() {
 
   useEffect(() => {
     void loadEntries();
-  }, [loadEntries, submittedPending]);
+  }, [loadEntries, submittedPending, submittedLive]);
 
   useEffect(() => {
     if (!auth) return;
@@ -135,11 +138,16 @@ export default function DrawingCompetitionApp() {
     return list;
   }, [filteredEntries, sort]);
 
-  const leaderboard = useMemo(() => sortedEntries.slice(0, 10), [sortedEntries]);
-  const winner = useMemo(
-    () => (effectiveMeta.winnerEntryId ? entries.find((e) => e.id === effectiveMeta.winnerEntryId) : null),
-    [entries, effectiveMeta.winnerEntryId]
-  );
+  const categoryLeaderboard = useMemo(() => leaderboardByAgeGroup(entries, 3), [entries]);
+
+  const categoryWinners = useMemo(() => {
+    const winners = effectiveMeta.winnersByAgeGroup ?? {};
+    return AGE_GROUPS.map((group) => {
+      const entryId = winners[group.id];
+      const entry = entryId ? entries.find((e) => e.id === entryId) : null;
+      return { group, entry };
+    }).filter((row) => row.entry);
+  }, [entries, effectiveMeta.winnersByAgeGroup]);
 
   async function signInToVote() {
     if (!auth) return;
@@ -242,27 +250,21 @@ export default function DrawingCompetitionApp() {
     );
   }
 
-  return (
-    <div className="space-y-10">
-      {submittedPending && (
-        <div className="rounded-2xl border border-green-200 bg-green-50 p-5 text-sm text-laf-navy">
-          Thank you! Your artwork was received and is <strong>pending LAF review</strong>. It will appear in the
-          gallery after approval. You will not be able to vote until it is approved.
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-laf-border bg-white p-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-laf-muted">
+  const sidebar = (
+    <aside className="space-y-4 lg:sticky lg:top-20">
+      <div className="rounded-2xl border border-laf-border bg-white p-4 space-y-3">
+        <h3 className="font-semibold text-laf-navy text-sm">Quick actions</h3>
+        <p className="text-xs text-laf-muted leading-relaxed">
           {voteUser
-            ? `Signed in to vote as ${voteUser.displayName || voteUser.email}`
+            ? `Signed in as ${voteUser.displayName || voteUser.email}`
             : "Sign in with Google to vote — one account, one vote per drawing."}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
           {voteUser ? (
             <button
               type="button"
               onClick={() => auth && signOut(auth)}
-              className="px-4 py-2 rounded-lg border border-laf-border text-sm font-medium text-laf-navy"
+              className="w-full px-4 py-2.5 rounded-lg border border-laf-border text-sm font-medium text-laf-navy"
             >
               Sign out
             </button>
@@ -271,211 +273,250 @@ export default function DrawingCompetitionApp() {
               type="button"
               disabled={authBusy || !auth}
               onClick={() => void signInToVote()}
-              className="px-4 py-2 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
+              className="w-full px-4 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
             >
-              {authBusy ? "Signing in…" : "Sign in with Google to vote"}
+              {authBusy ? "Signing in…" : "Sign in with Google"}
             </button>
           )}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-laf-border bg-white p-6 lg:p-8 space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-laf-navy">{effectiveMeta.title}</h2>
-            {effectiveMeta.theme && <p className="mt-1 text-laf-muted">Theme: {effectiveMeta.theme}</p>}
-          </div>
           {phase.submissionsAllowed && (
             <Link
               href="/events/drawing-competition/submit"
-              className="px-5 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold hover:bg-laf-gold-bright transition-colors"
+              className="w-full text-center px-4 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold hover:bg-laf-navy/90 transition-colors"
             >
               Submit artwork
             </Link>
           )}
         </div>
-        <div
-          className="prose prose-sm max-w-none text-laf-muted"
-          dangerouslySetInnerHTML={{ __html: effectiveMeta.rulesHtml }}
-        />
-        <div className="flex flex-wrap gap-3 text-xs text-laf-muted">
-          <span
-            className={`px-2.5 py-1 rounded-full ${phase.submissionsAllowed ? "bg-green-100 text-green-800" : "bg-gray-100"}`}
-          >
-            Submissions: {phase.submissionsAllowed ? "Open" : "Closed"}
-          </span>
-          <span
-            className={`px-2.5 py-1 rounded-full ${phase.votingAllowed ? "bg-green-100 text-green-800" : "bg-gray-100"}`}
-          >
-            Voting: {phase.votingAllowed ? "Open (Google login)" : "Closed"}
-          </span>
-        </div>
       </div>
 
-      {winner && (
-        <div className="rounded-2xl border-2 border-laf-gold bg-laf-cream/60 p-6 lg:p-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-laf-gold">Winner announced</p>
-          <h3 className="mt-2 text-xl font-bold text-laf-navy">{winner.title}</h3>
-          <p className="text-laf-muted">
-            by {formatArtistPublicLine(winner)} · {winner.voteCount} public votes
-          </p>
-          <div className="relative mt-4 aspect-[4/3] max-w-md overflow-hidden rounded-xl border border-laf-border bg-white">
-            <Image src={winner.imageUrl} alt={winner.title} fill className="object-contain" sizes="400px" unoptimized />
-          </div>
+      <div className="rounded-2xl border border-laf-border bg-white p-4">
+        <h3 className="font-semibold text-laf-navy text-sm mb-3">Vote rankings by category</h3>
+        <div className="space-y-4">
+          {AGE_GROUPS.map((group) => {
+            const top = categoryLeaderboard[group.id];
+            return (
+              <div key={group.id}>
+                <p className="text-xs font-semibold text-laf-gold uppercase tracking-wide mb-2">{group.label}</p>
+                {top.length === 0 ? (
+                  <p className="text-xs text-laf-muted">No entries yet.</p>
+                ) : (
+                  <ol className="space-y-2">
+                    {top.map((entry, i) => (
+                      <li key={entry.id} className="flex gap-2 text-xs">
+                        <span className="font-bold text-laf-navy w-4 shrink-0">{i + 1}</span>
+                        <div className="min-w-0">
+                          <p className="font-medium text-laf-navy truncate">{entry.title}</p>
+                          <p className="text-laf-muted truncate">
+                            {entry.artistName} · {entry.voteCount} votes
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </aside>
+  );
+
+  return (
+    <div className="space-y-6">
+      {submittedPending && (
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-laf-navy">
+          Thank you! Your artwork was received and is <strong>pending LAF review</strong>. It will appear in the
+          gallery after approval.
+        </div>
+      )}
+      {submittedLive && (
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-laf-navy">
+          Thank you! Your artwork is <strong>live in the gallery</strong>. Sign in with Google to vote for your
+          favourites.
         </div>
       )}
 
-      <div className="grid lg:grid-cols-[1fr_280px] gap-8 items-start">
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-lg font-semibold text-laf-navy">Gallery</h3>
-            <div className="flex flex-wrap gap-2">
-              <select
-                value={ageFilter}
-                onChange={(e) => setAgeFilter(e.target.value as AgeGroupId | "all")}
-                className="px-3 py-1.5 rounded-lg text-sm border border-laf-border bg-white"
+      <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_300px] gap-6 lg:gap-8 items-start">
+        <div className="order-1 lg:hidden">{sidebar}</div>
+
+        <main className="order-2 lg:order-1 space-y-6 min-w-0">
+          <div className="rounded-2xl border border-laf-border bg-white p-5 lg:p-6 space-y-4">
+            <div>
+              <h2 className="text-xl lg:text-2xl font-bold text-laf-navy">{effectiveMeta.title}</h2>
+              {effectiveMeta.theme && <p className="mt-1 text-sm text-laf-muted">Theme: {effectiveMeta.theme}</p>}
+            </div>
+            <div
+              className="prose prose-sm max-w-none text-laf-muted"
+              dangerouslySetInnerHTML={{ __html: effectiveMeta.rulesHtml }}
+            />
+            <div className="flex flex-wrap gap-2 text-xs text-laf-muted">
+              <span
+                className={`px-2.5 py-1 rounded-full ${phase.submissionsAllowed ? "bg-green-100 text-green-800" : "bg-gray-100"}`}
               >
-                <option value="all">All age groups</option>
-                {AGE_GROUPS.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setSort("votes")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${sort === "votes" ? "bg-laf-navy text-white" : "bg-laf-cream text-laf-muted"}`}
+                Submissions: {phase.submissionsAllowed ? "Open" : "Closed"}
+              </span>
+              <span
+                className={`px-2.5 py-1 rounded-full ${phase.votingAllowed ? "bg-green-100 text-green-800" : "bg-gray-100"}`}
               >
-                Most votes
-              </button>
-              <button
-                type="button"
-                onClick={() => setSort("newest")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${sort === "newest" ? "bg-laf-navy text-white" : "bg-laf-cream text-laf-muted"}`}
-              >
-                Newest
-              </button>
+                Voting: {phase.votingAllowed ? "Open" : "Closed"}
+              </span>
             </div>
           </div>
 
-          {voteMsg && <p className="text-sm text-red-600">{voteMsg}</p>}
-
-          {entriesError ? (
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-              <p className="text-sm text-red-800">{entriesError}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setEntriesLoading(true);
-                  void loadEntries();
-                }}
-                className="mt-3 px-4 py-2 rounded-lg bg-laf-navy text-white text-sm font-medium"
-              >
-                Try again
-              </button>
+          {categoryWinners.length > 0 && (
+            <div className="rounded-2xl border-2 border-laf-gold bg-laf-cream/60 p-5 lg:p-6 space-y-4">
+              <p className="text-sm font-semibold uppercase tracking-wide text-laf-gold">Category winners</p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {categoryWinners.map(({ group, entry }) =>
+                  entry ? (
+                    <div key={group.id} className="rounded-xl border border-laf-border bg-white p-4">
+                      <p className="text-xs font-semibold text-laf-gold">{group.label}</p>
+                      <h3 className="mt-1 font-bold text-laf-navy">{entry.title}</h3>
+                      <p className="text-sm text-laf-muted">
+                        {formatArtistPublicLine(entry)} · {entry.voteCount} votes
+                      </p>
+                      <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg border border-laf-border bg-laf-cream/30">
+                        <DrawingEntryImage entry={entry} alt={entry.title} sizes="240px" />
+                      </div>
+                    </div>
+                  ) : null
+                )}
+              </div>
             </div>
-          ) : entriesLoading ? (
-            <p className="text-sm text-laf-muted">Loading entries…</p>
-          ) : sortedEntries.length === 0 ? (
-            <p className="text-sm text-laf-muted">No approved entries in this category yet.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-6">
-              {sortedEntries.map((entry) => {
-                const hasVoted = votedIds.has(entry.id);
-                const canVote = phase.votingAllowed && voteUser && !hasVoted;
-                return (
-                  <article
-                    key={entry.id}
-                    className="rounded-2xl border border-laf-border bg-white overflow-hidden shadow-sm"
+          )}
+
+          <section className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
+              <h3 className="text-lg font-semibold text-laf-navy">Gallery</h3>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={ageFilter}
+                  onChange={(e) => setAgeFilter(e.target.value as AgeGroupId | "all")}
+                  className="w-full sm:w-auto px-3 py-2 rounded-lg text-sm border border-laf-border bg-white"
+                >
+                  <option value="all">All age groups</option>
+                  {AGE_GROUPS.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setSort("votes")}
+                    className={`flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm ${sort === "votes" ? "bg-laf-navy text-white" : "bg-laf-cream text-laf-muted"}`}
                   >
-                    <div className="relative aspect-[4/3] bg-laf-cream/30">
-                      <Image
-                        src={entry.imageUrl}
-                        alt={entry.title}
-                        fill
-                        className="object-contain"
-                        sizes="(max-width: 640px) 100vw, 50vw"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="p-4 space-y-3">
-                      <div>
-                        <h4 className="font-semibold text-laf-navy">{entry.title}</h4>
-                        <p className="text-sm text-laf-muted">{formatArtistPublicLine(entry)}</p>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-medium text-laf-navy">{entry.voteCount} votes</span>
-                        {!voteUser ? (
-                          <button
-                            type="button"
-                            onClick={() => void signInToVote()}
-                            className="px-3 py-1.5 rounded-lg text-sm font-medium border border-laf-gold text-laf-gold"
-                          >
-                            Sign in to vote
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={!canVote || votingId === entry.id}
-                            onClick={() => handleVote(entry)}
-                            className="px-3 py-1.5 rounded-lg text-sm font-medium bg-laf-gold text-white hover:bg-laf-gold-bright disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {hasVoted ? "Voted" : votingId === entry.id ? "…" : "Vote"}
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setReportEntry(entry);
-                            setReportReason("inappropriate");
-                            setReportDetails("");
-                            setReportMsg("");
-                          }}
-                          className="text-xs text-laf-muted hover:text-laf-navy underline"
-                        >
-                          Report
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+                    Most votes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSort("newest")}
+                    className={`flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm ${sort === "newest" ? "bg-laf-navy text-white" : "bg-laf-cream text-laf-muted"}`}
+                  >
+                    Newest
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
 
-        <aside className="rounded-2xl border border-laf-border bg-white p-5 lg:sticky lg:top-24">
-          <h3 className="font-semibold text-laf-navy mb-4">Leaderboard</h3>
-          {leaderboard.length === 0 ? (
-            <p className="text-sm text-laf-muted">No entries yet.</p>
-          ) : (
-            <ol className="space-y-3">
-              {leaderboard.map((entry, i) => (
-                <li key={entry.id} className="flex gap-3 text-sm">
-                  <span className="font-bold text-laf-gold w-5 shrink-0">{i + 1}</span>
-                  <div className="min-w-0">
-                    <p className="font-medium text-laf-navy truncate">{entry.title}</p>
-                    <p className="text-laf-muted truncate">
-                      {formatArtistPublicLine(entry)} · {entry.voteCount} votes
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          )}
-        </aside>
+            {voteMsg && <p className="text-sm text-red-600">{voteMsg}</p>}
+
+            {entriesError ? (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+                <p className="text-sm text-red-800">{entriesError}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEntriesLoading(true);
+                    void loadEntries();
+                  }}
+                  className="mt-3 px-4 py-2 rounded-lg bg-laf-navy text-white text-sm font-medium"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : entriesLoading ? (
+              <p className="text-sm text-laf-muted">Loading entries…</p>
+            ) : sortedEntries.length === 0 ? (
+              <p className="text-sm text-laf-muted">No entries in this category yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                {sortedEntries.map((entry) => {
+                  const hasVoted = votedIds.has(entry.id);
+                  const canVote = phase.votingAllowed && voteUser && !hasVoted;
+                  return (
+                    <article
+                      key={entry.id}
+                      className="rounded-2xl border border-laf-border bg-white overflow-hidden shadow-sm"
+                    >
+                      <div className="relative aspect-[4/3] bg-laf-cream/30">
+                        <DrawingEntryImage entry={entry} alt={entry.title} />
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div>
+                          <h4 className="font-semibold text-laf-navy">{entry.title}</h4>
+                          <p className="text-sm text-laf-muted">{formatArtistPublicLine(entry)}</p>
+                          <p className="text-xs text-laf-muted mt-0.5">{ageGroupLabel(entry.ageGroup)}</p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-medium text-laf-navy">{entry.voteCount} votes</span>
+                          {!voteUser ? (
+                            <button
+                              type="button"
+                              onClick={() => void signInToVote()}
+                              className="px-3 py-1.5 rounded-lg text-sm font-medium border border-laf-gold text-laf-gold"
+                            >
+                              Sign in to vote
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={!canVote || votingId === entry.id}
+                              onClick={() => handleVote(entry)}
+                              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-laf-gold text-white hover:bg-laf-gold-bright disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {hasVoted ? "Voted" : votingId === entry.id ? "…" : "Vote"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReportEntry(entry);
+                              setReportReason("inappropriate");
+                              setReportDetails("");
+                              setReportMsg("");
+                            }}
+                            className="text-xs text-laf-muted hover:text-laf-navy underline ml-auto sm:ml-0"
+                          >
+                            Report
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </main>
+
+        <div className="order-3 lg:order-2 hidden lg:block">{sidebar}</div>
       </div>
 
       {reportEntry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <form onSubmit={handleReport} className="w-full max-w-md rounded-2xl bg-white p-6 space-y-4 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50">
+          <form
+            onSubmit={handleReport}
+            className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto"
+          >
             <h3 className="text-lg font-semibold text-laf-navy">Report entry</h3>
             <p className="text-sm text-laf-muted">{reportEntry.title}</p>
             <select
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value as DrawingReportReason)}
-              className="w-full px-3 py-2 rounded-lg border border-laf-border"
+              className="w-full px-3 py-2 rounded-lg border border-laf-border text-base"
             >
               {REPORT_REASONS.map((r) => (
                 <option key={r.value} value={r.value}>
@@ -489,7 +530,7 @@ export default function DrawingCompetitionApp() {
               placeholder="Optional details"
               maxLength={500}
               rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-laf-border"
+              className="w-full px-3 py-2 rounded-lg border border-laf-border text-base"
             />
             {reportMsg && <p className="text-sm text-laf-muted">{reportMsg}</p>}
             <div className="flex gap-2 justify-end">

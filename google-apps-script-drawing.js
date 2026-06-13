@@ -70,7 +70,7 @@ function doPost(e) {
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     const fileId = file.getId();
-    const directUrl = "https://drive.google.com/uc?export=view&id=" + fileId;
+    const directUrl = "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1600";
 
     return ContentService.createTextOutput(
       JSON.stringify({
