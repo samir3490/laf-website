@@ -14,11 +14,14 @@ const navLinks = [
   { href: "/csr", label: "CSR" },
   { href: "/blog", label: "Blog" },
   { href: "/library", label: "Library" },
-  { href: "/drawing-competition", label: "Drawing" },
-  { href: "/reviews", label: "Reviews" },
-  { href: "/community-scratch-games", label: "Scratch Games" },
+  { href: "/events", label: "Events" },
   { href: "/contact", label: "Contact" },
 ];
+
+function isNavActive(pathname: string, href: string): boolean {
+  if (href === "/events") return pathname === "/events" || pathname.startsWith("/events/");
+  return pathname === href;
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -64,7 +67,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`text-sm font-medium transition-colors whitespace-nowrap ${
-                  pathname === link.href
+                  isNavActive(pathname, link.href)
                     ? "text-laf-gold"
                     : scrolled
                       ? "text-laf-muted hover:text-laf-navy"
@@ -106,7 +109,7 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className={`block py-2.5 text-sm font-medium ${
-                pathname === link.href ? "text-laf-gold" : "text-laf-navy"
+                isNavActive(pathname, link.href) ? "text-laf-gold" : "text-laf-navy"
               }`}
             >
               {link.label}

@@ -11,6 +11,7 @@ import {
   DRAWING_ENTRIES_COLLECTION,
   DRAWING_META_DOC_ID,
   DRAWING_VOTED_STORAGE_KEY,
+  formatArtistPublicLine,
   normalizeCompetitionMeta,
   normalizeDrawingEntry,
   type DrawingCompetitionMeta,
@@ -211,7 +212,7 @@ export default function DrawingCompetitionApp() {
             </div>
             {phase.submissionsAllowed && (
               <Link
-                href="/drawing-competition/submit"
+                href="/events/drawing-competition/submit"
                 className="px-5 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold hover:bg-laf-gold-bright transition-colors"
               >
                 Submit artwork
@@ -238,7 +239,7 @@ export default function DrawingCompetitionApp() {
           <p className="text-sm font-semibold uppercase tracking-wide text-laf-gold">Winner announced</p>
           <h3 className="mt-2 text-xl font-bold text-laf-navy">{winner.title}</h3>
           <p className="text-laf-muted">
-            by {winner.artistName} · {winner.voteCount} votes
+            by {formatArtistPublicLine(winner)} · {winner.voteCount} votes
           </p>
           <div className="relative mt-4 aspect-[4/3] max-w-md overflow-hidden rounded-xl border border-laf-border bg-white">
             <Image src={winner.imageUrl} alt={winner.title} fill className="object-contain" sizes="400px" unoptimized />
@@ -295,11 +296,7 @@ export default function DrawingCompetitionApp() {
                     <div className="p-4 space-y-3">
                       <div>
                         <h4 className="font-semibold text-laf-navy">{entry.title}</h4>
-                        <p className="text-sm text-laf-muted">
-                          {entry.artistName}
-                          {entry.artistAge ? ` · ${entry.artistAge}` : ""}
-                          {entry.artistCity ? ` · ${entry.artistCity}` : ""}
-                        </p>
+                        <p className="text-sm text-laf-muted">{formatArtistPublicLine(entry)}</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-medium text-laf-navy">{entry.voteCount} votes</span>
@@ -344,7 +341,7 @@ export default function DrawingCompetitionApp() {
                   <div className="min-w-0">
                     <p className="font-medium text-laf-navy truncate">{entry.title}</p>
                     <p className="text-laf-muted truncate">
-                      {entry.artistName} · {entry.voteCount} votes
+                      {formatArtistPublicLine(entry)} · {entry.voteCount} votes
                     </p>
                   </div>
                 </li>

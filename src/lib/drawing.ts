@@ -31,6 +31,8 @@ export type DrawingEntry = {
   title: string;
   artistName: string;
   artistAge?: number;
+  artistClass?: string;
+  artistSchool?: string;
   artistCity?: string;
   imageUrl: string;
   /** Google Drive file ID (preferred storage). */
@@ -89,6 +91,8 @@ export function normalizeDrawingEntry(
 
   const status: DrawingEntryStatus = data.status === "removed" ? "removed" : "active";
   const artistAge = typeof data.artistAge === "number" ? data.artistAge : undefined;
+  const artistClass = typeof data.artistClass === "string" ? data.artistClass.trim() : undefined;
+  const artistSchool = typeof data.artistSchool === "string" ? data.artistSchool.trim() : undefined;
   const artistCity = typeof data.artistCity === "string" ? data.artistCity.trim() : undefined;
   const voteCount = typeof data.voteCount === "number" ? data.voteCount : 0;
 
@@ -97,6 +101,8 @@ export function normalizeDrawingEntry(
     title,
     artistName,
     artistAge,
+    artistClass,
+    artistSchool,
     artistCity,
     imageUrl,
     driveFileId,
@@ -125,4 +131,17 @@ export function competitionPhase(meta: DrawingCompetitionMeta): {
 
 export function voteDocId(voterId: string, entryId: string): string {
   return `${voterId}_${entryId}`;
+}
+
+/** Public display line for gallery cards — first name, age, class, school, city only. */
+export function formatArtistPublicLine(entry: Pick<
+  DrawingEntry,
+  "artistName" | "artistAge" | "artistClass" | "artistSchool" | "artistCity"
+>): string {
+  const parts: string[] = [entry.artistName];
+  if (entry.artistAge != null) parts.push(`Age ${entry.artistAge}`);
+  if (entry.artistClass) parts.push(`Class ${entry.artistClass}`);
+  if (entry.artistSchool) parts.push(entry.artistSchool);
+  if (entry.artistCity) parts.push(entry.artistCity);
+  return parts.join(" · ");
 }

@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Submit Artwork — Drawing Competition",
   description: "Upload your painting or drawing to the Lata Agrawal Foundation drawing competition.",
-  path: "/drawing-competition/submit",
+  path: "/events/drawing-competition/submit",
 });
 
 export default function DrawingSubmitPage() {

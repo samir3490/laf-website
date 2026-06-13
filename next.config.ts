@@ -70,6 +70,9 @@ const nextConfig: NextConfig = {
       { source: "/category/:path*", destination: "/blog", permanent: true },
       { source: "/tag/:path*", destination: "/blog", permanent: true },
       { source: "/author/:path*", destination: "/blog", permanent: true },
+      { source: "/drawing-competition", destination: "/events/drawing-competition", permanent: true },
+      { source: "/drawing-competition/submit", destination: "/events/drawing-competition/submit", permanent: true },
+      { source: "/community-scratch-games", destination: "/events/scratch-games", permanent: true },
     ];
     return redirects;
   },

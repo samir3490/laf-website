@@ -76,6 +76,8 @@ export async function POST(req: Request) {
     const title = String(formData.get("title") ?? "").trim();
     const artistName = String(formData.get("artistName") ?? "").trim();
     const artistCity = String(formData.get("artistCity") ?? "").trim();
+    const artistClass = String(formData.get("artistClass") ?? "").trim();
+    const artistSchool = String(formData.get("artistSchool") ?? "").trim();
     const termsAccepted = formData.get("termsAccepted") === "true";
     const ageRaw = String(formData.get("artistAge") ?? "").trim();
     const file = formData.get("image");
@@ -83,8 +85,17 @@ export async function POST(req: Request) {
     if (!title || title.length > 120) {
       return NextResponse.json({ error: "Please enter a title (max 120 characters)." }, { status: 400 });
     }
-    if (!artistName || artistName.length > 80) {
-      return NextResponse.json({ error: "Please enter your name (max 80 characters)." }, { status: 400 });
+    if (!artistName || artistName.length > 40) {
+      return NextResponse.json({ error: "Please enter a first name (max 40 characters)." }, { status: 400 });
+    }
+    if (!artistClass || artistClass.length > 20) {
+      return NextResponse.json({ error: "Please enter a class or grade." }, { status: 400 });
+    }
+    if (!artistSchool || artistSchool.length > 100) {
+      return NextResponse.json({ error: "Please enter a school name (max 100 characters)." }, { status: 400 });
+    }
+    if (!artistCity || artistCity.length > 80) {
+      return NextResponse.json({ error: "Please enter a city." }, { status: 400 });
     }
     if (!termsAccepted) {
       return NextResponse.json({ error: "Please confirm the artwork is your original work." }, { status: 400 });
@@ -96,10 +107,12 @@ export async function POST(req: Request) {
     let artistAge: number | undefined;
     if (ageRaw) {
       const age = Number.parseInt(ageRaw, 10);
-      if (!Number.isFinite(age) || age < 1 || age > 120) {
-        return NextResponse.json({ error: "Please enter a valid age." }, { status: 400 });
+      if (!Number.isFinite(age) || age < 1 || age > 25) {
+        return NextResponse.json({ error: "Please enter a valid age (1–25)." }, { status: 400 });
       }
       artistAge = age;
+    } else {
+      return NextResponse.json({ error: "Please enter an age." }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -132,8 +145,10 @@ export async function POST(req: Request) {
     await adminDb.collection(DRAWING_ENTRIES_COLLECTION).doc(entryId).set({
       title,
       artistName,
-      artistAge: artistAge ?? null,
-      artistCity: artistCity || null,
+      artistAge,
+      artistClass,
+      artistSchool,
+      artistCity,
       imageUrl: driveUpload.url,
       driveFileId: driveUpload.fileId,
       voteCount: 0,

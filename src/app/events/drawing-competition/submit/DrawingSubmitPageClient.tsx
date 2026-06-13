@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
+import EventBackLink from "@/components/events/EventBackLink";
 import SubmitDrawingForm from "@/components/drawing/SubmitDrawingForm";
 import {
   competitionPhase,
@@ -30,6 +31,7 @@ export default function DrawingSubmitPageClient() {
     <>
       <PageHeader title="Submit Artwork" subtitle="Upload your painting or drawing to the competition" />
       <PageContainer className="py-12 lg:py-16">
+        <EventBackLink />
         {!config ? (
           <p className="text-sm text-laf-muted">Firebase setup required.</p>
         ) : (
