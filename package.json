@@ -17,6 +17,7 @@
     "seo:blog": "node scripts/seo-enhance-blog-posts.mjs",
     "remove:articly-posts": "node scripts/remove-articly-posts.mjs",
     "rename:blog-titles": "node scripts/rename-blog-titles.mjs",
+    "rewrite:blog-posts": "node scripts/rewrite-blog-posts.mjs",
     "publish:blog": "node scripts/publish-scheduled-blog.mjs"
   },
   "dependencies": {

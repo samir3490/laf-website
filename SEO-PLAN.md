@@ -124,7 +124,7 @@
 |---------|---------|
 | `npm run seo:blog` | Internal links + strip Articly junk in all posts |
 | `npm run remove:articly-posts` | Remove duplicate posts (same title/content), not all Articly posts |
-| `npm run rename:blog-titles` | Give repetitive food-donation posts unique titles (slugs unchanged) |
+| `npm run rewrite:blog-posts` | Regenerate NGO-focused article HTML (keeps slug, date, URL) |
 | `npm run clean:blog-posts -- --all` | Rewrite intros / known bad posts |
 | `npm run publish:blog` | Move due scheduled posts → live (local test) |
 | `npm run export:wp` | Pull from WordPress (legacy) |
@@ -137,7 +137,6 @@ See **BLOG-AUTOMATION.md** for weekly publishing workflow.
 
 | Category | Count | Action |
 |----------|-------|--------|
-| Live blog posts | **87** | Restored; 5 exact duplicates removed; titles deduplicated via `npm run rename:blog-titles` |
-| Duplicate republished posts | **5 removed** | Same title/content as another post (e.g. `-2`, `-3` slug suffixes) |
-| Real LAF event stories (Sewashram Wardha) | **2** | Promote on home + blog |
+| Live blog posts | **87** | Full rewrite on NGO topics (education, career, digital literacy, women, health, food, volunteering); dates & slugs unchanged |
+| Real LAF event stories (Sewashram Wardha) | **2** | Original dental & eye camp content preserved |
 | Scheduled weekly posts | 4 queued | See `scheduled-posts.json` + GitHub Action |
