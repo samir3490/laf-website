@@ -124,6 +124,7 @@
 |---------|---------|
 | `npm run seo:blog` | Internal links + strip Articly junk in all posts |
 | `npm run remove:articly-posts` | Remove duplicate posts (same title/content), not all Articly posts |
+| `npm run rename:blog-titles` | Give repetitive food-donation posts unique titles (slugs unchanged) |
 | `npm run clean:blog-posts -- --all` | Rewrite intros / known bad posts |
 | `npm run publish:blog` | Move due scheduled posts → live (local test) |
 | `npm run export:wp` | Pull from WordPress (legacy) |
