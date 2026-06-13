@@ -38,10 +38,7 @@ export default function LibraryPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-      <PageHeader
-        title="Learning Resource Library"
-        subtitle="Curated free learning websites for students, teachers, volunteers, and parents across India"
-      />
+      <PageHeader title="Learning Resource Library" />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}

@@ -14,10 +14,7 @@ export const metadata: Metadata = pageMetadata({
 export default function LibrarySubmitPage() {
   return (
     <>
-      <PageHeader
-        title="Suggest a Resource"
-        subtitle="Help us grow India's free educational resource directory"
-      />
+      <PageHeader title="Suggest a Resource" />
       <PageContainer className="py-12 lg:py-16">
         <SubmitResourceForm />
       </PageContainer>

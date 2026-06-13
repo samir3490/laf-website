@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
 export default function WaysToHelpPage() {
   return (
     <>
-      <PageHeader title="Ways to Help" subtitle={ways.tagline} />
+      <PageHeader title="Ways to Help" />
       <PageContainer className="py-12 lg:py-16 space-y-16">
         {ways.ways.map((way, i) => (
           <section

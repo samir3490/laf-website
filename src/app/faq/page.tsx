@@ -19,7 +19,7 @@ export default function FaqPage() {
   return (
     <>
       <JsonLd data={faqPageJsonLd(faq.items)} />
-      <PageHeader title="FAQs" subtitle="Common questions about how you can help" />
+      <PageHeader title="FAQs" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-[1fr_min(320px,32%)] gap-10 lg:gap-14 items-start">
           <FaqAccordion items={faq.items} />

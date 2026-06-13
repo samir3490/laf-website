@@ -15,10 +15,7 @@ export const metadata: Metadata = pageMetadata({
 export default function EventsPage() {
   return (
     <>
-      <PageHeader
-        title="Events & Competitions"
-        subtitle={`Drawing Competition open ${DRAWING_COMPETITION_DATES.label} · Create, share, and celebrate together`}
-      />
+      <PageHeader title="Events & Competitions" />
       <PageContainer className="py-12 lg:py-16">
         <EventsHub />
       </PageContainer>

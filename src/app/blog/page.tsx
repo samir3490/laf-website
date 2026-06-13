@@ -43,7 +43,7 @@ export default async function BlogPage({ searchParams }: Props) {
 
   return (
     <>
-      <PageHeader title="Blog" subtitle="Stories of impact and community in Wardha and across India" />
+      <PageHeader title="Blog" />
       <PageContainer className="py-12">
         <ul className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {slice.map((post) => {

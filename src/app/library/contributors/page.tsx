@@ -15,10 +15,7 @@ export const metadata: Metadata = pageMetadata({
 export default function LibraryContributorsPage() {
   return (
     <>
-      <PageHeader
-        title="Top Contributors"
-        subtitle="Thank you to everyone who suggests quality learning resources"
-      />
+      <PageHeader title="Top Contributors" />
       <PageContainer className="py-8 lg:py-12 max-w-2xl">
         <p className="text-sm text-laf-muted mb-8 leading-relaxed">
           Only human-approved submissions count. Names are shown as you choose on the{" "}

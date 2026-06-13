@@ -18,10 +18,7 @@ export default function LibraryScholarshipsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Scholarship Library"
-        subtitle="Find scholarships and education funding opportunities across India"
-      />
+      <PageHeader title="Scholarship Library" />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}

@@ -7,7 +7,6 @@ import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
 import DrawingCompetitionBanner from "@/components/drawing/DrawingCompetitionBanner";
 import SubmitDrawingForm from "@/components/drawing/SubmitDrawingForm";
-import { DRAWING_COMPETITION_DATES } from "@/lib/drawing-competition-promo";
 import {
   competitionPhase,
   DRAWING_COMPETITION_COLLECTION,
@@ -31,10 +30,7 @@ export default function DrawingSubmitPageClient() {
 
   return (
     <>
-      <PageHeader
-        title="Submit Artwork"
-        subtitle={`LAF Drawing Competition · ${DRAWING_COMPETITION_DATES.label}`}
-      />
+      <PageHeader title="Submit Artwork" />
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink />
         {!config ? (

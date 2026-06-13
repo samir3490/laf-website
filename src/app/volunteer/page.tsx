@@ -16,10 +16,7 @@ export const metadata: Metadata = pageMetadata({
 export default function VolunteerPage() {
   return (
     <>
-      <PageHeader
-        title="Become a Volunteer"
-        subtitle="Offer your time and skills to mentor, teach, and support our programs"
-      />
+      <PageHeader title="Become a Volunteer" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
           <div className="space-y-10">

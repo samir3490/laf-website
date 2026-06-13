@@ -157,7 +157,7 @@ async function main() {
 
   const site = {
     name: 'Lata Agrawal Foundation',
-    tagline: 'Education, healthcare, and community programs across India.',
+    tagline: 'We aim to bridge the education gap by providing essential resources, mentorship, and opportunities.',
     url: 'https://agrawalfoundation.org',
     contact: {
       email: 'info@agrawalfoundation.org',

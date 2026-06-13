@@ -18,10 +18,7 @@ export default function ReviewsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Google Reviews"
-        subtitle="Thank you to everyone who shares feedback about our work"
-      />
+      <PageHeader title="Google Reviews" />
       <PageContainer wide className="py-8 lg:py-12">
         <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 xl:gap-12 items-start">
           <GoogleReviewsList />

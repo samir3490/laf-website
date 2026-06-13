@@ -18,10 +18,7 @@ export default function LibraryNgoPage() {
 
   return (
     <>
-      <PageHeader
-        title="NGO Knowledge Library"
-        subtitle="Guides and tools for nonprofits, CSR partners, and community organizations"
-      />
+      <PageHeader title="NGO Knowledge Library" />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}

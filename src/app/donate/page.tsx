@@ -19,10 +19,7 @@ export default function DonatePage() {
   return (
     <>
       <DonateAnalytics />
-      <PageHeader
-        title="Donate Now"
-        subtitle="Every contribution brings hope and change"
-      />
+      <PageHeader title="Donate Now" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           <div className="space-y-8">

@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 export default function AdminLibraryPage() {
   return (
     <>
-      <PageHeader
-        title="Library Admin"
-        subtitle="Review submissions and manage the learning resource catalog"
-      />
+      <PageHeader title="Library Admin" />
       <PageContainer className="py-12 lg:py-16">
         <AdminLibraryApp />
       </PageContainer>

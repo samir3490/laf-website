@@ -18,10 +18,7 @@ export default function LibraryRoboticsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Robotics Learning Library"
-        subtitle="From Scratch to Arduino — curated robotics and maker resources"
-      />
+      <PageHeader title="Robotics Learning Library" />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}

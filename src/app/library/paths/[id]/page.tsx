@@ -31,7 +31,7 @@ export default async function LearningPathPage({ params }: Props) {
 
   return (
     <>
-      <PageHeader title={path.title} subtitle={path.description} />
+      <PageHeader title={path.title} />
       <PageContainer className="py-12 lg:py-16 max-w-2xl">
         <Link href="/library/paths" className="text-sm text-laf-gold hover:underline">
           ← All learning paths

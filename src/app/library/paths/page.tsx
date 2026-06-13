@@ -17,10 +17,7 @@ export default function LibraryPathsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Learning Paths"
-        subtitle="Follow curated journeys from beginner to advanced"
-      />
+      <PageHeader title="Learning Paths" />
       <PageContainer className="py-12 lg:py-16">
         <Link href="/library" className="text-sm text-laf-gold hover:underline">
           ← Back to library

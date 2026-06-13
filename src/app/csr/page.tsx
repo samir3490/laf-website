@@ -16,10 +16,7 @@ export const metadata: Metadata = pageMetadata({
 export default function CsrPage() {
   return (
     <>
-      <PageHeader
-        title="CSR for Companies"
-        subtitle="Partner with us to create lasting community impact"
-      />
+      <PageHeader title="CSR for Companies" />
       <PageContainer className="py-12 lg:py-16">
         <p className="text-lg text-laf-muted leading-relaxed max-w-3xl mb-12">{csr.intro}</p>
 

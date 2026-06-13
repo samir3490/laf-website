@@ -14,10 +14,7 @@ export const metadata: Metadata = pageMetadata({
 export default function CommunityScratchGamesPage() {
   return (
     <>
-      <PageHeader
-        title="Community Scratch Games"
-        subtitle="Play games built with MIT Scratch — sign up to share your own projects"
-      />
+      <PageHeader title="Community Scratch Games" />
       <PageContainer className="py-12 lg:py-16">
         <ScratchGamesApp />
       </PageContainer>

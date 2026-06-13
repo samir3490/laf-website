@@ -20,7 +20,7 @@ export default function ContactPage() {
   return (
     <>
       <JsonLd data={contactPageJsonLd()} />
-      <PageHeader title="Contact Us" subtitle="We would love to hear from you" />
+      <PageHeader title="Contact Us" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
           <div className="space-y-8">

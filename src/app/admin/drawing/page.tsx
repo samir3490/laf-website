@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function AdminDrawingPage() {
   return (
     <>
-      <PageHeader title="Drawing Competition Admin" subtitle="Manage entries, voting, and winner announcement" />
+      <PageHeader title="Drawing Competition Admin" />
       <PageContainer className="py-12 lg:py-16">
         <AdminDrawingApp />
       </PageContainer>

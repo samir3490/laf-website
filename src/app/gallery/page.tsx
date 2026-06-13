@@ -17,10 +17,7 @@ export default function GalleryPage() {
 
   return (
     <>
-      <PageHeader
-        title="Photo Gallery"
-        subtitle="Snapshots from our education, health, and community programs"
-      />
+      <PageHeader title="Photo Gallery" />
       <PageContainer wide className="py-8 lg:py-12">
         <PhotoGallery intro={intro} categories={categories} images={images} />
       </PageContainer>

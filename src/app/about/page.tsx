@@ -17,7 +17,7 @@ export const metadata: Metadata = pageMetadata({
 export default function AboutPage() {
   return (
     <>
-      <PageHeader title="About Us" subtitle="Empowering smiles, changing lives" />
+      <PageHeader title="About Us" />
       <PageContainer className="py-12 lg:py-16">
         <div className="grid lg:grid-cols-[1fr_min(380px,35%)] gap-10 lg:gap-14 items-start mb-16">
           <div className="space-y-6">

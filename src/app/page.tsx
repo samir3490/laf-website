@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import home from "@/content/home.json";
+import { getSite } from "@/lib/content";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
 import DrawingCompetitionPromo from "@/components/home/DrawingCompetitionPromo";
@@ -17,6 +18,7 @@ export const metadata: Metadata = pageMetadata({
 
 export default function HomePage() {
   const { hero, impact, help } = home;
+  const site = getSite();
 
   return (
     <>
@@ -39,7 +41,7 @@ export default function HomePage() {
               {hero.title}
             </h1>
             <div className="w-16 h-1 bg-laf-gold my-6 rounded-full" />
-            <p className="text-lg font-medium text-white/95">{hero.subtitle}</p>
+            <p className="text-lg font-medium text-white/95">{site.tagline}</p>
             <p className="mt-4 text-white/85 leading-relaxed max-w-xl">{hero.body}</p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button href="/about">Learn More</Button>

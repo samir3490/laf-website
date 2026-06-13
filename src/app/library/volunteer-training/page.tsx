@@ -18,10 +18,7 @@ export default function LibraryVolunteerPage() {
 
   return (
     <>
-      <PageHeader
-        title="Volunteer Training Library"
-        subtitle="Guides and courses for volunteers working with children and communities"
-      />
+      <PageHeader title="Volunteer Training Library" />
       <PageContainer wide className="py-8 lg:py-12">
         <LibraryPageShell
           seedResources={seedResources}
