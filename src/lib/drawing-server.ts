@@ -11,6 +11,7 @@ function timestampToIso(value: unknown): string | undefined {
   return undefined;
 }
 
+/** Public gallery entry — no parent contact info or judge scores. */
 export function normalizeDrawingEntryForApi(
   id: string,
   data: DocumentData | undefined
@@ -18,8 +19,9 @@ export function normalizeDrawingEntryForApi(
   const entry = normalizeDrawingEntry((data ?? {}) as Record<string, unknown>, id);
   if (!entry || entry.status !== "active") return null;
 
+  const { judgeScore: _judgeScore, ...publicFields } = entry;
   return {
-    ...entry,
+    ...publicFields,
     createdAt: timestampToIso(data?.createdAt),
   };
 }

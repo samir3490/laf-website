@@ -1,7 +1,7 @@
-import { getAuth } from "firebase-admin/auth";
+import { getAuth, type DecodedIdToken } from "firebase-admin/auth";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
 
-export async function verifyLibraryAdminRequest(req: Request): Promise<string | null> {
+export async function verifyFirebaseIdToken(req: Request): Promise<DecodedIdToken | null> {
   if (!getFirebaseAdminDb()) return null;
 
   const authHeader = req.headers.get("authorization");
@@ -9,9 +9,26 @@ export async function verifyLibraryAdminRequest(req: Request): Promise<string | 
   if (!token) return null;
 
   try {
-    const decoded = await getAuth().verifyIdToken(token);
-    return decoded.email ?? null;
+    return await getAuth().verifyIdToken(token);
   } catch {
     return null;
   }
+}
+
+export async function verifyLibraryAdminRequest(req: Request): Promise<string | null> {
+  const decoded = await verifyFirebaseIdToken(req);
+  return decoded?.email ?? null;
+}
+
+export function authProvider(decoded: DecodedIdToken): string | undefined {
+  const firebase = decoded.firebase as { sign_in_provider?: string } | undefined;
+  return firebase?.sign_in_provider;
+}
+
+export function isPhoneAuth(decoded: DecodedIdToken): boolean {
+  return authProvider(decoded) === "phone" && Boolean(decoded.phone_number);
+}
+
+export function isGoogleAuth(decoded: DecodedIdToken): boolean {
+  return authProvider(decoded) === "google.com";
 }

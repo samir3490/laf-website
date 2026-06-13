@@ -19,6 +19,8 @@ import {
 } from "firebase/firestore";
 import Image from "next/image";
 import {
+  ageGroupLabel,
+  combinedEntryScore,
   DEFAULT_COMPETITION_META,
   DRAWING_COMPETITION_COLLECTION,
   DRAWING_ENTRIES_COLLECTION,
@@ -26,14 +28,15 @@ import {
   DRAWING_REPORTS_COLLECTION,
   isDrawingAdmin,
   normalizeCompetitionMeta,
-  normalizeDrawingEntry,
+  normalizeDrawingEntryAdmin,
+  type AgeGroupId,
   type DrawingCompetitionMeta,
-  type DrawingEntry,
+  type DrawingEntryAdmin,
 } from "@/lib/drawing";
 import { getFirebaseAuth, getFirebaseConfig, getFirebaseDb } from "@/lib/firebase";
 
-function toEntry(snap: QueryDocumentSnapshot): DrawingEntry | null {
-  return normalizeDrawingEntry(snap.data() as Record<string, unknown>, snap.id);
+function toEntry(snap: QueryDocumentSnapshot): DrawingEntryAdmin | null {
+  return normalizeDrawingEntryAdmin(snap.data() as Record<string, unknown>, snap.id);
 }
 
 export default function AdminDrawingApp() {
@@ -49,9 +52,11 @@ export default function AdminDrawingApp() {
   const [busy, setBusy] = useState("");
 
   const [meta, setMeta] = useState<DrawingCompetitionMeta>(DEFAULT_COMPETITION_META);
-  const [entries, setEntries] = useState<DrawingEntry[]>([]);
+  const [entries, setEntries] = useState<DrawingEntryAdmin[]>([]);
   const [openReports, setOpenReports] = useState(0);
   const [winnerPick, setWinnerPick] = useState("");
+  const [winnerAgeGroup, setWinnerAgeGroup] = useState<AgeGroupId | "all">("all");
+  const [judgeScores, setJudgeScores] = useState<Record<string, string>>({});
 
   const isAdmin = isDrawingAdmin(user?.email);
 
@@ -70,10 +75,15 @@ export default function AdminDrawingApp() {
     });
 
     const entriesUnsub = onSnapshot(
-      query(collection(db, DRAWING_ENTRIES_COLLECTION), orderBy("voteCount", "desc")),
+      query(collection(db, DRAWING_ENTRIES_COLLECTION), orderBy("createdAt", "desc")),
       (snap) => {
-        const list = snap.docs.map(toEntry).filter((e): e is DrawingEntry => e !== null);
+        const list = snap.docs.map(toEntry).filter((e): e is DrawingEntryAdmin => e !== null);
         setEntries(list);
+        const scores: Record<string, string> = {};
+        list.forEach((e) => {
+          if (e.judgeScore != null) scores[e.id] = String(e.judgeScore);
+        });
+        setJudgeScores(scores);
       }
     );
 
@@ -88,8 +98,27 @@ export default function AdminDrawingApp() {
     };
   }, [db, isAdmin]);
 
+  const pendingEntries = useMemo(() => entries.filter((e) => e.status === "pending"), [entries]);
   const activeEntries = useMemo(() => entries.filter((e) => e.status === "active"), [entries]);
-  const topEntry = activeEntries[0] ?? null;
+  const maxVotes = useMemo(
+    () => Math.max(1, ...activeEntries.map((e) => e.voteCount)),
+    [activeEntries]
+  );
+
+  const rankedActive = useMemo(() => {
+    const list = [...activeEntries];
+    list.sort(
+      (a, b) =>
+        combinedEntryScore(b, meta, maxVotes) - combinedEntryScore(a, meta, maxVotes) ||
+        b.voteCount - a.voteCount
+    );
+    return list;
+  }, [activeEntries, meta, maxVotes]);
+
+  const topCombined = useMemo(() => {
+    if (winnerAgeGroup === "all") return rankedActive[0] ?? null;
+    return rankedActive.find((e) => e.ageGroup === winnerAgeGroup) ?? null;
+  }, [rankedActive, winnerAgeGroup]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -102,6 +131,25 @@ export default function AdminDrawingApp() {
     }
   }
 
+  async function adminFetch(path: string, body: Record<string, unknown>) {
+    if (!user) return null;
+    const token = await user.getIdToken();
+    const res = await fetch(path, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setMsg(data.error ?? "Request failed.");
+      return null;
+    }
+    return data;
+  }
+
   async function saveMeta(e: React.FormEvent) {
     e.preventDefault();
     if (!db) return;
@@ -110,10 +158,7 @@ export default function AdminDrawingApp() {
     try {
       await setDoc(
         doc(db, DRAWING_COMPETITION_COLLECTION, DRAWING_META_DOC_ID),
-        {
-          ...meta,
-          updatedAt: serverTimestamp(),
-        },
+        { ...meta, updatedAt: serverTimestamp() },
         { merge: true }
       );
       setMsg("Competition settings saved.");
@@ -124,37 +169,40 @@ export default function AdminDrawingApp() {
     }
   }
 
+  async function moderateEntry(entryId: string, action: "approve" | "reject") {
+    setBusy(entryId);
+    setMsg("");
+    const result = await adminFetch("/api/drawing/admin/approve", { entryId, action });
+    if (result) setMsg(action === "approve" ? "Entry approved and published." : "Entry rejected.");
+    setBusy("");
+  }
+
+  async function saveJudgeScore(entryId: string) {
+    const raw = judgeScores[entryId];
+    const score = Number(raw);
+    if (!Number.isFinite(score)) {
+      setMsg("Enter a judge score from 0 to 100.");
+      return;
+    }
+    setBusy(`score-${entryId}`);
+    setMsg("");
+    const result = await adminFetch("/api/drawing/admin/judge-score", { entryId, judgeScore: score });
+    if (result) setMsg("Judge score saved.");
+    setBusy("");
+  }
+
   async function removeEntry(entryId: string) {
-    if (!auth || !user) return;
     if (!confirm("Remove this entry from the public gallery?")) return;
     setBusy(entryId);
     setMsg("");
-    try {
-      const token = await user.getIdToken();
-      const res = await fetch("/api/drawing/admin/remove", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ entryId }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setMsg(data.error ?? "Remove failed.");
-        return;
-      }
-      setMsg("Entry removed.");
-    } catch {
-      setMsg("Remove failed.");
-    } finally {
-      setBusy("");
-    }
+    const result = await adminFetch("/api/drawing/admin/remove", { entryId });
+    if (result) setMsg("Entry removed.");
+    setBusy("");
   }
 
   async function announceWinner(useTop: boolean) {
     if (!db) return;
-    const entryId = useTop ? topEntry?.id : winnerPick;
+    const entryId = useTop ? topCombined?.id : winnerPick;
     if (!entryId) {
       setMsg("Select an entry to announce as winner.");
       return;
@@ -216,24 +264,66 @@ export default function AdminDrawingApp() {
     <div className="space-y-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-laf-muted">Signed in as {user.email}</p>
-        <button
-          type="button"
-          onClick={() => auth && signOut(auth)}
-          className="text-sm text-laf-gold hover:underline"
-        >
+        <button type="button" onClick={() => auth && signOut(auth)} className="text-sm text-laf-gold hover:underline">
           Sign out
         </button>
       </div>
 
       {msg && <p className="text-sm text-laf-navy bg-laf-cream/60 rounded-lg px-4 py-2">{msg}</p>}
 
-      <section className="rounded-2xl border border-laf-border bg-white p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-laf-navy">Competition settings</h2>
+      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-laf-navy">
+          Pending review ({pendingEntries.length})
+        </h2>
         {openReports > 0 && (
-          <p className="text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
-            {openReports} open report{openReports === 1 ? "" : "s"} — review entries below.
+          <p className="text-sm text-amber-800">
+            {openReports} open report{openReports === 1 ? "" : "s"} — review below.
           </p>
         )}
+        {pendingEntries.length === 0 ? (
+          <p className="text-sm text-laf-muted">No submissions awaiting approval.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pendingEntries.map((entry) => (
+              <div key={entry.id} className="rounded-xl border border-amber-200 bg-white overflow-hidden">
+                <div className="relative aspect-video bg-laf-cream/30">
+                  <Image src={entry.imageUrl} alt={entry.title} fill className="object-contain" unoptimized />
+                </div>
+                <div className="p-3 space-y-2 text-sm">
+                  <p className="font-medium text-laf-navy">{entry.title}</p>
+                  <p className="text-xs text-laf-muted">
+                    {entry.artistName} · {ageGroupLabel(entry.ageGroup)}
+                  </p>
+                  <p className="text-xs text-laf-muted">
+                    Parent: {entry.parentName} · {entry.parentEmail} · {entry.parentPhone}
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      type="button"
+                      disabled={busy === entry.id}
+                      onClick={() => moderateEntry(entry.id, "approve")}
+                      className="text-xs font-semibold text-green-700 hover:underline"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy === entry.id}
+                      onClick={() => moderateEntry(entry.id, "reject")}
+                      className="text-xs font-semibold text-red-600 hover:underline"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-laf-border bg-white p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-laf-navy">Competition settings</h2>
         <form onSubmit={saveMeta} className="space-y-4 max-w-2xl">
           <input
             type="text"
@@ -276,30 +366,26 @@ export default function AdminDrawingApp() {
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-laf-muted mb-1">Submission ends (optional)</label>
+              <label className="block text-xs text-laf-muted mb-1">Judge weight (0–1)</label>
               <input
-                type="datetime-local"
-                value={meta.submissionEndsAt?.slice(0, 16) ?? ""}
-                onChange={(e) =>
-                  setMeta({
-                    ...meta,
-                    submissionEndsAt: e.target.value ? new Date(e.target.value).toISOString() : null,
-                  })
-                }
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={meta.judgeWeight ?? 0.7}
+                onChange={(e) => setMeta({ ...meta, judgeWeight: Number(e.target.value) })}
                 className="w-full px-3 py-2 rounded-lg border border-laf-border text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-laf-muted mb-1">Voting ends (optional)</label>
+              <label className="block text-xs text-laf-muted mb-1">Public vote weight (0–1)</label>
               <input
-                type="datetime-local"
-                value={meta.votingEndsAt?.slice(0, 16) ?? ""}
-                onChange={(e) =>
-                  setMeta({
-                    ...meta,
-                    votingEndsAt: e.target.value ? new Date(e.target.value).toISOString() : null,
-                  })
-                }
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={meta.publicVoteWeight ?? 0.3}
+                onChange={(e) => setMeta({ ...meta, publicVoteWeight: Number(e.target.value) })}
                 className="w-full px-3 py-2 rounded-lg border border-laf-border text-sm"
               />
             </div>
@@ -316,14 +402,35 @@ export default function AdminDrawingApp() {
 
       <section className="rounded-2xl border border-laf-border bg-white p-6 space-y-4">
         <h2 className="text-lg font-semibold text-laf-navy">Announce winner</h2>
-        {topEntry && (
+        <p className="text-sm text-laf-muted">
+          Combined score = {(meta.judgeWeight ?? 0.7) * 100}% judge +{" "}
+          {(meta.publicVoteWeight ?? 0.3) * 100}% public votes (normalized).
+        </p>
+        {topCombined && (
           <p className="text-sm text-laf-muted">
-            Current leader: <strong>{topEntry.title}</strong> by {topEntry.artistName} ({topEntry.voteCount} votes)
+            Top combined ({winnerAgeGroup === "all" ? "all ages" : ageGroupLabel(winnerAgeGroup)}):{" "}
+            <strong>{topCombined.title}</strong> — score{" "}
+            {(combinedEntryScore(topCombined, meta, maxVotes) * 100).toFixed(1)} · {topCombined.voteCount} votes
+            {topCombined.judgeScore != null ? ` · judge ${topCombined.judgeScore}/100` : ""}
           </p>
         )}
         <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="block text-xs text-laf-muted mb-1">Pick winner</label>
+            <label className="block text-xs text-laf-muted mb-1">Age group for auto-pick</label>
+            <select
+              value={winnerAgeGroup}
+              onChange={(e) => setWinnerAgeGroup(e.target.value as AgeGroupId | "all")}
+              className="px-3 py-2 rounded-lg border border-laf-border text-sm"
+            >
+              <option value="all">All ages</option>
+              <option value="under_6">Under 6</option>
+              <option value="7_10">7–10</option>
+              <option value="11_14">11–14</option>
+              <option value="15_18">15–18</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-laf-muted mb-1">Pick winner manually</label>
             <select
               value={winnerPick}
               onChange={(e) => setWinnerPick(e.target.value)}
@@ -332,7 +439,7 @@ export default function AdminDrawingApp() {
               <option value="">Select entry…</option>
               {activeEntries.map((e) => (
                 <option key={e.id} value={e.id}>
-                  {e.title} ({e.voteCount} votes)
+                  {e.title} ({ageGroupLabel(e.ageGroup)})
                 </option>
               ))}
             </select>
@@ -347,44 +454,58 @@ export default function AdminDrawingApp() {
           </button>
           <button
             type="button"
-            disabled={busy === "winner" || !topEntry}
+            disabled={busy === "winner" || !topCombined}
             onClick={() => announceWinner(true)}
             className="px-4 py-2 rounded-lg border border-laf-border text-sm font-medium disabled:opacity-60"
           >
-            Announce top votes
+            Announce top combined score
           </button>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-laf-navy">Entries ({entries.length})</h2>
-        {entries.length === 0 ? (
-          <p className="text-sm text-laf-muted">No entries yet.</p>
+        <h2 className="text-lg font-semibold text-laf-navy">Published entries ({activeEntries.length})</h2>
+        {activeEntries.length === 0 ? (
+          <p className="text-sm text-laf-muted">No approved entries yet.</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {entries.map((entry) => (
-              <div
-                key={entry.id}
-                className={`rounded-xl border overflow-hidden ${entry.status === "removed" ? "opacity-60 border-red-200" : "border-laf-border bg-white"}`}
-              >
+            {activeEntries.map((entry) => (
+              <div key={entry.id} className="rounded-xl border border-laf-border bg-white overflow-hidden">
                 <div className="relative aspect-video bg-laf-cream/30">
                   <Image src={entry.imageUrl} alt={entry.title} fill className="object-contain" unoptimized />
                 </div>
                 <div className="p-3 space-y-2">
                   <p className="font-medium text-sm text-laf-navy">{entry.title}</p>
                   <p className="text-xs text-laf-muted">
-                    {entry.artistName} · {entry.voteCount} votes · {entry.status}
+                    {entry.artistName} · {ageGroupLabel(entry.ageGroup)} · {entry.voteCount} votes
                   </p>
-                  {entry.status === "active" && (
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      placeholder="Judge /100"
+                      value={judgeScores[entry.id] ?? ""}
+                      onChange={(e) => setJudgeScores((s) => ({ ...s, [entry.id]: e.target.value }))}
+                      className="w-20 px-2 py-1 rounded border border-laf-border text-xs"
+                    />
+                    <button
+                      type="button"
+                      disabled={busy === `score-${entry.id}`}
+                      onClick={() => saveJudgeScore(entry.id)}
+                      className="text-xs text-laf-gold font-medium hover:underline"
+                    >
+                      Save score
+                    </button>
                     <button
                       type="button"
                       disabled={busy === entry.id}
                       onClick={() => removeEntry(entry.id)}
-                      className="text-xs text-red-600 hover:underline disabled:opacity-50"
+                      className="text-xs text-red-600 hover:underline"
                     >
                       Remove
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}

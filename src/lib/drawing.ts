@@ -12,7 +12,16 @@ export const DRAWING_VOTED_STORAGE_KEY = "laf_drawing_voted";
 export const MAX_DRAWING_BYTES = 5 * 1024 * 1024;
 export const MIN_DRAWING_BYTES = 10 * 1024;
 
-export type DrawingEntryStatus = "active" | "removed";
+export type DrawingEntryStatus = "pending" | "active" | "removed";
+
+export type AgeGroupId = "under_6" | "7_10" | "11_14" | "15_18";
+
+export const AGE_GROUPS: { id: AgeGroupId; label: string }[] = [
+  { id: "under_6", label: "Under 6" },
+  { id: "7_10", label: "7–10" },
+  { id: "11_14", label: "11–14" },
+  { id: "15_18", label: "15–18" },
+];
 
 export type DrawingCompetitionMeta = {
   title: string;
@@ -24,24 +33,37 @@ export type DrawingCompetitionMeta = {
   votingEndsAt?: string | null;
   winnerEntryId?: string | null;
   winnerAnnouncedAt?: string | null;
+  /** Weight for judge score in combined ranking (0–1). Default 0.7 */
+  judgeWeight?: number;
+  /** Weight for public votes in combined ranking (0–1). Default 0.3 */
+  publicVoteWeight?: number;
 };
 
 export type DrawingEntry = {
   id: string;
   title: string;
+  /** Child first name — shown publicly */
   artistName: string;
   artistAge?: number;
   artistClass?: string;
   artistSchool?: string;
   artistCity?: string;
+  ageGroup: AgeGroupId;
   imageUrl: string;
-  /** Google Drive file ID (preferred storage). */
   driveFileId?: string;
-  /** Legacy Firebase Storage path — older entries only. */
   imagePath?: string;
   voteCount: number;
+  /** Admin-only in UI; not exposed on public gallery API */
+  judgeScore?: number;
   status: DrawingEntryStatus;
   createdAt?: { toDate?: () => Date } | string;
+};
+
+export type DrawingEntryAdmin = DrawingEntry & {
+  parentName: string;
+  parentEmail: string;
+  parentPhone: string;
+  submitterUid: string;
 };
 
 export function entryCreatedAtMs(entry: Pick<DrawingEntry, "createdAt">): number {
@@ -60,21 +82,42 @@ export const DEFAULT_COMPETITION_META: DrawingCompetitionMeta = {
   title: "LAF Drawing Competition",
   theme: "Education, hope, and community",
   rulesHtml:
-    "<p>Submit your original artwork (paintings, drawings, or digital art). One vote per person per entry. Voting is best-effort via browser cookie — please vote fairly.</p>",
+    "<p>Submit original artwork (paintings, drawings, or digital art). A parent or guardian must verify their mobile number to upload. Entries are reviewed by LAF before appearing in the gallery. Sign in with Google to vote — one vote per account per drawing.</p>",
   submissionOpen: true,
   votingOpen: true,
   submissionEndsAt: null,
   votingEndsAt: null,
   winnerEntryId: null,
   winnerAnnouncedAt: null,
+  judgeWeight: 0.7,
+  publicVoteWeight: 0.3,
 };
 
 export function isDrawingAdmin(email: string | null | undefined): boolean {
   return isLibraryAdmin(email);
 }
 
+export function ageGroupForAge(age: number): AgeGroupId {
+  if (age <= 6) return "under_6";
+  if (age <= 10) return "7_10";
+  if (age <= 14) return "11_14";
+  return "15_18";
+}
+
+export function ageGroupLabel(id: AgeGroupId): string {
+  return AGE_GROUPS.find((g) => g.id === id)?.label ?? id;
+}
+
 export function normalizeCompetitionMeta(data: Record<string, unknown> | undefined): DrawingCompetitionMeta {
   if (!data) return DEFAULT_COMPETITION_META;
+  const judgeWeight =
+    typeof data.judgeWeight === "number" && data.judgeWeight >= 0 && data.judgeWeight <= 1
+      ? data.judgeWeight
+      : DEFAULT_COMPETITION_META.judgeWeight!;
+  const publicVoteWeight =
+    typeof data.publicVoteWeight === "number" && data.publicVoteWeight >= 0 && data.publicVoteWeight <= 1
+      ? data.publicVoteWeight
+      : DEFAULT_COMPETITION_META.publicVoteWeight!;
   return {
     title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : DEFAULT_COMPETITION_META.title,
     theme: typeof data.theme === "string" ? data.theme.trim() : DEFAULT_COMPETITION_META.theme,
@@ -85,7 +128,20 @@ export function normalizeCompetitionMeta(data: Record<string, unknown> | undefin
     votingEndsAt: typeof data.votingEndsAt === "string" ? data.votingEndsAt : null,
     winnerEntryId: typeof data.winnerEntryId === "string" ? data.winnerEntryId : null,
     winnerAnnouncedAt: typeof data.winnerAnnouncedAt === "string" ? data.winnerAnnouncedAt : null,
+    judgeWeight,
+    publicVoteWeight,
   };
+}
+
+function parseStatus(value: unknown): DrawingEntryStatus {
+  if (value === "pending" || value === "active" || value === "removed") return value;
+  return "active";
+}
+
+function parseAgeGroup(value: unknown, artistAge?: number): AgeGroupId {
+  if (value === "under_6" || value === "7_10" || value === "11_14" || value === "15_18") return value;
+  if (artistAge != null) return ageGroupForAge(artistAge);
+  return "7_10";
 }
 
 export function normalizeDrawingEntry(
@@ -99,12 +155,16 @@ export function normalizeDrawingEntry(
   const imagePath = typeof data.imagePath === "string" ? data.imagePath.trim() : undefined;
   if (!title || !artistName || !imageUrl) return null;
 
-  const status: DrawingEntryStatus = data.status === "removed" ? "removed" : "active";
   const artistAge = typeof data.artistAge === "number" ? data.artistAge : undefined;
+  const status = parseStatus(data.status);
   const artistClass = typeof data.artistClass === "string" ? data.artistClass.trim() : undefined;
   const artistSchool = typeof data.artistSchool === "string" ? data.artistSchool.trim() : undefined;
   const artistCity = typeof data.artistCity === "string" ? data.artistCity.trim() : undefined;
   const voteCount = typeof data.voteCount === "number" ? data.voteCount : 0;
+  const judgeScore =
+    typeof data.judgeScore === "number" && data.judgeScore >= 0 && data.judgeScore <= 100
+      ? data.judgeScore
+      : undefined;
 
   return {
     id,
@@ -114,13 +174,31 @@ export function normalizeDrawingEntry(
     artistClass,
     artistSchool,
     artistCity,
+    ageGroup: parseAgeGroup(data.ageGroup, artistAge),
     imageUrl,
     driveFileId,
     imagePath,
     voteCount,
+    judgeScore,
     status,
     createdAt: data.createdAt as DrawingEntry["createdAt"],
   };
+}
+
+export function normalizeDrawingEntryAdmin(
+  data: Record<string, unknown>,
+  id: string
+): DrawingEntryAdmin | null {
+  const base = normalizeDrawingEntry(data, id);
+  if (!base) return null;
+  const parentName = typeof data.parentName === "string" ? data.parentName.trim() : "";
+  const parentEmail = typeof data.parentEmail === "string" ? data.parentEmail.trim() : "";
+  const parentPhone = typeof data.parentPhone === "string" ? data.parentPhone.trim() : "";
+  const submitterUid = typeof data.submitterUid === "string" ? data.submitterUid.trim() : "";
+  if (!parentName || !parentEmail || !parentPhone || !submitterUid) {
+    return { ...base, parentName: parentName || "—", parentEmail, parentPhone, submitterUid };
+  }
+  return { ...base, parentName, parentEmail, parentPhone, submitterUid };
 }
 
 export function competitionPhase(meta: DrawingCompetitionMeta): {
@@ -139,19 +217,46 @@ export function competitionPhase(meta: DrawingCompetitionMeta): {
   return { submissionsAllowed, votingAllowed };
 }
 
-export function voteDocId(voterId: string, entryId: string): string {
-  return `${voterId}_${entryId}`;
+export function voteDocId(voterUid: string, entryId: string): string {
+  return `${voterUid}_${entryId}`;
 }
 
-/** Public display line for gallery cards — first name, age, class, school, city only. */
-export function formatArtistPublicLine(entry: Pick<
-  DrawingEntry,
-  "artistName" | "artistAge" | "artistClass" | "artistSchool" | "artistCity"
->): string {
+/** Combined ranking score (0–1 scale) for admin winner selection. */
+export function combinedEntryScore(
+  entry: Pick<DrawingEntry, "voteCount" | "judgeScore">,
+  meta: Pick<DrawingCompetitionMeta, "judgeWeight" | "publicVoteWeight">,
+  maxVoteCount: number
+): number {
+  const judgeWeight = meta.judgeWeight ?? 0.7;
+  const voteWeight = meta.publicVoteWeight ?? 0.3;
+  const judgeNorm = (entry.judgeScore ?? 0) / 100;
+  const voteNorm = maxVoteCount > 0 ? entry.voteCount / maxVoteCount : 0;
+  return judgeWeight * judgeNorm + voteWeight * voteNorm;
+}
+
+/** Public display line for gallery cards — first name, age group, class, school, city. */
+export function formatArtistPublicLine(
+  entry: Pick<
+    DrawingEntry,
+    "artistName" | "artistAge" | "artistClass" | "artistSchool" | "artistCity" | "ageGroup"
+  >
+): string {
   const parts: string[] = [entry.artistName];
-  if (entry.artistAge != null) parts.push(`Age ${entry.artistAge}`);
+  parts.push(ageGroupLabel(entry.ageGroup));
   if (entry.artistClass) parts.push(`Class ${entry.artistClass}`);
   if (entry.artistSchool) parts.push(entry.artistSchool);
   if (entry.artistCity) parts.push(entry.artistCity);
   return parts.join(" · ");
+}
+
+export function normalizeIndiaPhone(input: string): string | null {
+  const digits = input.replace(/\D/g, "");
+  if (digits.length === 10) return `+91${digits}`;
+  if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
+  if (input.startsWith("+") && digits.length >= 10 && digits.length <= 15) return `+${digits}`;
+  return null;
+}
+
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

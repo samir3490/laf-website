@@ -1,23 +1,21 @@
-import { createHash, randomUUID } from "crypto";
+import { createHash } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
   competitionPhase,
   DRAWING_COMPETITION_COLLECTION,
   DRAWING_ENTRIES_COLLECTION,
   DRAWING_META_DOC_ID,
-  DRAWING_VOTER_COOKIE,
   DRAWING_VOTES_COLLECTION,
   normalizeCompetitionMeta,
   voteDocId,
 } from "@/lib/drawing";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
+import { isGoogleAuth, verifyFirebaseIdToken } from "@/lib/firebase-admin-auth";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 
-const RATE_LIMIT = 30;
+const RATE_LIMIT = 60;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 function ipHash(ip: string): string {
   return createHash("sha256").update(`drawing-vote:${ip}`).digest("hex").slice(0, 16);
@@ -25,8 +23,19 @@ function ipHash(ip: string): string {
 
 export async function POST(req: Request) {
   try {
+    const decoded = await verifyFirebaseIdToken(req);
+    if (!decoded || !isGoogleAuth(decoded)) {
+      return NextResponse.json(
+        { error: "Please sign in with Google to vote. One Google account = one vote per drawing." },
+        { status: 401 }
+      );
+    }
+
     const ip = clientIp(req);
     if (!checkRateLimit(`drawing-vote:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+      return NextResponse.json({ error: "Too many votes. Please try again later." }, { status: 429 });
+    }
+    if (!checkRateLimit(`drawing-vote-user:${decoded.uid}`, RATE_LIMIT, RATE_WINDOW_MS)) {
       return NextResponse.json({ error: "Too many votes. Please try again later." }, { status: 429 });
     }
 
@@ -57,12 +66,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "This entry is not available." }, { status: 404 });
     }
 
-    const cookieStore = await cookies();
-    let voterId = cookieStore.get(DRAWING_VOTER_COOKIE)?.value;
-    const setCookie = !voterId;
-    if (!voterId) voterId = randomUUID();
-
-    const voteRef = adminDb.collection(DRAWING_VOTES_COLLECTION).doc(voteDocId(voterId, entryId));
+    const voterUid = decoded.uid;
+    const voteRef = adminDb.collection(DRAWING_VOTES_COLLECTION).doc(voteDocId(voterUid, entryId));
     let voteCount = typeof entrySnap.data()?.voteCount === "number" ? entrySnap.data()!.voteCount : 0;
     let alreadyVoted = false;
 
@@ -74,7 +79,8 @@ export async function POST(req: Request) {
       }
 
       tx.set(voteRef, {
-        voterId,
+        voterUid,
+        voterEmail: decoded.email ?? null,
         entryId,
         ipHash: ipHash(ip),
         createdAt: FieldValue.serverTimestamp(),
@@ -83,17 +89,7 @@ export async function POST(req: Request) {
       voteCount += 1;
     });
 
-    const response = NextResponse.json({ ok: true, voteCount, alreadyVoted, entryId });
-    if (setCookie) {
-      response.cookies.set(DRAWING_VOTER_COOKIE, voterId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: COOKIE_MAX_AGE,
-      });
-    }
-    return response;
+    return NextResponse.json({ ok: true, voteCount, alreadyVoted, entryId });
   } catch (err) {
     console.error("[drawing/vote]", err);
     return NextResponse.json({ error: "Vote failed. Please try again." }, { status: 500 });

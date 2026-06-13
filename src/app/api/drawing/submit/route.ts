@@ -2,11 +2,15 @@ import { createHash, randomUUID } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import {
+  ageGroupForAge,
   DRAWING_ENTRIES_COLLECTION,
+  isValidEmail,
   MAX_DRAWING_BYTES,
   MIN_DRAWING_BYTES,
+  normalizeIndiaPhone,
 } from "@/lib/drawing";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
+import { isPhoneAuth, verifyFirebaseIdToken } from "@/lib/firebase-admin-auth";
 import { uploadBufferToGoogleDrive } from "@/lib/google-drive-upload";
 import { notifyAdminOfDrawingSubmission } from "@/lib/drawing-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
@@ -23,6 +27,10 @@ const ALLOWED_MIME: Record<string, string> = {
 
 function ipHash(ip: string): string {
   return createHash("sha256").update(`drawing:${ip}`).digest("hex").slice(0, 16);
+}
+
+function phoneHash(phone: string): string {
+  return createHash("sha256").update(`drawing-phone:${phone}`).digest("hex").slice(0, 20);
 }
 
 function detectImageMime(buffer: Buffer): string | null {
@@ -58,6 +66,14 @@ export async function POST(req: Request) {
       );
     }
 
+    const decoded = await verifyFirebaseIdToken(req);
+    if (!decoded || !isPhoneAuth(decoded)) {
+      return NextResponse.json(
+        { error: "Please verify your mobile number with OTP before submitting." },
+        { status: 401 }
+      );
+    }
+
     const turnstileError = requireTurnstileInProduction();
     if (turnstileError) {
       return NextResponse.json({ error: turnstileError }, { status: 503 });
@@ -75,6 +91,8 @@ export async function POST(req: Request) {
 
     const title = String(formData.get("title") ?? "").trim();
     const artistName = String(formData.get("artistName") ?? "").trim();
+    const parentName = String(formData.get("parentName") ?? "").trim();
+    const parentEmail = String(formData.get("parentEmail") ?? "").trim();
     const artistCity = String(formData.get("artistCity") ?? "").trim();
     const artistClass = String(formData.get("artistClass") ?? "").trim();
     const artistSchool = String(formData.get("artistSchool") ?? "").trim();
@@ -86,13 +104,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please enter a title (max 120 characters)." }, { status: 400 });
     }
     if (!artistName || artistName.length > 40) {
-      return NextResponse.json({ error: "Please enter a first name (max 40 characters)." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Please enter the child's first name only (max 40 characters)." },
+        { status: 400 }
+      );
+    }
+    if (!parentName || parentName.length > 80) {
+      return NextResponse.json({ error: "Please enter parent / guardian name." }, { status: 400 });
+    }
+    if (!parentEmail || !isValidEmail(parentEmail) || parentEmail.length > 120) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     }
     if (!artistClass || artistClass.length > 20) {
       return NextResponse.json({ error: "Please enter a class or grade." }, { status: 400 });
     }
-    if (!artistSchool || artistSchool.length > 100) {
-      return NextResponse.json({ error: "Please enter a school name (max 100 characters)." }, { status: 400 });
+    if (artistSchool && artistSchool.length > 100) {
+      return NextResponse.json({ error: "School name must be at most 100 characters." }, { status: 400 });
     }
     if (!artistCity || artistCity.length > 80) {
       return NextResponse.json({ error: "Please enter a city." }, { status: 400 });
@@ -104,15 +131,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please upload an image file." }, { status: 400 });
     }
 
-    let artistAge: number | undefined;
+    let artistAge: number;
     if (ageRaw) {
       const age = Number.parseInt(ageRaw, 10);
-      if (!Number.isFinite(age) || age < 1 || age > 25) {
-        return NextResponse.json({ error: "Please enter a valid age (1–25)." }, { status: 400 });
+      if (!Number.isFinite(age) || age < 1 || age > 18) {
+        return NextResponse.json({ error: "Please enter a valid age (1–18)." }, { status: 400 });
       }
       artistAge = age;
     } else {
       return NextResponse.json({ error: "Please enter an age." }, { status: 400 });
+    }
+
+    const parentPhone = normalizeIndiaPhone(decoded.phone_number ?? "");
+    if (!parentPhone) {
+      return NextResponse.json({ error: "Verified phone number is invalid." }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -136,6 +168,22 @@ export async function POST(req: Request) {
       );
     }
 
+    const submitterUid = decoded.uid;
+    const existingSnap = await adminDb
+      .collection(DRAWING_ENTRIES_COLLECTION)
+      .where("submitterUid", "==", submitterUid)
+      .get();
+    const activeCount = existingSnap.docs.filter((d) => {
+      const s = d.data().status;
+      return s === "pending" || s === "active";
+    }).length;
+    if (activeCount >= 3) {
+      return NextResponse.json(
+        { error: "This mobile number already has the maximum number of entries for this competition." },
+        { status: 429 }
+      );
+    }
+
     const entryId = randomUUID();
     const ext = ALLOWED_MIME[mime];
     const fileName = `drawing-${entryId}.${ext}`;
@@ -146,13 +194,19 @@ export async function POST(req: Request) {
       title,
       artistName,
       artistAge,
+      ageGroup: ageGroupForAge(artistAge),
       artistClass,
       artistSchool,
       artistCity,
+      parentName,
+      parentEmail,
+      parentPhone,
+      submitterPhoneHash: phoneHash(parentPhone),
+      submitterUid,
       imageUrl: driveUpload.url,
       driveFileId: driveUpload.fileId,
       voteCount: 0,
-      status: "active",
+      status: "pending",
       submitterIpHash: ipHash(ip),
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -167,7 +221,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       entryId,
-      imageUrl: driveUpload.url,
+      pending: true,
+      message:
+        "Thank you! Your artwork was received and is pending LAF review before it appears in the gallery.",
     });
   } catch (err) {
     console.error("[drawing/submit]", err);
