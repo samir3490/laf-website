@@ -123,7 +123,7 @@
 | Command | Purpose |
 |---------|---------|
 | `npm run seo:blog` | Internal links + strip Articly junk in all posts |
-| `npm run remove:articly-posts` | Delete Articly template duplicates (keeps real WP stories) |
+| `npm run remove:articly-posts` | Remove duplicate posts (same title/content), not all Articly posts |
 | `npm run clean:blog-posts -- --all` | Rewrite intros / known bad posts |
 | `npm run publish:blog` | Move due scheduled posts → live (local test) |
 | `npm run export:wp` | Pull from WordPress (legacy) |
@@ -136,8 +136,7 @@ See **BLOG-AUTOMATION.md** for weekly publishing workflow.
 
 | Category | Count | Action |
 |----------|-------|--------|
-| Real LAF event stories (dental/eye camp, Sewashram Wardha) | **2** | Kept — promote on home + blog |
-| Articly duplicate posts | **90 removed** | Deleted from `posts.json` via `npm run remove:articly-posts` |
+| Live blog posts | **87** | Restored from backup; only 5 exact duplicates removed |
+| Duplicate republished posts | **5 removed** | Same title/content as another post (e.g. `-2`, `-3` slug suffixes) |
+| Real LAF event stories (Sewashram Wardha) | **2** | Promote on home + blog |
 | Scheduled weekly posts | 4 queued | See `scheduled-posts.json` + GitHub Action |
-
-**Kept posts:** `more-than-a-checkup-restoring-smiles-and-confidence`, `free-eye-checkup-at-sewashram`
