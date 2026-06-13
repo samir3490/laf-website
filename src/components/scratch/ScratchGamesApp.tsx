@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -14,7 +14,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  onSnapshot,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -45,6 +44,7 @@ export default function ScratchGamesApp() {
   const [user, setUser] = useState<User | null>(null);
   const [games, setGames] = useState<ScratchGame[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [tab, setTab] = useState<Tab>("browse");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [globalMsg, setGlobalMsg] = useState<{ type: "success" | "error"; text: string } | null>(
@@ -72,35 +72,46 @@ export default function ScratchGamesApp() {
     });
   }, [auth]);
 
-  useEffect(() => {
-    if (!db) {
-      setLoading(false);
-      return;
-    }
-    const unsub = onSnapshot(
-      collection(db, SCRATCH_GAMES_COLLECTION),
-      (snap) => {
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as ScratchGame[];
-        list.sort((a, b) => {
-          const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
-          const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
-          return tb - ta;
-        });
-        setGames(list);
-        setLoading(false);
-      },
-      () => setLoading(false)
-    );
-    return unsub;
-  }, [db]);
+  const firebaseReady = !!(config && auth && db);
 
-  if (!config || !auth || !db) {
+  const loadGames = useCallback(async () => {
+    setLoadError("");
+    try {
+      const res = await fetch("/api/scratch/games");
+      const data = (await res.json()) as { games?: ScratchGame[]; error?: string };
+      if (!res.ok) {
+        setLoadError(data.error ?? "Could not load games.");
+        setGames([]);
+        return;
+      }
+      setGames(Array.isArray(data.games) ? data.games : []);
+    } catch {
+      setLoadError("Could not load games. Check your connection and try again.");
+      setGames([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadGames();
+  }, [loadGames]);
+
+  if (!firebaseReady && tab !== "browse") {
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
         <h2 className="text-lg font-semibold text-laf-navy">Scratch Games setup required</h2>
         <p className="mt-2 text-sm text-laf-muted">
-          Add Firebase environment variables in Vercel (see <code>.env.example</code>).
+          Add Firebase environment variables in Vercel to sign in and publish games (see{" "}
+          <code>.env.example</code>).
         </p>
+        <button
+          type="button"
+          onClick={() => setTab("browse")}
+          className="mt-4 text-sm font-medium text-laf-gold hover:underline"
+        >
+          ← Back to browse games
+        </button>
       </div>
     );
   }
@@ -200,6 +211,7 @@ export default function ScratchGamesApp() {
         flash("success", "Game published!");
       }
       resetForm();
+      await loadGames();
     } catch {
       setFormError("Could not save game. Check your connection and try again.");
     } finally {
@@ -213,6 +225,7 @@ export default function ScratchGamesApp() {
     try {
       await deleteDoc(doc(db, SCRATCH_GAMES_COLLECTION, game.id));
       flash("success", "Game deleted.");
+      await loadGames();
     } catch {
       flash("error", "Could not delete game.");
     }
@@ -294,7 +307,25 @@ export default function ScratchGamesApp() {
 
       {tab === "browse" && (
         <section>
-          {loading ? (
+          <p className="mb-6 text-sm text-laf-muted">
+            No account needed — pick a game below and play in your browser. Sign in only if you want to publish your own
+            Scratch project.
+          </p>
+          {loadError ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+              <p className="text-sm text-red-800">{loadError}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  void loadGames();
+                }}
+                className="mt-4 px-4 py-2 rounded-lg bg-laf-navy text-white text-sm font-medium hover:bg-laf-navy/90"
+              >
+                Try again
+              </button>
+            </div>
+          ) : loading ? (
             <p className="text-center text-laf-muted py-12">Loading games…</p>
           ) : games.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-laf-border bg-laf-cream/40 p-12 text-center">

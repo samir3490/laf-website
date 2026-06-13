@@ -5,8 +5,8 @@ export type ScratchGame = {
   projectId: string;
   authorId: string;
   authorName: string;
-  createdAt?: { toDate?: () => Date };
-  updatedAt?: { toDate?: () => Date };
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export function parseScratchProjectId(input: string): string | null {
@@ -30,8 +30,9 @@ export function scratchEmbedCode(projectId: string): string {
   return `<iframe src="${src}" width="485" height="402" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen></iframe>`;
 }
 
-export function formatGameDate(ts?: ScratchGame["createdAt"]): string {
-  if (!ts) return "";
-  const d = ts.toDate ? ts.toDate() : new Date();
+export function formatGameDate(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
 }

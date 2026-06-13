@@ -41,8 +41,18 @@ export type DrawingEntry = {
   imagePath?: string;
   voteCount: number;
   status: DrawingEntryStatus;
-  createdAt?: { toDate?: () => Date };
+  createdAt?: { toDate?: () => Date } | string;
 };
+
+export function entryCreatedAtMs(entry: Pick<DrawingEntry, "createdAt">): number {
+  const ts = entry.createdAt;
+  if (!ts) return 0;
+  if (typeof ts === "string") {
+    const ms = Date.parse(ts);
+    return Number.isFinite(ms) ? ms : 0;
+  }
+  return ts.toDate?.()?.getTime() ?? 0;
+}
 
 export type DrawingReportReason = "inappropriate" | "not_original" | "spam" | "other";
 

@@ -4,16 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import {
   competitionPhase,
   DRAWING_COMPETITION_COLLECTION,
-  DRAWING_ENTRIES_COLLECTION,
   DRAWING_META_DOC_ID,
   DRAWING_VOTED_STORAGE_KEY,
+  entryCreatedAtMs,
   formatArtistPublicLine,
   normalizeCompetitionMeta,
-  normalizeDrawingEntry,
   type DrawingCompetitionMeta,
   type DrawingEntry,
   type DrawingReportReason,
@@ -59,6 +58,8 @@ export default function DrawingCompetitionApp() {
 
   const [meta, setMeta] = useState<DrawingCompetitionMeta | null>(null);
   const [entries, setEntries] = useState<DrawingEntry[]>([]);
+  const [entriesLoading, setEntriesLoading] = useState(true);
+  const [entriesError, setEntriesError] = useState("");
   const [sort, setSort] = useState<SortMode>("votes");
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const [votingId, setVotingId] = useState<string | null>(null);
@@ -73,6 +74,29 @@ export default function DrawingCompetitionApp() {
     setVotedIds(readVotedIds());
   }, []);
 
+  const loadEntries = useCallback(async () => {
+    setEntriesError("");
+    try {
+      const res = await fetch("/api/drawing/entries");
+      const data = (await res.json()) as { entries?: DrawingEntry[]; error?: string };
+      if (!res.ok) {
+        setEntriesError(data.error ?? "Could not load entries.");
+        setEntries([]);
+        return;
+      }
+      setEntries(Array.isArray(data.entries) ? data.entries : []);
+    } catch {
+      setEntriesError("Could not load entries. Check your connection and try again.");
+      setEntries([]);
+    } finally {
+      setEntriesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadEntries();
+  }, [loadEntries, submitted]);
+
   useEffect(() => {
     if (!db) return;
 
@@ -80,19 +104,8 @@ export default function DrawingCompetitionApp() {
       setMeta(normalizeCompetitionMeta(snap.data() as Record<string, unknown> | undefined));
     });
 
-    const entriesUnsub = onSnapshot(
-      query(collection(db, DRAWING_ENTRIES_COLLECTION), orderBy("createdAt", "desc")),
-      (snap) => {
-        const list = snap.docs
-          .map((d) => normalizeDrawingEntry(d.data() as Record<string, unknown>, d.id))
-          .filter((e): e is DrawingEntry => e !== null && e.status === "active");
-        setEntries(list);
-      }
-    );
-
     return () => {
       metaUnsub();
-      entriesUnsub();
     };
   }, [db]);
 
@@ -104,7 +117,7 @@ export default function DrawingCompetitionApp() {
   const sortedEntries = useMemo(() => {
     const list = [...entries];
     if (sort === "votes") {
-      list.sort((a, b) => b.voteCount - a.voteCount || (b.createdAt?.toDate?.()?.getTime() ?? 0) - (a.createdAt?.toDate?.()?.getTime() ?? 0));
+      list.sort((a, b) => b.voteCount - a.voteCount || entryCreatedAtMs(b) - entryCreatedAtMs(a));
     }
     return list;
   }, [entries, sort]);
@@ -271,7 +284,23 @@ export default function DrawingCompetitionApp() {
 
           {voteMsg && <p className="text-sm text-red-600">{voteMsg}</p>}
 
-          {sortedEntries.length === 0 ? (
+          {entriesError ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+              <p className="text-sm text-red-800">{entriesError}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setEntriesLoading(true);
+                  void loadEntries();
+                }}
+                className="mt-3 px-4 py-2 rounded-lg bg-laf-navy text-white text-sm font-medium"
+              >
+                Try again
+              </button>
+            </div>
+          ) : entriesLoading ? (
+            <p className="text-sm text-laf-muted">Loading entries…</p>
+          ) : sortedEntries.length === 0 ? (
             <p className="text-sm text-laf-muted">No entries yet. Be the first to submit!</p>
           ) : (
             <div className="grid sm:grid-cols-2 gap-6">

@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Scratch Games Showcase",
   description:
-    "Browse and play Scratch games shared by the community. Sign in to publish your own MIT Scratch projects.",
+    "Browse and play Scratch games shared by the community. No login required to play — sign in only to publish your own MIT Scratch projects.",
   path: "/events/scratch-games",
 });
 
@@ -17,7 +17,7 @@ export default function EventsScratchGamesPage() {
     <>
       <PageHeader
         title="Scratch Games Showcase"
-        subtitle="Play games built with MIT Scratch — sign up to share your own projects"
+        subtitle="Play games built with MIT Scratch — no login needed. Sign up to share your own projects"
       />
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink />

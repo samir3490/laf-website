@@ -26,7 +26,7 @@ export const EVENT_COMPETITIONS: EventCompetition[] = [
     title: "Scratch Games Showcase",
     subtitle: "Create games · Play together",
     description:
-      "Build games with MIT Scratch and share them with the community. Sign in to publish your project and explore games made by other young creators.",
+      "Play MIT Scratch games shared by the community — no login required. Sign in only to publish your own projects.",
     href: "/events/scratch-games",
     cta: "Play & share games",
   },
