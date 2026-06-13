@@ -137,6 +137,6 @@ See **BLOG-AUTOMATION.md** for weekly publishing workflow.
 
 | Category | Count | Action |
 |----------|-------|--------|
-| Live blog posts | **87** | Unique titles & SEO slugs aligned; 8 topic AI hero images; 301 redirects for old URLs |
+| Live blog posts | **87** | Original Articly/WP export content restored (5 exact duplicates removed) |
 | Real LAF event stories (Sewashram Wardha) | **2** | Original dental & eye camp content preserved |
 | Scheduled weekly posts | 4 queued | See `scheduled-posts.json` + GitHub Action |

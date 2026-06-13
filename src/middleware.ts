@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import posts from "@/content/posts.json";
-import blogRedirects from "@/content/blog-redirects.json";
 
 const POST_SLUGS = new Set(posts.map((p) => p.slug));
-const REDIRECTS = blogRedirects as Record<string, string>;
 
 /** Paths served by the App Router — do not treat as legacy blog URLs. */
 const RESERVED = new Set([
@@ -28,12 +26,6 @@ const RESERVED = new Set([
   "scratch-games",
 ]);
 
-function redirectBlog(request: NextRequest, newSlug: string) {
-  const url = request.nextUrl.clone();
-  url.pathname = `/blog/${newSlug}`;
-  return NextResponse.redirect(url, 301);
-}
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -47,21 +39,9 @@ export function middleware(request: NextRequest) {
   }
 
   const segments = pathname.split("/").filter(Boolean);
-
-  if (segments.length === 2 && segments[0] === "blog") {
-    const target = REDIRECTS[segments[1]];
-    if (target) return redirectBlog(request, target);
-    return NextResponse.next();
-  }
-
   if (segments.length !== 1) return NextResponse.next();
 
   const slug = segments[0];
-
-  if (REDIRECTS[slug]) {
-    return redirectBlog(request, REDIRECTS[slug]);
-  }
-
   if (RESERVED.has(slug) || !POST_SLUGS.has(slug)) {
     return NextResponse.next();
   }
