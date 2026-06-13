@@ -1,10 +1,18 @@
 /** Active and upcoming LAF events / competitions shown on /events */
 
+import {
+  DRAWING_COMPETITION_DATES,
+  DRAWING_COMPETITION_PROMO_IMAGE,
+  DRAWING_COMPETITION_THEME,
+} from "@/lib/drawing-competition-promo";
+
 export type EventCompetition = {
   id: string;
   title: string;
   subtitle: string;
   description: string;
+  dateRange?: string;
+  image?: string;
   href: string;
   submitHref?: string;
   cta: string;
@@ -14,9 +22,11 @@ export const EVENT_COMPETITIONS: EventCompetition[] = [
   {
     id: "drawing",
     title: "Drawing Competition",
-    subtitle: "Submit artwork · Vote for favourites",
+    subtitle: `${DRAWING_COMPETITION_DATES.labelShort} · Submit artwork · Vote for favourites`,
     description:
-      "Share your paintings and drawings. Browse entries from other participants and vote for your favourites. Parents can help children submit safely with first name, age, class, school, and city only.",
+      `Share your paintings and drawings (${DRAWING_COMPETITION_DATES.label}). Theme: ${DRAWING_COMPETITION_THEME}. Browse entries, vote in your age group, and celebrate young artists. Parents can help children submit safely with first name, age, class, school, and city only.`,
+    dateRange: DRAWING_COMPETITION_DATES.label,
+    image: DRAWING_COMPETITION_PROMO_IMAGE,
     href: "/events/drawing-competition",
     submitHref: "/events/drawing-competition/submit",
     cta: "View gallery & vote",

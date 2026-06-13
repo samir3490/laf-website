@@ -1,9 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-
-const PROMO_IMAGE = "/images/events/drawing-competition-promo.png";
+import {
+  DRAWING_COMPETITION_DATES,
+  DRAWING_COMPETITION_PROMO_ALT,
+  DRAWING_COMPETITION_PROMO_IMAGE,
+  DRAWING_COMPETITION_THEME,
+} from "@/lib/drawing-competition-promo";
 
 const HIGHLIGHTS = [
+  `Open ${DRAWING_COMPETITION_DATES.labelShort}`,
   "Upload paintings, drawings, or digital art",
   "Ages 1–18 · four age categories",
   "Parent email verification · safe & kid-friendly",
@@ -21,12 +26,12 @@ export default function DrawingCompetitionPromo() {
           <div className="order-2 lg:order-1 space-y-5">
             <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-laf-gold">
               <span className="inline-block w-2 h-2 rounded-full bg-laf-gold animate-pulse" aria-hidden />
-              Featured event · Submissions open
+              Featured event · {DRAWING_COMPETITION_DATES.label}
             </p>
             <h2 id="drawing-competition-promo-heading" className="text-3xl md:text-4xl font-bold text-laf-navy leading-tight">
               LAF Drawing Competition
             </h2>
-            <p className="text-lg font-medium text-laf-navy/90">Theme: Education, hope, and community</p>
+            <p className="text-lg font-medium text-laf-navy/90">Theme: {DRAWING_COMPETITION_THEME}</p>
             <p className="text-laf-muted leading-relaxed">
               Children across India can share their creativity with the Lata Agrawal Foundation community. Upload
               your artwork in minutes — appropriate entries appear in the gallery right away. Vote for favourites in
@@ -63,8 +68,8 @@ export default function DrawingCompetitionPromo() {
             className="order-1 lg:order-2 group block relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-xl border border-laf-border ring-1 ring-laf-gold/20 hover:ring-laf-gold/50 transition-all hover:shadow-2xl"
           >
             <Image
-              src={PROMO_IMAGE}
-              alt="Children's drawing competition — upload your artwork with crayons, paints, and colorful sketches"
+              src={DRAWING_COMPETITION_PROMO_IMAGE}
+              alt={DRAWING_COMPETITION_PROMO_ALT}
               fill
               priority
               quality={90}
@@ -73,7 +78,7 @@ export default function DrawingCompetitionPromo() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-laf-navy/80 via-laf-navy/20 to-transparent lg:bg-gradient-to-l lg:from-transparent lg:via-transparent lg:to-laf-navy/10" />
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
-              <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold">Upload your art today</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold">{DRAWING_COMPETITION_DATES.label}</p>
               <p className="mt-1 text-lg sm:text-xl font-bold drop-shadow-sm">Share your painting or drawing</p>
               <p className="mt-1 text-sm text-white/90 max-w-xs">Tap to open the submission form →</p>
             </div>

@@ -1,4 +1,8 @@
 import { isLibraryAdmin } from "@/lib/library";
+import {
+  DRAWING_COMPETITION_DATES,
+  DRAWING_COMPETITION_THEME,
+} from "@/lib/drawing-competition-promo";
 
 export const DRAWING_ENTRIES_COLLECTION = "drawing_entries";
 export const DRAWING_VOTES_COLLECTION = "drawing_votes";
@@ -82,13 +86,13 @@ export type DrawingReportReason = "inappropriate" | "not_original" | "spam" | "o
 
 export const DEFAULT_COMPETITION_META: DrawingCompetitionMeta = {
   title: "LAF Drawing Competition",
-  theme: "Education, hope, and community",
+  theme: DRAWING_COMPETITION_THEME,
   rulesHtml:
-    "<p>Submit original artwork (paintings, drawings, or digital art). A parent or guardian must verify their email with a one-time code to upload. Safe artwork is published automatically; others are reviewed by LAF. Sign in with Google to vote — one vote per account per drawing. You can report any entry that looks inappropriate.</p>",
+    `<p>Submit original artwork (paintings, drawings, or digital art) between <strong>${DRAWING_COMPETITION_DATES.label}</strong>. A parent or guardian must verify their email with a one-time code to upload. Safe artwork is published automatically; others are reviewed by LAF. Sign in with Google to vote — one vote per account per drawing. You can report any entry that looks inappropriate.</p>`,
   submissionOpen: true,
   votingOpen: true,
-  submissionEndsAt: null,
-  votingEndsAt: null,
+  submissionEndsAt: DRAWING_COMPETITION_DATES.endIso,
+  votingEndsAt: DRAWING_COMPETITION_DATES.endIso,
   winnerEntryId: null,
   winnerAnnouncedAt: null,
   winnersByAgeGroup: {},

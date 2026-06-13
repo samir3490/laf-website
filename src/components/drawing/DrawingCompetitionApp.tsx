@@ -30,6 +30,7 @@ import {
 } from "@/lib/drawing";
 import { getFirebaseAuth, getFirebaseConfig, getFirebaseDb } from "@/lib/firebase";
 import { trackDrawingVote } from "@/lib/gtag";
+import { DRAWING_COMPETITION_DATES } from "@/lib/drawing-competition-promo";
 
 type SortMode = "votes" | "newest";
 
@@ -343,6 +344,9 @@ export default function DrawingCompetitionApp() {
         <main className="order-2 lg:order-1 space-y-6 min-w-0">
           <div className="rounded-2xl border border-laf-border bg-white p-5 lg:p-6 space-y-4">
             <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold mb-1">
+                {DRAWING_COMPETITION_DATES.label}
+              </p>
               <h2 className="text-xl lg:text-2xl font-bold text-laf-navy">{effectiveMeta.title}</h2>
               {effectiveMeta.theme && <p className="mt-1 text-sm text-laf-muted">Theme: {effectiveMeta.theme}</p>}
             </div>

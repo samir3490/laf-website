@@ -3,11 +3,12 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventsHub from "@/components/events/EventsHub";
 import { pageMetadata } from "@/lib/seo";
+import { DRAWING_COMPETITION_DATES } from "@/lib/drawing-competition-promo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Events & Competitions",
   description:
-    "Join Lata Agrawal Foundation events — drawing competitions, Scratch games showcases, and more for children and learners across India.",
+    `Join LAF events — Drawing Competition (${DRAWING_COMPETITION_DATES.label}), Scratch games, and more for children across India.`,
   path: "/events",
 });
 
@@ -16,7 +17,7 @@ export default function EventsPage() {
     <>
       <PageHeader
         title="Events & Competitions"
-        subtitle="Create, share, and celebrate together"
+        subtitle={`Drawing Competition open ${DRAWING_COMPETITION_DATES.label} · Create, share, and celebrate together`}
       />
       <PageContainer className="py-12 lg:py-16">
         <EventsHub />
