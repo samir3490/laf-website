@@ -136,7 +136,7 @@ See **BLOG-AUTOMATION.md** for weekly publishing workflow.
 
 | Category | Count | Action |
 |----------|-------|--------|
-| Live blog posts | **87** | Restored from backup; only 5 exact duplicates removed |
+| Live blog posts | **87** | Restored; 5 exact duplicates removed; titles deduplicated via `npm run rename:blog-titles` |
 | Duplicate republished posts | **5 removed** | Same title/content as another post (e.g. `-2`, `-3` slug suffixes) |
 | Real LAF event stories (Sewashram Wardha) | **2** | Promote on home + blog |
 | Scheduled weekly posts | 4 queued | See `scheduled-posts.json` + GitHub Action |
