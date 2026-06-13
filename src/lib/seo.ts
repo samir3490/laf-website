@@ -62,21 +62,32 @@ export function articleJsonLd(post: {
   excerpt: string;
   date: string;
   slug: string;
+  featuredImage?: string | null;
 }) {
   const site = getSite();
+  const image = post.featuredImage
+    ? siteUrl(post.featuredImage.startsWith("/") ? post.featuredImage : `/${post.featuredImage}`)
+    : siteUrl("/opengraph-image");
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
     description: stripHtml(post.excerpt).slice(0, 200),
     datePublished: post.date,
-    author: { "@type": "Organization", name: site.name },
+    dateModified: post.date,
+    image: [image],
+    author: { "@type": "Organization", name: site.name, url: site.url },
     publisher: {
       "@type": "Organization",
       name: site.name,
       url: site.url,
+      logo: {
+        "@type": "ImageObject",
+        url: siteUrl("/logo.png"),
+      },
     },
     mainEntityOfPage: siteUrl(`/blog/${post.slug}`),
+    inLanguage: "en-IN",
   };
 }
 

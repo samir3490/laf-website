@@ -5,16 +5,31 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import BlogPagination, { BLOG_PER_PAGE, blogPageCount } from "@/components/BlogPagination";
 import { getAllPosts, getPostFeaturedImage, stripHtml } from "@/lib/content";
-import { pageMetadata } from "@/lib/seo";
-
-export const metadata: Metadata = pageMetadata({
-  title: "Blog",
-  description:
-    "Stories, news, and insights on education, volunteering, and community impact from the Lata Agrawal Foundation.",
-  path: "/blog",
-});
+import { pageMetadata, siteUrl } from "@/lib/seo";
 
 type Props = { searchParams: Promise<{ page?: string }> };
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { page: pageParam } = await searchParams;
+  const posts = getAllPosts();
+  const totalPages = blogPageCount(posts.length);
+  const page = Math.min(Math.max(1, parseInt(pageParam ?? "1", 10) || 1), totalPages);
+
+  const base = pageMetadata({
+    title: page > 1 ? `Blog — Page ${page}` : "Blog",
+    description:
+      "Stories, news, and insights on children's education, volunteering, and community impact from the Lata Agrawal Foundation in Wardha, India.",
+    path: page > 1 ? `/blog?page=${page}` : "/blog",
+  });
+
+  return {
+    ...base,
+    alternates: {
+      canonical: siteUrl(page > 1 ? `/blog?page=${page}` : "/blog"),
+    },
+    robots: page > 1 ? { index: true, follow: true } : base.robots,
+  };
+}
 
 export default async function BlogPage({ searchParams }: Props) {
   const { page: pageParam } = await searchParams;
@@ -28,7 +43,7 @@ export default async function BlogPage({ searchParams }: Props) {
 
   return (
     <>
-      <PageHeader title="Blog" subtitle="Stories of impact and community" />
+      <PageHeader title="Blog" subtitle="Stories of impact and community in Wardha and across India" />
       <PageContainer className="py-12">
         <ul className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {slice.map((post) => {
@@ -41,7 +56,7 @@ export default async function BlogPage({ searchParams }: Props) {
                 <Link href={`/blog/${post.slug}`} className="block relative aspect-[16/10] bg-laf-cream">
                   <Image
                     src={image}
-                    alt=""
+                    alt={post.title}
                     fill
                     quality={75}
                     className="object-cover"

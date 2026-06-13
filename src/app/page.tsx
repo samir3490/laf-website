@@ -4,6 +4,7 @@ import home from "@/content/home.json";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
 import DrawingCompetitionPromo from "@/components/home/DrawingCompetitionPromo";
+import HomeLatestStories from "@/components/home/HomeLatestStories";
 import JsonLd from "@/components/JsonLd";
 import { pageMetadata, websiteJsonLd } from "@/lib/seo";
 
@@ -61,6 +62,8 @@ export default function HomePage() {
       </section>
 
       <DrawingCompetitionPromo />
+
+      <HomeLatestStories />
 
       <section className="py-20 bg-white">
         <PageContainer>

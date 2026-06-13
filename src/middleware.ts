@@ -19,6 +19,11 @@ const RESERVED = new Set([
   "community-scratch-games",
   "privacy-policy",
   "terms-conditions",
+  "library",
+  "gallery",
+  "reviews",
+  "admin",
+  "scratch-games",
 ]);
 
 export function middleware(request: NextRequest) {

@@ -1,0 +1,41 @@
+name: Publish scheduled LAF blog posts
+
+on:
+  schedule:
+    # Every Monday 9:00 AM UTC — publishes posts scheduled for that week
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-scheduled-posts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Publish due scheduled posts
+        run: node scripts/publish-scheduled-blog.mjs
+
+      - name: Configure git
+        run: |
+          git config user.name "LAF Blog Bot"
+          git config user.email "bot@agrawalfoundation.org"
+
+      - name: Commit and push if changed
+        run: |
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "Publish scheduled LAF blog post(s)"
+            git push
+          else
+            echo "No changes to commit"
+          fi

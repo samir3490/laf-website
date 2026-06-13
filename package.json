@@ -13,7 +13,9 @@
     "seed:library": "node scripts/seed-library.mjs",
     "clean:blog-top10": "node scripts/clean-blog-posts.mjs",
     "sync:gmail-env": "node scripts/sync-gmail-env.mjs",
-    "clean:blog-posts": "node scripts/clean-blog-posts.mjs --all"
+    "clean:blog-posts": "node scripts/clean-blog-posts.mjs --all",
+    "seo:blog": "node scripts/seo-enhance-blog-posts.mjs",
+    "publish:blog": "node scripts/publish-scheduled-blog.mjs"
   },
   "dependencies": {
     "firebase": "^12.14.0",
