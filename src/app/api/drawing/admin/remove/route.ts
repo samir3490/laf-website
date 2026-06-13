@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { DRAWING_ENTRIES_COLLECTION, isDrawingAdmin } from "@/lib/drawing";
 import { getDrawingStorageBucketName, getFirebaseAdminDb, getFirebaseAdminStorage } from "@/lib/firebase-admin";
 import { verifyLibraryAdminRequest } from "@/lib/firebase-admin-auth";
+import { trashGoogleDriveFile } from "@/lib/google-drive-upload";
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +31,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Entry not found." }, { status: 404 });
     }
 
-    const imagePath = typeof entrySnap.data()?.imagePath === "string" ? entrySnap.data()!.imagePath : "";
+    const data = entrySnap.data()!;
+    const driveFileId = typeof data.driveFileId === "string" ? data.driveFileId : "";
+    const imagePath = typeof data.imagePath === "string" ? data.imagePath : "";
 
     await entryRef.update({
       status: "removed",
@@ -38,13 +41,17 @@ export async function POST(req: Request) {
       removedBy: email,
     });
 
-    if (deleteImage && imagePath) {
-      const storage = getFirebaseAdminStorage();
-      if (storage) {
-        try {
-          await storage.bucket(getDrawingStorageBucketName()).file(imagePath).delete({ ignoreNotFound: true });
-        } catch {
-          // Entry marked removed even if storage delete fails
+    if (deleteImage) {
+      if (driveFileId) {
+        await trashGoogleDriveFile(driveFileId);
+      } else if (imagePath) {
+        const storage = getFirebaseAdminStorage();
+        if (storage) {
+          try {
+            await storage.bucket(getDrawingStorageBucketName()).file(imagePath).delete({ ignoreNotFound: true });
+          } catch {
+            // Entry marked removed even if storage delete fails
+          }
         }
       }
     }

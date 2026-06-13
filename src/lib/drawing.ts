@@ -33,7 +33,10 @@ export type DrawingEntry = {
   artistAge?: number;
   artistCity?: string;
   imageUrl: string;
-  imagePath: string;
+  /** Google Drive file ID (preferred storage). */
+  driveFileId?: string;
+  /** Legacy Firebase Storage path — older entries only. */
+  imagePath?: string;
   voteCount: number;
   status: DrawingEntryStatus;
   createdAt?: { toDate?: () => Date };
@@ -80,7 +83,8 @@ export function normalizeDrawingEntry(
   const title = typeof data.title === "string" ? data.title.trim() : "";
   const artistName = typeof data.artistName === "string" ? data.artistName.trim() : "";
   const imageUrl = typeof data.imageUrl === "string" ? data.imageUrl.trim() : "";
-  const imagePath = typeof data.imagePath === "string" ? data.imagePath.trim() : "";
+  const driveFileId = typeof data.driveFileId === "string" ? data.driveFileId.trim() : undefined;
+  const imagePath = typeof data.imagePath === "string" ? data.imagePath.trim() : undefined;
   if (!title || !artistName || !imageUrl) return null;
 
   const status: DrawingEntryStatus = data.status === "removed" ? "removed" : "active";
@@ -95,6 +99,7 @@ export function normalizeDrawingEntry(
     artistAge,
     artistCity,
     imageUrl,
+    driveFileId,
     imagePath,
     voteCount,
     status,

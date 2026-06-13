@@ -6,7 +6,8 @@ import {
   MAX_DRAWING_BYTES,
   MIN_DRAWING_BYTES,
 } from "@/lib/drawing";
-import { getDrawingStorageBucketName, getFirebaseAdminDb, getFirebaseAdminStorage } from "@/lib/firebase-admin";
+import { getFirebaseAdminDb } from "@/lib/firebase-admin";
+import { uploadBufferToGoogleDrive } from "@/lib/google-drive-upload";
 import { notifyAdminOfDrawingSubmission } from "@/lib/drawing-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
@@ -115,8 +116,7 @@ export async function POST(req: Request) {
     }
 
     const adminDb = getFirebaseAdminDb();
-    const storage = getFirebaseAdminStorage();
-    if (!adminDb || !storage) {
+    if (!adminDb) {
       return NextResponse.json(
         { error: "Submissions are temporarily unavailable. Please try again later." },
         { status: 503 }
@@ -125,39 +125,34 @@ export async function POST(req: Request) {
 
     const entryId = randomUUID();
     const ext = ALLOWED_MIME[mime];
-    const imagePath = `drawings/${entryId}.${ext}`;
-    const bucket = storage.bucket(getDrawingStorageBucketName());
-    const storageFile = bucket.file(imagePath);
+    const fileName = `drawing-${entryId}.${ext}`;
 
-    await storageFile.save(buffer, {
-      metadata: {
-        contentType: mime,
-        cacheControl: "public, max-age=31536000",
-      },
-    });
-    await storageFile.makePublic();
-
-    const imageUrl = `https://storage.googleapis.com/${bucket.name}/${imagePath}`;
+    const driveUpload = await uploadBufferToGoogleDrive(buffer, fileName, mime);
 
     await adminDb.collection(DRAWING_ENTRIES_COLLECTION).doc(entryId).set({
       title,
       artistName,
       artistAge: artistAge ?? null,
       artistCity: artistCity || null,
-      imageUrl,
-      imagePath,
+      imageUrl: driveUpload.url,
+      driveFileId: driveUpload.fileId,
       voteCount: 0,
       status: "active",
       submitterIpHash: ipHash(ip),
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    void notifyAdminOfDrawingSubmission({ entryId, title, artistName, imageUrl });
+    void notifyAdminOfDrawingSubmission({
+      entryId,
+      title,
+      artistName,
+      imageUrl: driveUpload.url,
+    });
 
     return NextResponse.json({
       ok: true,
       entryId,
-      imageUrl,
+      imageUrl: driveUpload.url,
     });
   } catch (err) {
     console.error("[drawing/submit]", err);
