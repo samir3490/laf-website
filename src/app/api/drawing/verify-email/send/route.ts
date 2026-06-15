@@ -7,7 +7,6 @@ import {
 import { isValidEmail, normalizeEmail } from "@/lib/drawing";
 import { isMailConfigured } from "@/lib/mail";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
-import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
 
 const SEND_RATE_IP = 10;
 const SEND_RATE_EMAIL = 3;
@@ -27,11 +26,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
-    const turnstileError = requireTurnstileInProduction();
-    if (turnstileError) {
-      return NextResponse.json({ error: turnstileError }, { status: 503 });
-    }
-
     const body = await req.json();
     const rawEmail = typeof body.email === "string" ? body.email.trim() : "";
     const email = normalizeEmail(rawEmail);
@@ -45,14 +39,6 @@ export async function POST(req: Request) {
         { error: "Too many codes sent to this email. Please try again in an hour." },
         { status: 429 }
       );
-    }
-
-    if (isTurnstileEnabled()) {
-      const token = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
-      const valid = await verifyTurnstileToken(token, ip);
-      if (!valid) {
-        return NextResponse.json({ error: "Captcha verification failed. Please try again." }, { status: 403 });
-      }
     }
 
     const code = generateOtpCode();

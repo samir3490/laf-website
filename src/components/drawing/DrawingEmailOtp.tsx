@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import TurnstileWidget from "@/components/library/TurnstileWidget";
 import RequiredMark from "@/components/drawing/RequiredMark";
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 type DrawingEmailOtpProps = {
   email: string;
@@ -25,8 +22,6 @@ export default function DrawingEmailOtp({
   const [step, setStep] = useState<"email" | "otp" | "done">("email");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
 
   async function sendOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -35,16 +30,12 @@ export default function DrawingEmailOtp({
       setError("Enter your email address first.");
       return;
     }
-    if (turnstileRequired && !turnstileToken) {
-      setError("Please complete the captcha.");
-      return;
-    }
     setBusy(true);
     try {
       const res = await fetch("/api/drawing/verify-email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ email: email.trim() }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -128,16 +119,9 @@ export default function DrawingEmailOtp({
               className="w-full px-4 py-3 rounded-xl border border-laf-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
             />
           </div>
-          {turnstileRequired && (
-            <TurnstileWidget
-              siteKey={TURNSTILE_SITE_KEY}
-              onToken={setTurnstileToken}
-              onExpire={() => setTurnstileToken("")}
-            />
-          )}
           <button
             type="submit"
-            disabled={busy || disabled || (turnstileRequired && !turnstileToken)}
+            disabled={busy || disabled}
             className="px-4 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold disabled:opacity-60"
           >
             {busy ? "Sending…" : "Send verification code"}
