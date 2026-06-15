@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
+import DrawingAnalytics from "@/components/drawing/DrawingAnalytics";
 import DrawingCompetitionApp from "@/components/drawing/DrawingCompetitionApp";
 import DrawingCompetitionBanner from "@/components/drawing/DrawingCompetitionBanner";
 import { pageMetadata } from "@/lib/seo";
@@ -18,6 +19,7 @@ export const metadata: Metadata = pageMetadata({
 export default function DrawingCompetitionPage() {
   return (
     <>
+      <DrawingAnalytics page="gallery" />
       <PageHeader title="Drawing Competition" />
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink />

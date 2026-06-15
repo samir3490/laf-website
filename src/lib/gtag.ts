@@ -70,8 +70,27 @@ export function trackDonateSuccess(amount?: number) {
   });
 }
 
-export function trackDrawingSubmit(entryId: string) {
-  trackGa4Event("drawing_submit", { entry_id: entryId, page_path: "/events/drawing-competition/submit" });
+export function trackDrawingPageView(
+  page: "gallery" | "submit",
+  source?: string
+) {
+  const pagePath =
+    page === "submit"
+      ? "/events/drawing-competition/submit"
+      : "/events/drawing-competition";
+  trackGa4Event("view_drawing_page", {
+    page_path: pagePath,
+    drawing_page: page,
+    ...(source ? { traffic_source: source } : {}),
+  });
+}
+
+export function trackDrawingSubmit(entryId: string, source?: string) {
+  trackGa4Event("drawing_submit", {
+    entry_id: entryId,
+    page_path: "/events/drawing-competition/submit",
+    ...(source ? { traffic_source: source } : {}),
+  });
 }
 
 export function trackDrawingVote(entryId: string) {

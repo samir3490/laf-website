@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DrawingEmailOtp from "@/components/drawing/DrawingEmailOtp";
 import RequiredMark from "@/components/drawing/RequiredMark";
+import { trackDrawingEvent } from "@/components/drawing/DrawingAnalytics";
+import { getStoredDrawingAttribution } from "@/lib/drawing-attribution";
 import { trackDrawingSubmit } from "@/lib/gtag";
 import { MAX_DRAWING_BYTES } from "@/lib/drawing";
 
@@ -21,6 +23,7 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
   const [artistName, setArtistName] = useState("");
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
   const [artistAge, setArtistAge] = useState("");
   const [artistClass, setArtistClass] = useState("");
   const [artistSchool, setArtistSchool] = useState("");
@@ -64,12 +67,14 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
       formData.set("artistName", artistName.trim());
       formData.set("parentName", parentName.trim());
       formData.set("parentEmail", parentEmail.trim());
+      formData.set("parentPhone", parentPhone.trim());
       formData.set("artistAge", artistAge.trim());
       formData.set("artistClass", artistClass.trim());
       formData.set("artistSchool", artistSchool.trim());
       formData.set("artistCity", artistCity.trim());
       formData.set("termsAccepted", "true");
       formData.set("image", image);
+      formData.set("attribution", JSON.stringify(getStoredDrawingAttribution()));
 
       const res = await fetch("/api/drawing/submit", {
         method: "POST",
@@ -80,10 +85,13 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
 
       if (!res.ok) {
         setError(data.error ?? "Submission failed.");
+        void trackDrawingEvent("submit_failed", "submit");
         return;
       }
 
-      trackDrawingSubmit(data.entryId as string);
+      const attribution = getStoredDrawingAttribution();
+      trackDrawingSubmit(data.entryId as string, attribution.source);
+      void trackDrawingEvent("submit_success", "submit", { entryId: data.entryId as string });
       const thanksQuery = data.published ? "submitted=live" : "submitted=pending";
       router.push(`${GALLERY_PATH}?${thanksQuery}`, { scroll: false });
     } catch {
@@ -112,8 +120,8 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
     >
       <p className="text-sm text-laf-muted leading-relaxed">
         For child safety, only the child&apos;s <strong>first name</strong>, age group, class, school, and city are
-        shown publicly. Parent email is used for verification only and is not shown on the gallery. Appropriate artwork
-        is published automatically; others are reviewed by LAF.
+        shown publicly. Parent email is used for verification only; mobile number is for LAF contact only —
+        neither is shown on the gallery. Appropriate artwork is published automatically; others are reviewed by LAF.
       </p>
       <p className="text-xs text-laf-muted">
         Fields marked with <RequiredMark /> are required.
@@ -152,6 +160,27 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
             onChange={(e) => setParentName(e.target.value)}
             className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
           />
+        </div>
+        <div>
+          <label htmlFor="parent-phone" className="block text-sm font-medium text-laf-navy mb-2">
+            Mobile number
+            <RequiredMark />
+          </label>
+          <input
+            id="parent-phone"
+            type="tel"
+            required
+            inputMode="tel"
+            autoComplete="tel"
+            maxLength={20}
+            placeholder="e.g. 9421095604 or +91 94210 95604"
+            value={parentPhone}
+            onChange={(e) => setParentPhone(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-laf-border bg-laf-cream/50 focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
+          />
+          <p className="mt-1.5 text-xs text-laf-muted">
+            For LAF to reach you about the competition. We verify by email only — no SMS code.
+          </p>
         </div>
       </div>
 

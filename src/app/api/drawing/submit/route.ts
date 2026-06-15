@@ -8,7 +8,9 @@ import {
   MAX_DRAWING_BYTES,
   MIN_DRAWING_BYTES,
   normalizeEmail,
+  normalizeIndiaPhone,
 } from "@/lib/drawing";
+import { attributionFromPayload } from "@/lib/drawing-analytics";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
 import {
   countActiveEntriesForEmail,
@@ -85,12 +87,22 @@ export async function POST(req: Request) {
     const artistName = String(formData.get("artistName") ?? "").trim();
     const parentName = String(formData.get("parentName") ?? "").trim();
     const parentEmail = String(formData.get("parentEmail") ?? "").trim();
+    const parentPhoneRaw = String(formData.get("parentPhone") ?? "").trim();
     const artistCity = String(formData.get("artistCity") ?? "").trim();
     const artistClass = String(formData.get("artistClass") ?? "").trim();
     const artistSchool = String(formData.get("artistSchool") ?? "").trim();
     const termsAccepted = formData.get("termsAccepted") === "true";
     const ageRaw = String(formData.get("artistAge") ?? "").trim();
     const file = formData.get("image");
+    const attributionRaw = String(formData.get("attribution") ?? "").trim();
+    let attribution: ReturnType<typeof attributionFromPayload> = null;
+    if (attributionRaw) {
+      try {
+        attribution = attributionFromPayload(JSON.parse(attributionRaw) as Record<string, unknown>);
+      } catch {
+        /* ignore invalid attribution payload */
+      }
+    }
 
     if (!title || title.length > 120) {
       return NextResponse.json({ error: "Please enter a title (max 120 characters)." }, { status: 400 });
@@ -106,6 +118,13 @@ export async function POST(req: Request) {
     }
     if (!parentEmail || !isValidEmail(parentEmail) || parentEmail.length > 120) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+    const parentPhone = normalizeIndiaPhone(parentPhoneRaw);
+    if (!parentPhone) {
+      return NextResponse.json(
+        { error: "Please enter a valid mobile number (10 digits, or include +91)." },
+        { status: 400 }
+      );
     }
 
     const session = await verifyDrawingEmailSession(verifyToken, parentEmail);
@@ -193,6 +212,7 @@ export async function POST(req: Request) {
       artistCity,
       parentName,
       parentEmail: normalizedEmail,
+      parentPhone,
       submitterEmailHash,
       submitterUid: submitterEmailHash,
       imageUrl: driveUpload.url,
@@ -211,6 +231,14 @@ export async function POST(req: Request) {
           }
         : {}),
       submitterIpHash: ipHash(ip),
+      ...(attribution
+        ? {
+            trafficSource: attribution.source,
+            ...(attribution.utmSource ? { utmSource: attribution.utmSource } : {}),
+            ...(attribution.utmMedium ? { utmMedium: attribution.utmMedium } : {}),
+            ...(attribution.utmCampaign ? { utmCampaign: attribution.utmCampaign } : {}),
+          }
+        : {}),
       createdAt: FieldValue.serverTimestamp(),
     });
 

@@ -70,6 +70,7 @@ export type DrawingEntryAdmin = DrawingEntry & {
   parentEmail: string;
   parentPhone: string;
   submitterUid: string;
+  trafficSource?: "instagram" | "facebook" | "direct" | "other";
 };
 
 export function entryCreatedAtMs(entry: Pick<DrawingEntry, "createdAt">): number {
@@ -213,10 +214,25 @@ export function normalizeDrawingEntryAdmin(
   const parentEmail = typeof data.parentEmail === "string" ? data.parentEmail.trim() : "";
   const parentPhone = typeof data.parentPhone === "string" ? data.parentPhone.trim() : "";
   const submitterUid = typeof data.submitterUid === "string" ? data.submitterUid.trim() : "";
+  const trafficSource = data.trafficSource;
+  const source =
+    trafficSource === "instagram" ||
+    trafficSource === "facebook" ||
+    trafficSource === "direct" ||
+    trafficSource === "other"
+      ? trafficSource
+      : undefined;
   if (!parentName || !parentEmail) {
-    return { ...base, parentName: parentName || "—", parentEmail, parentPhone, submitterUid };
+    return {
+      ...base,
+      parentName: parentName || "—",
+      parentEmail,
+      parentPhone,
+      submitterUid,
+      ...(source ? { trafficSource: source } : {}),
+    };
   }
-  return { ...base, parentName, parentEmail, parentPhone, submitterUid };
+  return { ...base, parentName, parentEmail, parentPhone, submitterUid, ...(source ? { trafficSource: source } : {}) };
 }
 
 export function competitionPhase(meta: DrawingCompetitionMeta): {
@@ -311,6 +327,10 @@ export function normalizeIndiaPhone(input: string): string | null {
   if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
   if (input.startsWith("+") && digits.length >= 10 && digits.length <= 15) return `+${digits}`;
   return null;
+}
+
+export function isValidParentPhone(phone: string): boolean {
+  return normalizeIndiaPhone(phone) !== null;
 }
 
 export function isValidEmail(email: string): boolean {

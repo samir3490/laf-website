@@ -5,6 +5,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
+import DrawingAnalytics from "@/components/drawing/DrawingAnalytics";
 import DrawingCompetitionBanner from "@/components/drawing/DrawingCompetitionBanner";
 import SubmitDrawingForm from "@/components/drawing/SubmitDrawingForm";
 import {
@@ -30,6 +31,7 @@ export default function DrawingSubmitPageClient() {
 
   return (
     <>
+      <DrawingAnalytics page="submit" />
       <PageHeader title="Submit Artwork" />
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink />

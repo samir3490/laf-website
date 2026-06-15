@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import RequiredMark from "@/components/drawing/RequiredMark";
+import { trackDrawingEvent } from "@/components/drawing/DrawingAnalytics";
 
 type DrawingEmailOtpProps = {
   email: string;
@@ -41,6 +42,7 @@ export default function DrawingEmailOtp({
         setError(data.error ?? "Could not send code.");
         return;
       }
+      void trackDrawingEvent("otp_sent", "submit");
       setStep("otp");
     } catch {
       setError("Could not send code. Please try again.");
@@ -63,6 +65,7 @@ export default function DrawingEmailOtp({
         setError(data.error ?? "Verification failed.");
         return;
       }
+      void trackDrawingEvent("otp_verified", "submit");
       setStep("done");
       onVerified(data.verifyToken as string);
     } catch {

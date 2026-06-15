@@ -18,6 +18,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import DrawingEntryImage from "@/components/drawing/DrawingEntryImage";
+import AdminDrawingAnalytics from "@/components/drawing/AdminDrawingAnalytics";
 import {
   AGE_GROUPS,
   ageGroupLabel,
@@ -366,6 +367,8 @@ export default function AdminDrawingApp() {
       </div>
 
       {msg && <p className="text-sm text-laf-navy bg-laf-cream/60 rounded-lg px-4 py-2">{msg}</p>}
+
+      <AdminDrawingAnalytics entries={entries} />
 
       {openReports > 0 && (
         <section className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-4">
