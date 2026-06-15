@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -65,6 +65,18 @@ export default function DrawingCompetitionApp() {
   const [reportDetails, setReportDetails] = useState("");
   const [reportBusy, setReportBusy] = useState(false);
   const [reportMsg, setReportMsg] = useState("");
+  const thanksRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!submittedPending && !submittedLive) return;
+    const el = thanksRef.current;
+    if (!el) return;
+    const timer = window.setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.focus({ preventScroll: true });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [submittedPending, submittedLive]);
 
   const loadEntries = useCallback(async () => {
     setEntriesError("");
@@ -325,16 +337,24 @@ export default function DrawingCompetitionApp() {
 
   return (
     <div className="space-y-6">
-      {submittedPending && (
-        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-laf-navy">
-          Thank you! Your artwork was received and is <strong>pending LAF review</strong>. It will appear in the
-          gallery after approval.
-        </div>
-      )}
-      {submittedLive && (
-        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-laf-navy">
-          Thank you! Your artwork is <strong>live in the gallery</strong>. Sign in with Google to vote for your
-          favourites.
+      {(submittedPending || submittedLive) && (
+        <div
+          ref={thanksRef}
+          id="drawing-submit-thanks"
+          className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-laf-navy scroll-mt-28"
+          tabIndex={-1}
+        >
+          {submittedLive ? (
+            <>
+              Thank you! Your artwork is <strong>live in the gallery</strong>. Sign in with Google to vote for your
+              favourites.
+            </>
+          ) : (
+            <>
+              Thank you! Your artwork was received and is <strong>pending LAF review</strong>. It will appear in the
+              gallery after approval.
+            </>
+          )}
         </div>
       )}
 

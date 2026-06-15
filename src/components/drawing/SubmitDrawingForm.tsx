@@ -84,7 +84,8 @@ export default function SubmitDrawingForm({ submissionsAllowed }: SubmitDrawingF
       }
 
       trackDrawingSubmit(data.entryId as string);
-      router.push(data.published ? `${GALLERY_PATH}?submitted=live` : `${GALLERY_PATH}?submitted=pending`);
+      const thanksQuery = data.published ? "submitted=live" : "submitted=pending";
+      router.push(`${GALLERY_PATH}?${thanksQuery}`, { scroll: false });
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
