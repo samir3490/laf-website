@@ -23,8 +23,7 @@ export default function DrawingEmailOtp({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function sendOtp(e: React.FormEvent) {
-    e.preventDefault();
+  async function sendOtp() {
     setError("");
     if (!email.trim()) {
       setError("Enter your email address first.");
@@ -50,8 +49,7 @@ export default function DrawingEmailOtp({
     }
   }
 
-  async function verifyOtp(e: React.FormEvent) {
-    e.preventDefault();
+  async function verifyOtp() {
     setError("");
     setBusy(true);
     try {
@@ -102,7 +100,7 @@ export default function DrawingEmailOtp({
       </p>
 
       {step === "email" ? (
-        <form onSubmit={sendOtp} className="space-y-3">
+        <div className="space-y-3">
           <div>
             <label htmlFor="verify-email" className="block text-xs text-laf-muted mb-1">
               Email address
@@ -116,19 +114,26 @@ export default function DrawingEmailOtp({
               value={email}
               disabled={disabled}
               onChange={(e) => onEmailChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void sendOtp();
+                }
+              }}
               className="w-full px-4 py-3 rounded-xl border border-laf-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-laf-gold/50"
             />
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={() => void sendOtp()}
             disabled={busy || disabled}
             className="px-4 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold disabled:opacity-60"
           >
             {busy ? "Sending…" : "Send verification code"}
           </button>
-        </form>
+        </div>
       ) : (
-        <form onSubmit={verifyOtp} className="space-y-3">
+        <div className="space-y-3">
           <p className="text-xs text-laf-muted">Code sent to {email}. Check spam if you don&apos;t see it.</p>
           <div>
             <label htmlFor="email-otp" className="block text-xs text-laf-muted mb-1">
@@ -144,12 +149,19 @@ export default function DrawingEmailOtp({
               maxLength={6}
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && otp.length >= 6) {
+                  e.preventDefault();
+                  void verifyOtp();
+                }
+              }}
               className="w-full max-w-xs px-4 py-3 rounded-xl border border-laf-border bg-white text-sm tracking-widest"
             />
           </div>
           <div className="flex flex-wrap gap-2">
             <button
-              type="submit"
+              type="button"
+              onClick={() => void verifyOtp()}
               disabled={busy || otp.length < 6}
               className="px-4 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
             >
@@ -159,7 +171,7 @@ export default function DrawingEmailOtp({
               Change email
             </button>
           </div>
-        </form>
+        </div>
       )}
 
       {error && (
