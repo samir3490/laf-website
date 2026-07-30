@@ -36,7 +36,7 @@ export default function Footer() {
               {site.portalUrl && (
                 <li>
                   <a href={site.portalUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                    Partner Portal
+                    Portal
                   </a>
                 </li>
               )}

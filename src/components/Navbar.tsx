@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import PageContainer from "@/components/PageContainer";
+import { getSite } from "@/lib/content";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const portalUrl = getSite().portalUrl;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -77,6 +79,20 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {portalUrl && (
+              <a
+                href={portalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-colors whitespace-nowrap ${
+                  scrolled
+                    ? "border-laf-navy text-laf-navy hover:bg-laf-navy hover:text-white"
+                    : "border-white/80 text-white hover:bg-white hover:text-laf-navy"
+                }`}
+              >
+                Portal
+              </a>
+            )}
             <Link
               href="/donate"
               className="px-4 py-2 rounded-lg text-sm font-semibold bg-laf-gold text-white hover:bg-laf-gold-bright transition-colors whitespace-nowrap"
@@ -115,6 +131,22 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          {portalUrl && (
+            <a
+              href={portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mt-2 py-2.5 text-center text-sm font-semibold rounded-lg border border-laf-navy text-laf-navy"
+            >
+              Portal
+            </a>
+          )}
+          <Link
+            href="/donate"
+            className="block mt-2 py-2.5 text-center text-sm font-semibold rounded-lg bg-laf-gold text-white"
+          >
+            Donate Now
+          </Link>
         </div>
       )}
     </nav>
