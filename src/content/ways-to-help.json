@@ -1,25 +1,244 @@
 {
-  "ways": [
+  "intro": "Rather than only asking for money, we invite you to contribute in ways that match your skills, time, or resources. Every form of support helps children learn, grow, and build a brighter future.",
+  "closing": {
+    "title": "Every Contribution Matters",
+    "body": "Whether you donate a laptop, teach one class, sponsor a child, or simply introduce us to someone who can help, your support creates opportunities for children to learn, grow, and build a brighter future."
+  },
+  "categories": [
     {
-      "title": "Donate",
-      "description": "Support our mission financially or with essential resources like books, clothes, and technology. Every contribution helps underprivileged communities build a better future.",
-      "image": "/images/2025/09/premium_photo-1663089162887-403fb53108cd-1-1024x683.jpg",
-      "href": "/donate",
-      "cta": "Donate Now"
+      "id": "donate-education",
+      "title": "Donate for Education",
+      "items": [
+        "Sponsor a child's education",
+        "Sponsor robotics classes",
+        "Sponsor career guidance programs",
+        "Sponsor computer education",
+        "Sponsor STEM learning kits"
+      ]
     },
     {
-      "title": "Volunteer",
-      "description": "Share your time and skills to teach, mentor, or support our initiatives. Your involvement helps shape the future for children and families in need.",
-      "image": "/images/2025/09/premium_photo-1681195079271-cbfd9ba1cbc7-2-1024x683.jpg",
-      "href": "/volunteer",
-      "cta": "Become a Volunteer"
+      "id": "donate-technology",
+      "title": "Donate Technology",
+      "items": [
+        "New or used laptops",
+        "Desktop computers",
+        "Tablets",
+        "Computer accessories",
+        "Printers",
+        "Projectors",
+        "Monitors",
+        "Keyboards and mice",
+        "Webcams",
+        "Headphones",
+        "Wi-Fi routers"
+      ]
     },
     {
-      "title": "Spread the Word",
-      "description": "Help us raise awareness by sharing our mission on social media and with your network. Together we can reach more people and amplify our impact.",
-      "image": "/images/2025/09/premium_photo-1682310558560-d4219a34bb7d-2.jpg",
-      "href": "/contact",
-      "cta": "Get in Touch"
+      "id": "donate-robotics",
+      "title": "Donate Robotics & STEM Equipment",
+      "items": [
+        "Robotics kits",
+        "Arduino kits",
+        "Raspberry Pi",
+        "Sensors",
+        "Servo motors",
+        "Electronic components",
+        "Breadboards",
+        "Batteries",
+        "3D printers",
+        "3D printer filament",
+        "VR headsets",
+        "Science experiment kits"
+      ]
+    },
+    {
+      "id": "donate-school-supplies",
+      "title": "Donate School Supplies",
+      "items": [
+        "School bags",
+        "Notebooks",
+        "Pens and pencils",
+        "Geometry boxes",
+        "Drawing books",
+        "Art and craft materials",
+        "Whiteboards",
+        "Markers",
+        "Educational charts"
+      ]
+    },
+    {
+      "id": "donate-books",
+      "title": "Donate Books",
+      "items": [
+        "Story books",
+        "Children's books",
+        "Science books",
+        "Competitive exam books",
+        "Dictionaries",
+        "Career guidance books",
+        "English learning books",
+        "General knowledge books"
+      ]
+    },
+    {
+      "id": "donate-furniture",
+      "title": "Donate Furniture",
+      "items": [
+        "Tables",
+        "Chairs",
+        "Cupboards",
+        "Bookshelves",
+        "Study desks",
+        "Whiteboards",
+        "Storage racks"
+      ]
+    },
+    {
+      "id": "donate-sports",
+      "title": "Donate Sports Equipment",
+      "items": [
+        "Cricket kits",
+        "Footballs",
+        "Volleyballs",
+        "Badminton sets",
+        "Chess boards",
+        "Carrom boards",
+        "Skipping ropes",
+        "Indoor games"
+      ]
+    },
+    {
+      "id": "donate-food",
+      "title": "Donate Food & Nutrition",
+      "items": [
+        "Grocery kits",
+        "Rice",
+        "Wheat",
+        "Dal",
+        "Cooking oil",
+        "Fruits",
+        "Milk",
+        "Healthy snacks",
+        "Mid-day meals",
+        "Drinking water"
+      ]
+    },
+    {
+      "id": "donate-hygiene",
+      "title": "Donate Hygiene & Health Supplies",
+      "items": [
+        "Soap",
+        "Toothbrushes",
+        "Toothpaste",
+        "Sanitary napkins",
+        "First-aid kits",
+        "Towels",
+        "Blankets",
+        "Bedsheets"
+      ]
+    },
+    {
+      "id": "sponsor-activity",
+      "title": "Sponsor an Activity",
+      "items": [
+        "Robotics workshop",
+        "Career guidance session",
+        "Health camp",
+        "Dental camp",
+        "Eye check-up camp",
+        "Tree plantation drive",
+        "Computer donation drive",
+        "Science exhibition",
+        "Drawing competition"
+      ]
+    },
+    {
+      "id": "volunteer-time",
+      "title": "Volunteer Your Time",
+      "items": [
+        "Teach students",
+        "Conduct workshops",
+        "Mentor children",
+        "Career counselling",
+        "English speaking practice",
+        "Computer training",
+        "Robotics mentoring",
+        "Photography",
+        "Videography",
+        "Event management"
+      ]
+    },
+    {
+      "id": "volunteer-skills",
+      "title": "Volunteer Your Professional Skills",
+      "items": [
+        "Doctors",
+        "Dentists",
+        "Engineers",
+        "Teachers",
+        "Chartered Accountants",
+        "Lawyers",
+        "HR professionals",
+        "Software developers",
+        "Graphic designers",
+        "Video editors",
+        "Social media managers",
+        "Content writers",
+        "Translators"
+      ]
+    },
+    {
+      "id": "corporate-csr",
+      "title": "Corporate & CSR Support",
+      "items": [
+        "Sponsor a computer lab",
+        "Sponsor a robotics lab",
+        "Employee volunteering",
+        "Corporate matching donations",
+        "Skill-based volunteering",
+        "Sponsor events",
+        "Donate equipment",
+        "Internship opportunities"
+      ]
+    },
+    {
+      "id": "infrastructure",
+      "title": "Support Our Infrastructure",
+      "items": [
+        "Rent for learning centers",
+        "Electricity bills",
+        "Internet connection",
+        "Classroom setup",
+        "Computer maintenance",
+        "Transportation",
+        "Office supplies"
+      ]
+    },
+    {
+      "id": "other-ways",
+      "title": "Other Ways to Help",
+      "items": [
+        "Introduce us to schools",
+        "Connect us with orphanages",
+        "Connect us with donors",
+        "Connect us with CSR teams",
+        "Share our work on social media",
+        "Organize fundraising campaigns",
+        "Celebrate birthdays or anniversaries by sponsoring a meal or educational activity",
+        "Recommend us to friends and family"
+      ]
+    },
+    {
+      "id": "long-term-partner",
+      "title": "Become a Long-Term Partner",
+      "items": [
+        "Sponsor a child for one year",
+        "Adopt a learning center",
+        "Sponsor a robotics batch",
+        "Fund a community project",
+        "Support digital education initiatives",
+        "Partner with us to expand opportunities for children across India"
+      ]
     }
   ]
 }

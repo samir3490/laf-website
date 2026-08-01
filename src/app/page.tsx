@@ -150,6 +150,9 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+          <div className="mt-10 text-center">
+            <Button href="/ways-to-help">See all ways to help</Button>
+          </div>
         </PageContainer>
       </section>
 
@@ -161,6 +164,9 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Button href="/donate">Donate</Button>
+            <Button href="/ways-to-help" variant="outline" className="border-white text-white hover:bg-white hover:text-laf-navy">
+              Ways to Help
+            </Button>
             <Button href="/volunteer" variant="outline" className="border-white text-white hover:bg-white hover:text-laf-navy">
               Volunteer
             </Button>

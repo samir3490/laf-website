@@ -53,9 +53,13 @@ export default function VolunteerPage() {
                 ))}
               </ul>
               <p className="mt-6 text-sm text-laf-muted">
-                Prefer to donate instead?{" "}
+                Prefer to donate money or goods?{" "}
                 <Link href="/donate" className="text-laf-gold font-medium hover:underline">
-                  Support our mission financially
+                  Donate online
+                </Link>{" "}
+                or{" "}
+                <Link href="/ways-to-help" className="text-laf-gold font-medium hover:underline">
+                  see all ways to help
                 </Link>
                 .
               </p>

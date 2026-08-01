@@ -29,6 +29,7 @@ export default function Footer() {
               <li><Link href="/gallery" className="hover:text-white">Gallery</Link></li>
               <li><Link href="/events" className="hover:text-white">Events</Link></li>
               <li><Link href="/donate" className="hover:text-white">Donate</Link></li>
+              <li><Link href="/ways-to-help" className="hover:text-white">Ways to Help</Link></li>
               <li><Link href="/volunteer" className="hover:text-white">Volunteer</Link></li>
               <li><Link href="/faq" className="hover:text-white">FAQs</Link></li>
               <li><Link href="/blog" className="hover:text-white">Blog</Link></li>

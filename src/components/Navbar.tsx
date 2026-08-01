@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/donate", label: "Donate" },
+  { href: "/ways-to-help", label: "Ways to Help" },
   { href: "/volunteer", label: "Volunteer" },
   { href: "/csr", label: "CSR" },
   { href: "/blog", label: "Blog" },

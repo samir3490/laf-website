@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import RazorpayDonateButton from "@/components/RazorpayDonateButton";
@@ -27,6 +28,13 @@ export default function DonatePage() {
               Every donation, no matter the size, helps us take one step closer to making a
               lasting difference. Your generosity enables us to provide food, education, and
               support to those in need.
+            </p>
+            <p className="text-sm text-laf-muted">
+              Prefer to give goods, time, or skills instead?{" "}
+              <Link href="/ways-to-help" className="text-laf-gold font-medium hover:underline">
+                Explore all ways to help
+              </Link>
+              .
             </p>
             <div className="rounded-2xl border border-laf-border bg-white p-6 md:p-8">
               <h2 className="text-xl font-semibold text-laf-navy">Credit / Debit / Net Banking</h2>
