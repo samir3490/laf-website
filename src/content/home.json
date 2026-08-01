@@ -1,10 +1,40 @@
-{
+﻿{
   "hero": {
     "title": "Empowering Education for All",
     "subtitle": "We aim to bridge the education gap by providing essential resources, mentorship, and opportunities.",
     "body": "We believe that education is the key to breaking the cycle of poverty. Our mission is to ensure that every child, regardless of their background, has access to quality education, resources, and opportunities to thrive.",
     "image": "/images/2024/12/mission-ngo-lata.webp",
     "backgroundImage": "/images/2024/12/homebannerngo-1024x585.webp"
+  },
+  "centers": {
+    "title": "Our Free Computer Learning Centres",
+    "subtitle": "Four free digital learning spaces where children gain computer skills, robotics, and confidence for the future.",
+    "items": [
+      {
+        "name": "Buniyad Next Gen Robotics",
+        "location": "Wardha, Maharashtra",
+        "description": "Hands-on robotics and coding for children — building curiosity, problem-solving, and digital confidence.",
+        "image": "/images/centers/buniyad-next-gen-robotics.png"
+      },
+      {
+        "name": "Computer Lab at Sewashram",
+        "location": "Wardha, Maharashtra",
+        "description": "A free computer lab supporting children and youth at Sewashram with essential digital literacy skills.",
+        "image": "/images/centers/computer-lab-sewashram-wardha.png"
+      },
+      {
+        "name": "Computer Lab in Prayagraj",
+        "location": "Prayagraj, Uttar Pradesh",
+        "description": "Community computer learning for students who need access to devices, training, and guided practice.",
+        "image": "/images/centers/computer-lab-prayagraj.png"
+      },
+      {
+        "name": "Computer Lab at ZPPS Jalna",
+        "location": "Jalna, Maharashtra",
+        "description": "Digital learning support at Zilla Parishad Primary School, helping village children build future-ready skills.",
+        "image": "/images/centers/computer-lab-zpps-jalna.png"
+      }
+    ]
   },
   "impact": [
     {

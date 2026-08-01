@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function HomePage() {
-  const { hero, impact, help } = home;
+  const { hero, impact, help, centers } = home;
   const site = getSite();
 
   return (
@@ -58,6 +58,46 @@ export default function HomePage() {
               className="object-cover object-center"
               sizes="(max-width: 1280px) 45vw, 520px"
             />
+          </div>
+        </PageContainer>
+      </section>
+
+      <section className="py-20 bg-laf-cream">
+        <PageContainer>
+          <h2 className="text-3xl md:text-4xl font-bold text-laf-navy text-center">{centers.title}</h2>
+          <div className="w-16 h-1 bg-laf-gold mx-auto mt-4 mb-4 rounded-full" />
+          <p className="text-center text-laf-muted max-w-2xl mx-auto mb-12 leading-relaxed">
+            {centers.subtitle}
+          </p>
+          <div className="grid sm:grid-cols-2 gap-6 lg:gap-8">
+            {centers.items.map((center) => (
+              <article
+                key={center.name}
+                className="rounded-2xl border border-laf-border bg-white overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative aspect-[16/10]">
+                  <Image
+                    src={center.image}
+                    alt={`${center.name}, ${center.location}`}
+                    fill
+                    quality={80}
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-5 sm:p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold mb-1">
+                    {center.location}
+                  </p>
+                  <h3 className="text-xl font-semibold text-laf-navy">{center.name}</h3>
+                  <p className="mt-2 text-sm text-laf-muted leading-relaxed">{center.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Button href="/donate">Support our centres</Button>
           </div>
         </PageContainer>
       </section>
