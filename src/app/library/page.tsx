@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import LibraryBrowser from "@/components/library/LibraryBrowser";
-import LibraryPageShell from "@/components/library/LibraryPageShell";
 import { getSeedLibraryResources } from "@/lib/library-data";
 import { pageMetadata, siteUrl } from "@/lib/seo";
 
@@ -40,17 +39,16 @@ export default function LibraryPage() {
       />
       <PageHeader title="Learning Resource Library" />
       <PageContainer wide className="py-8 lg:py-12">
-        <LibraryPageShell
+        <LibraryBrowser
           seedResources={seedResources}
           intro={
             <p className="text-sm text-laf-muted leading-relaxed">
-              Search {seedResources.length}+ trusted sites — coding, robotics, scholarships, and
-              more. Use <strong className="text-laf-navy">Ask the library</strong> or filters below.
+              Browse {seedResources.length}+ trusted free learning sites — coding, robotics,
+              scholarships, science, and more. Use search and filters in the sidebar to narrow
+              results.
             </p>
           }
-        >
-          <LibraryBrowser seedResources={seedResources} />
-        </LibraryPageShell>
+        />
       </PageContainer>
     </>
   );

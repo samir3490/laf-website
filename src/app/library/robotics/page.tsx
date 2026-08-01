@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import LibraryBrowser from "@/components/library/LibraryBrowser";
-import LibraryPageShell from "@/components/library/LibraryPageShell";
 import { getSeedLibraryResources } from "@/lib/library-data";
 import { pageMetadata } from "@/lib/seo";
 
@@ -20,16 +19,15 @@ export default function LibraryRoboticsPage() {
     <>
       <PageHeader title="Robotics Learning Library" />
       <PageContainer wide className="py-8 lg:py-12">
-        <LibraryPageShell
+        <LibraryBrowser
           seedResources={seedResources}
+          initialModule="robotics"
           intro={
             <p className="text-sm text-laf-muted">
-              From Scratch to Arduino — curated robotics and maker resources.
+              Scratch, Arduino, Tinkercad, and other free robotics and maker resources.
             </p>
           }
-        >
-          <LibraryBrowser seedResources={seedResources} initialModule="robotics" />
-        </LibraryPageShell>
+        />
       </PageContainer>
     </>
   );

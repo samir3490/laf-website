@@ -9,14 +9,26 @@ const MODULE_LINKS = [
   { href: "/library/ngo", label: "NGO knowledge" },
   { href: "/library/paths", label: "Learning paths" },
   { href: "/library/contributors", label: "Top contributors" },
-  { href: "/library/submit", label: "Suggest a site" },
 ];
 
-export default function LibrarySidebarNav() {
+type LibrarySidebarNavProps = {
+  searchSlot?: React.ReactNode;
+};
+
+export default function LibrarySidebarNav({ searchSlot }: LibrarySidebarNavProps) {
   const paths = getLearningPaths();
 
   return (
     <nav className="space-y-6" aria-label="Library navigation">
+      {searchSlot && (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold mb-3">
+            Search
+          </p>
+          {searchSlot}
+        </div>
+      )}
+
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-laf-gold mb-3">
           Browse

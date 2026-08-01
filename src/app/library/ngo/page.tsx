@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import LibraryBrowser from "@/components/library/LibraryBrowser";
-import LibraryPageShell from "@/components/library/LibraryPageShell";
 import { getSeedLibraryResources } from "@/lib/library-data";
 import { pageMetadata } from "@/lib/seo";
 
@@ -20,20 +19,15 @@ export default function LibraryNgoPage() {
     <>
       <PageHeader title="NGO Knowledge Library" />
       <PageContainer wide className="py-8 lg:py-12">
-        <LibraryPageShell
+        <LibraryBrowser
           seedResources={seedResources}
+          initialModule="ngo"
           intro={
             <p className="text-sm text-laf-muted">
               Transparency, compliance, and partnership resources for NGOs and volunteers.
             </p>
           }
-        >
-          <LibraryBrowser
-            seedResources={seedResources}
-            initialModule="ngo"
-            showSmartSearch={false}
-          />
-        </LibraryPageShell>
+        />
       </PageContainer>
     </>
   );
