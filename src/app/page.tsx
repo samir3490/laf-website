@@ -4,7 +4,6 @@ import home from "@/content/home.json";
 import { getSite } from "@/lib/content";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
-import DrawingCompetitionPromo from "@/components/home/DrawingCompetitionPromo";
 import HomeLatestStories from "@/components/home/HomeLatestStories";
 import JsonLd from "@/components/JsonLd";
 import { pageMetadata, websiteJsonLd } from "@/lib/seo";
@@ -12,7 +11,7 @@ import { pageMetadata, websiteJsonLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Education & Community Programs in Wardha, India",
   description:
-    "Lata Agrawal Foundation supports children's education, nutrition, and wellbeing in Wardha and across India. Join our drawing competition, donate, volunteer, or explore our free learning library.",
+    "Lata Agrawal Foundation supports children's education, nutrition, and wellbeing in Wardha and across India. Donate, volunteer, or explore our free learning library.",
   path: "/",
 });
 
@@ -62,8 +61,6 @@ export default function HomePage() {
           </div>
         </PageContainer>
       </section>
-
-      <DrawingCompetitionPromo />
 
       <HomeLatestStories />
 
