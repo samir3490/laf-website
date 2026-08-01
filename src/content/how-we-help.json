@@ -1,0 +1,183 @@
+{
+  "intro": "Here is what Lata Agrawal Foundation actually does — education, technology, health awareness, and community support for children, schools, orphanages, and partners. We keep this list aspirational but grounded in services we currently provide or realistically plan to deliver.",
+  "mission": {
+    "title": "Our Mission",
+    "body": "Our mission is to create opportunities by making education, technology, guidance, and community support accessible to everyone—especially children and communities with limited access to resources."
+  },
+  "referrals": {
+    "title": "Guidance & Referrals",
+    "body": "If we are unable to help directly, we will try to connect individuals and organizations with trusted partners, government schemes, NGOs, healthcare providers, educational institutions, or professionals who may be able to assist."
+  },
+  "comingSoon": {
+    "title": "Future Services (Coming Soon)",
+    "intro": "These initiatives show the direction in which Lata Agrawal Foundation is growing. We share them so donors, volunteers, and partners can see where we are headed.",
+    "items": [
+      "Scholarship assistance",
+      "Employment readiness programs",
+      "Entrepreneurship workshops",
+      "Mobile STEM labs",
+      "Digital library",
+      "Online learning platform",
+      "Mentorship network",
+      "Community innovation centers",
+      "Emergency relief coordination",
+      "MSW student fieldwork and internship network"
+    ]
+  },
+  "categories": [
+    {
+      "id": "education-learning",
+      "title": "Education & Learning",
+      "items": [
+        "Free computer education",
+        "Robotics and STEM education",
+        "Scratch programming classes",
+        "CAD design training",
+        "3D printing workshops",
+        "Basic coding classes",
+        "Artificial Intelligence awareness",
+        "Digital literacy programs",
+        "Career guidance sessions",
+        "Study skills and learning support"
+      ]
+    },
+    {
+      "id": "student-development",
+      "title": "Student Development",
+      "items": [
+        "Personality development",
+        "Communication skills",
+        "Leadership activities",
+        "Public speaking opportunities",
+        "Creative thinking workshops",
+        "Problem-solving activities",
+        "Innovation challenges",
+        "Science exhibitions",
+        "Educational competitions"
+      ]
+    },
+    {
+      "id": "school-college",
+      "title": "School & College Support",
+      "items": [
+        "Robotics lab setup",
+        "Computer lab setup",
+        "STEM workshops",
+        "Career awareness seminars",
+        "Technology demonstrations",
+        "Teacher training support",
+        "Student mentoring"
+      ]
+    },
+    {
+      "id": "orphanage-ngo",
+      "title": "Orphanage & NGO Support",
+      "items": [
+        "Computer donations (subject to availability)",
+        "Robotics workshops",
+        "Career guidance programs",
+        "Digital literacy training",
+        "Volunteer support",
+        "Educational activities",
+        "Technology awareness sessions"
+      ]
+    },
+    {
+      "id": "health-wellness",
+      "title": "Health & Wellness",
+      "items": [
+        "Free dental check-up camps",
+        "Health awareness programs",
+        "Hygiene awareness sessions",
+        "Menstrual hygiene awareness",
+        "Nutrition awareness",
+        "Mental well-being awareness",
+        "Eye check-up camps (through partners)"
+      ]
+    },
+    {
+      "id": "community-development",
+      "title": "Community Development",
+      "items": [
+        "Digital awareness programs",
+        "Consumer awareness programs",
+        "Financial literacy sessions",
+        "Environmental awareness",
+        "Tree plantation drives",
+        "Cleanliness drives",
+        "Community outreach programs"
+      ]
+    },
+    {
+      "id": "technology-support",
+      "title": "Technology Support",
+      "items": [
+        "Basic computer training",
+        "Internet safety awareness",
+        "Cybersecurity awareness",
+        "Digital tools training",
+        "AI awareness workshops",
+        "Basic office software training"
+      ]
+    },
+    {
+      "id": "volunteer-opportunities",
+      "title": "Volunteer Opportunities",
+      "items": [
+        "Volunteer placements",
+        "Corporate volunteering",
+        "Student internships",
+        "Skill-based volunteering",
+        "Community service opportunities",
+        "Event volunteering"
+      ]
+    },
+    {
+      "id": "career-support",
+      "title": "Career Support",
+      "items": [
+        "Career counselling",
+        "Resume guidance",
+        "Interview preparation",
+        "Career exploration sessions",
+        "Higher education guidance",
+        "Scholarship awareness"
+      ]
+    },
+    {
+      "id": "resource-support",
+      "title": "Resource Support",
+      "items": [
+        "Books (subject to availability)",
+        "Educational materials",
+        "School supplies",
+        "Learning resources",
+        "Computer access",
+        "Technology demonstrations"
+      ]
+    },
+    {
+      "id": "institutional-support",
+      "title": "NGO & Institutional Support",
+      "items": [
+        "Volunteer coordination",
+        "Community project collaboration",
+        "Awareness campaign support",
+        "CSR implementation support",
+        "Educational event collaboration"
+      ]
+    },
+    {
+      "id": "special-programs",
+      "title": "Special Programs",
+      "items": [
+        "Summer camps",
+        "Holiday workshops",
+        "STEM bootcamps",
+        "Innovation labs",
+        "Science and technology events",
+        "Community learning initiatives"
+      ]
+    }
+  ]
+}

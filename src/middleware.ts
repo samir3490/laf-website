@@ -14,6 +14,7 @@ const RESERVED = new Set([
   "faq",
   "blog",
   "ways-to-help",
+  "how-we-help",
   "events",
   "drawing-competition",
   "community-scratch-games",

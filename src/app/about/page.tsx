@@ -59,8 +59,14 @@ export default function AboutPage() {
           <p className="mt-4 text-white/85 max-w-2xl mx-auto leading-relaxed">{about.team.body}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/volunteer"
+              href="/how-we-help"
               className="px-6 py-2.5 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright transition-colors"
+            >
+              How We Help
+            </Link>
+            <Link
+              href="/volunteer"
+              className="px-6 py-2.5 rounded-lg border border-white/40 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
             >
               Become a Volunteer
             </Link>

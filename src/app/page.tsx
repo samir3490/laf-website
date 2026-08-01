@@ -43,7 +43,7 @@ export default function HomePage() {
             <p className="text-lg font-medium text-white/95">{site.tagline}</p>
             <p className="mt-4 text-white/85 leading-relaxed max-w-xl">{hero.body}</p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button href="/about">Learn More</Button>
+              <Button href="/how-we-help">How We Help</Button>
               <Button href="/donate" variant="outline" className="border-white text-white hover:bg-white hover:text-laf-navy">
                 Donate
               </Button>

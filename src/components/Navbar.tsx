@@ -10,6 +10,7 @@ import { getSite } from "@/lib/content";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/how-we-help", label: "How We Help" },
   { href: "/donate", label: "Donate" },
   { href: "/ways-to-help", label: "Ways to Help" },
   { href: "/volunteer", label: "Volunteer" },

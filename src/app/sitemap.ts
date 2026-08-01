@@ -10,6 +10,7 @@ const ROUTE_PRIORITY: Record<string, number> = {
   "/library": 0.85,
   "/about": 0.85,
   "/ways-to-help": 0.8,
+  "/how-we-help": 0.85,
   "/contact": 0.75,
   "/events": 0.75,
   "/blog": 0.7,
@@ -41,6 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     "",
     "/about",
+    "/how-we-help",
     "/gallery",
     "/reviews",
     "/donate",
