@@ -1,41 +1,228 @@
 {
   "image": "/images/2025/09/Thinking-img.jpg",
-  "items": [
+  "closing": "Every child deserves an opportunity, every community deserves support, and every individual can make a difference. Whether you donate, volunteer, partner with us, or simply spread the word, your support helps create lasting impact.",
+  "categories": [
     {
-      "question": "I don't live in Wardha. How can I help?",
-      "answer": "You can courier listed items to our office, or purchase them online and use our address as the delivery address. Thousands of our donors have been doing this for years."
+      "id": "about",
+      "title": "About Lata Agrawal Foundation",
+      "items": [
+        {
+          "question": "What is Lata Agrawal Foundation?",
+          "answer": "Lata Agrawal Foundation is a non-profit organization dedicated to creating opportunities through education, technology, career guidance, health initiatives, and community development programs."
+        },
+        {
+          "question": "Who do you help?",
+          "answer": "We primarily work with:",
+          "bullets": [
+            "Underprivileged children",
+            "Government schools",
+            "Orphanages",
+            "NGOs",
+            "Students",
+            "Rural communities",
+            "Women and youth",
+            "Anyone who can benefit from our educational and community programs"
+          ]
+        },
+        {
+          "question": "What kind of programs do you conduct?",
+          "answer": "Our initiatives include:",
+          "bullets": [
+            "Robotics & STEM education",
+            "Computer literacy",
+            "Career guidance",
+            "Health and hygiene awareness",
+            "Dental and health camps",
+            "Educational workshops",
+            "Volunteer engagement",
+            "Community awareness programs"
+          ]
+        },
+        {
+          "question": "Where do you operate?",
+          "answer": "Our headquarters are in Wardha, Maharashtra. We collaborate with schools, NGOs, orphanages, and volunteers across India whenever possible."
+        }
+      ]
     },
     {
-      "question": "Where is your collection centre?",
-      "answer": "Lata Agrawal Foundation, 48 Mohini Nagar, Behind Arti Talkies, Wardha, Maharashtra 442001."
+      "id": "volunteering",
+      "title": "Volunteering",
+      "items": [
+        {
+          "question": "Can I volunteer with Lata Agrawal Foundation?",
+          "answer": "Yes. We welcome students, working professionals, teachers, doctors, engineers, designers, social workers, and anyone who wants to contribute their time and skills."
+        },
+        {
+          "question": "Can I volunteer online?",
+          "answer": "Yes. Depending on the project, volunteers can contribute remotely through mentoring, teaching, content creation, research, technology support, and administrative assistance."
+        },
+        {
+          "question": "Do volunteers receive certificates?",
+          "answer": "Yes. Volunteers who actively contribute to our programs may receive a certificate of appreciation or completion."
+        }
+      ]
     },
     {
-      "question": "Can I speak to someone at your office?",
-      "answer": "For any queries, please speak to Samir Agrawal at +91 9421 095 604 (best time: 10:00am–5:00pm) or write to admin@agrawalfoundation.org."
+      "id": "donations",
+      "title": "Donations",
+      "items": [
+        {
+          "question": "How can I support Lata Agrawal Foundation?",
+          "answer": "You can support us by:",
+          "bullets": [
+            "Donating funds",
+            "Sponsoring a child or program",
+            "Donating computers or educational materials",
+            "Volunteering",
+            "Introducing us to schools, orphanages, companies, or donors",
+            "Sharing our work with others"
+          ]
+        },
+        {
+          "question": "What items can I donate?",
+          "answer": "We welcome donations such as:",
+          "bullets": [
+            "Computers and laptops",
+            "Robotics kits",
+            "Books",
+            "School supplies",
+            "Sports equipment",
+            "Educational materials",
+            "Furniture",
+            "Technology equipment",
+            "Hygiene supplies",
+            "Stationery",
+            "Science kits",
+            "Art and craft materials"
+          ],
+          "after": "If you would like to donate physical items, they can be sent to:\n\nLata Agrawal Foundation\n48, Mohini Nagar,\nBehind Arti Talkies,\nWardha, Maharashtra – 442001\n\nIf you are planning to send large items or multiple donations, we recommend contacting us in advance so we can coordinate the delivery."
+        },
+        {
+          "question": "Can I sponsor a specific project?",
+          "answer": "Yes. You can choose to sponsor a robotics class, computer lab, educational workshop, health camp, or another initiative based on your interests."
+        },
+        {
+          "question": "Is my donation tax exempt?",
+          "answer": "Eligible donations may qualify for tax benefits under Section 80G of the Income Tax Act. Please contact us for the latest details and documentation."
+        },
+        {
+          "question": "Where can I send donated items?",
+          "answer": "You can send donated items to:\n\nLata Agrawal Foundation\n48, Mohini Nagar,\nBehind Arti Talkies,\nWardha, Maharashtra – 442001\n\nWe welcome donations of educational materials, computers, robotics equipment, books, school supplies, hygiene products, and other useful items that can benefit children and communities.\n\nIf you have any questions about your donation, please contact us before shipping so we can ensure the items are suitable for our current programs."
+        },
+        {
+          "question": "I have items that are no longer useful to me. Can they still help someone?",
+          "answer": "Absolutely! Many gently used items can make a meaningful difference. If your items are in good working condition, we may be able to refurbish, reuse, or distribute them to schools, orphanages, students, or community organizations that need them.\n\nExamples include:",
+          "bullets": [
+            "Laptops and desktop computers",
+            "Monitors and printers",
+            "Books and educational materials",
+            "School furniture",
+            "Sports equipment",
+            "Toys and learning aids",
+            "Projectors",
+            "Tablets and other digital devices"
+          ],
+          "after": "Before sending your donation, please contact us so we can confirm our current needs and arrange the best way to receive your contribution."
+        },
+        {
+          "question": "I don't live in Wardha. How can I help?",
+          "answer": "You can courier listed items to our Wardha office, or purchase them online and use our address as the delivery address. Thousands of our donors have been doing this for years. For large shipments, please contact us first so we can coordinate delivery."
+        },
+        {
+          "question": "Can you pick up items from my home?",
+          "answer": "It is not practically possible for us to collect items from homes, as our team is focused on distribution across India. We humbly request you to drop donations at our collection centre or courier them to our Wardha address."
+        },
+        {
+          "question": "Do you accept donations of food?",
+          "answer": "Yes. You can consider donating packets of biscuits, cake, dry fruits, tetra pack juice, and similar packaged items. Please contact us before sending perishable food."
+        },
+        {
+          "question": "Can I make a financial contribution?",
+          "answer": "We welcome monetary donations. You can donate online via our Donate page, or transfer to Bank: HDFC Bank, Account Name: Lata Agrawal Foundation, A/c No: 50200097041761, IFSC: HDFC0000965. Cheques payable to \"Lata Agrawal Foundation\" can be mailed to our Wardha address. Eligible donations may qualify for tax exemption under Section 80G."
+        }
+      ]
     },
     {
-      "question": "Are you open on Sundays?",
-      "answer": "We are open all 7 days between 9:00am and 5:00pm."
+      "id": "partnerships",
+      "title": "Partnerships",
+      "items": [
+        {
+          "question": "Can schools collaborate with Lata Agrawal Foundation?",
+          "answer": "Yes. We partner with schools to conduct educational workshops, robotics classes, career guidance sessions, and technology awareness programs."
+        },
+        {
+          "question": "Can orphanages or NGOs request support?",
+          "answer": "Yes. We encourage orphanages and NGOs to contact us. We will evaluate each request and provide support based on available resources and partnerships."
+        },
+        {
+          "question": "Do you work with companies?",
+          "answer": "Yes. We welcome CSR partnerships, employee volunteering, equipment donations, and collaborative community initiatives."
+        }
+      ]
     },
     {
-      "question": "Do you accept donation of lightly used toys, clothes, etc.?",
-      "answer": "Yes — if your toys or clothes are in good condition, you may consider donating them."
+      "id": "students-parents",
+      "title": "Students & Parents",
+      "items": [
+        {
+          "question": "How can my child join your programs?",
+          "answer": "Parents can contact us to learn about upcoming batches, eligibility, and available seats for our educational programs."
+        },
+        {
+          "question": "Are your programs free?",
+          "answer": "Many of our programs are offered free of cost or at a highly subsidized rate with the support of donors, volunteers, and partners."
+        }
+      ]
     },
     {
-      "question": "Do you accept donations of food?",
-      "answer": "You can consider donating packets of biscuits, cake, dry fruits, tetra pack juice, and similar items."
+      "id": "transparency",
+      "title": "Transparency",
+      "items": [
+        {
+          "question": "How do you use donations?",
+          "answer": "Donations are used to support educational programs, technology initiatives, community development activities, volunteer engagement, and operational expenses that help us deliver our mission effectively."
+        },
+        {
+          "question": "Can I see the impact of my contribution?",
+          "answer": "Yes. We regularly share updates, photos, videos, and stories from our programs through our Instagram page and other communication channels so you can see the impact of your support.",
+          "links": [
+            {
+              "label": "Follow us on Instagram",
+              "href": "https://www.instagram.com/lata_agrawal_foundation/"
+            }
+          ]
+        },
+        {
+          "question": "Can I visit your projects?",
+          "answer": "Yes. Visitors are welcome by prior appointment. We encourage supporters to see our work firsthand."
+        }
+      ]
     },
     {
-      "question": "Can I make a financial contribution to the Lata Agrawal Foundation?",
-      "answer": "We welcome monetary donations. Cheques payable to \"Lata Agrawal Foundation\" can be mailed to our Wardha address. You can also donate online via our Donate page. Bank: HDFC Bank, Account Name: Lata Agrawal Foundation, A/c No: 50200097041761, IFSC: HDFC0000965. Donations are eligible for tax exemption under Section 80G of the Income Tax Act, 1961."
-    },
-    {
-      "question": "Can I join the Lata Agrawal Foundation team?",
-      "answer": "Yes. We encourage you, your family, and friends to join our charitable activities. Call +91 9421 095 604 or write to admin@agrawalfoundation.org, or fill out the volunteer form on our website."
-    },
-    {
-      "question": "Can you pick up items from my home?",
-      "answer": "It is not practically possible for us to collect items from homes, as our team is focused on distribution across India. We humbly request you to drop donations at our collection centre."
+      "id": "getting-help",
+      "title": "Getting Help",
+      "items": [
+        {
+          "question": "Can I contact you if someone needs help?",
+          "answer": "Absolutely. If you know a child, school, orphanage, NGO, or community in need, please contact us. While we may not always be able to provide direct assistance, we will do our best to evaluate the request or connect you with appropriate resources."
+        },
+        {
+          "question": "Do you help individuals directly?",
+          "answer": "Yes, when possible. Every request is reviewed individually based on urgency, available resources, and alignment with our mission. In cases where we cannot assist directly, we try to guide people toward other organizations or government schemes that may be able to help."
+        },
+        {
+          "question": "How can I stay connected with Lata Agrawal Foundation?",
+          "answer": "You can follow us on social media, visit our website, subscribe to updates, volunteer, or participate in our events and campaigns."
+        },
+        {
+          "question": "Can I speak to someone at your office?",
+          "answer": "For any queries, please speak to Samir Agrawal at +91 9421 095 604 (best time: 10:00am–5:00pm) or write to admin@agrawalfoundation.org."
+        },
+        {
+          "question": "Are you open on Sundays?",
+          "answer": "We are open all 7 days between 9:00am and 5:00pm."
+        }
+      ]
     }
   ]
 }
