@@ -5,6 +5,7 @@ import { getSite } from "@/lib/content";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
 import HomeLatestStories from "@/components/home/HomeLatestStories";
+import FacebookPagePlugin from "@/components/FacebookPagePlugin";
 import JsonLd from "@/components/JsonLd";
 import { pageMetadata, websiteJsonLd } from "@/lib/seo";
 
@@ -155,6 +156,37 @@ export default function HomePage() {
           </div>
         </PageContainer>
       </section>
+
+      {site.social.facebook && (
+        <section className="py-20 bg-white">
+          <PageContainer>
+            <h2 className="text-3xl md:text-4xl font-bold text-laf-navy text-center">
+              Latest from Facebook
+            </h2>
+            <div className="w-16 h-1 bg-laf-gold mx-auto mt-4 mb-4 rounded-full" />
+            <p className="text-center text-laf-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+              Follow our updates, photos, and community stories — including posts from Instagram —
+              on our Facebook page.
+            </p>
+            <div className="rounded-2xl border border-laf-border bg-laf-cream/40 p-4 sm:p-6 overflow-hidden">
+              <FacebookPagePlugin href={site.social.facebook} />
+            </div>
+            {site.social.instagram && (
+              <p className="mt-6 text-center text-sm text-laf-muted">
+                Prefer Instagram?{" "}
+                <a
+                  href={site.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-laf-gold font-medium hover:underline"
+                >
+                  Follow us on Instagram
+                </a>
+              </p>
+            )}
+          </PageContainer>
+        </section>
+      )}
 
       <section className="py-20 bg-laf-navy text-white text-center">
         <PageContainer narrow className="text-center">

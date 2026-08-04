@@ -3,6 +3,7 @@ import PageHeader from "@/components/PageHeader";
 import HubSpotForm from "@/components/HubSpotForm";
 import PageContainer from "@/components/PageContainer";
 import SocialLinks from "@/components/SocialLinks";
+import FacebookPagePlugin from "@/components/FacebookPagePlugin";
 import JsonLd from "@/components/JsonLd";
 import { getSite } from "@/lib/content";
 import { contactPageJsonLd, pageMetadata } from "@/lib/seo";
@@ -73,6 +74,15 @@ export default function ContactPage() {
               <h3 className="font-semibold text-laf-navy mb-4">Follow Us</h3>
               <SocialLinks variant="light" />
             </div>
+
+            {site.social.facebook && (
+              <div>
+                <h3 className="font-semibold text-laf-navy mb-4">Facebook Updates</h3>
+                <div className="rounded-2xl border border-laf-border bg-white p-3 overflow-hidden">
+                  <FacebookPagePlugin href={site.social.facebook} height={420} />
+                </div>
+              </div>
+            )}
           </div>
 
           <aside className="lg:sticky lg:top-24">
