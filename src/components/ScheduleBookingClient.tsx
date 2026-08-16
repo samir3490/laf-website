@@ -196,7 +196,58 @@ export default function ScheduleBookingClient({
       </div>
 
       {loading ? (
-        <p className="text-sm text-laf-muted">Loading available times…</p>
+        <div
+          className="rounded-2xl border border-laf-border bg-laf-cream/40 px-6 py-12 sm:py-16 text-center"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-laf-border">
+            <svg
+              className="h-12 w-12 text-laf-gold animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="3"
+              />
+              <path
+                className="opacity-90"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"
+              />
+            </svg>
+          </div>
+          <p className="text-lg sm:text-xl font-bold text-laf-navy">Loading available times</p>
+          <p className="mt-2 text-sm sm:text-base text-laf-muted max-w-md mx-auto">
+            Checking the calendar for open {durationMinutes}-minute slots. This can take a few
+            seconds…
+          </p>
+          <div className="mt-8 space-y-4 max-w-lg mx-auto" aria-hidden="true">
+            <div className="flex flex-wrap justify-center gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={`d-${i}`}
+                  className="h-10 w-28 rounded-lg bg-white/80 border border-laf-border animate-pulse"
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div
+                  key={`t-${i}`}
+                  className="h-11 rounded-lg bg-white/80 border border-laf-border animate-pulse"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       ) : slots.length === 0 ? (
         <p className="text-sm text-laf-muted">
           No open slots in the next two weeks. Please email us and we will find a time together.
