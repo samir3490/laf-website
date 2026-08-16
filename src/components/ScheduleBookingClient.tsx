@@ -34,6 +34,17 @@ function formatHour12(hour24: number): string {
   return `${hour} ${suffix}`;
 }
 
+/** Compact date chip for phones: "Mon 17" + "Aug" */
+function shortDateParts(isoDate: string): { weekday: string; day: string; month: string } {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  return {
+    weekday: dt.toLocaleDateString("en-IN", { weekday: "short", timeZone: "UTC" }),
+    day: String(d),
+    month: dt.toLocaleDateString("en-IN", { month: "short", timeZone: "UTC" }),
+  };
+}
+
 export default function ScheduleBookingClient({
   initialEmail = "",
   initialName = "",
@@ -82,12 +93,21 @@ export default function ScheduleBookingClient({
     for (const slot of slots) {
       if (!seen.has(slot.date)) seen.set(slot.date, slot.labelDate);
     }
-    return [...seen.entries()].map(([date, labelDate]) => ({ date, labelDate }));
+    return [...seen.entries()].map(([date, labelDate]) => ({
+      date,
+      labelDate,
+      ...shortDateParts(date),
+    }));
   }, [slots]);
 
   const timesForDate = useMemo(
     () => slots.filter((s) => s.date === selectedDate),
     [slots, selectedDate]
+  );
+
+  const selectedSlot = useMemo(
+    () => slots.find((s) => s.startLocal === selectedStart) || null,
+    [slots, selectedStart]
   );
 
   useEffect(() => {
@@ -96,8 +116,8 @@ export default function ScheduleBookingClient({
     }
   }, [timesForDate, selectedStart]);
 
-  const book = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const book = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!selectedStart) {
       setError("Please select a time slot.");
       return;
@@ -117,6 +137,7 @@ export default function ScheduleBookingClient({
       const data = (await res.json()) as BookResponse;
       if (!data.ok) throw new Error(data.error || "Could not book that slot");
       setConfirmed(data);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not book that slot");
       void loadSlots();
@@ -125,19 +146,25 @@ export default function ScheduleBookingClient({
     }
   };
 
+  const canSubmit = Boolean(selectedStart && email.trim() && !booking && !loading);
+
   if (confirmed?.ok) {
     return (
-      <div className="rounded-2xl border border-laf-border bg-white p-6 md:p-8 shadow-sm text-center space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wide text-laf-gold">Confirmed</p>
-        <h2 className="text-2xl font-bold text-laf-navy">Your intro call is booked</h2>
-        <p className="text-laf-muted">
+      <div className="rounded-2xl border border-laf-border bg-white p-5 sm:p-8 shadow-sm text-center space-y-3">
+        <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-laf-gold">
+          Confirmed
+        </p>
+        <h2 className="text-xl sm:text-2xl font-bold text-laf-navy px-1">
+          Your intro call is booked
+        </h2>
+        <p className="text-base text-laf-muted leading-relaxed">
           {confirmed.labelDate}
           <br />
-          {confirmed.labelTime}
-          {confirmed.durationMinutes ? ` · ${confirmed.durationMinutes} minutes` : ""}
+          <span className="font-semibold text-laf-navy">{confirmed.labelTime}</span>
+          {confirmed.durationMinutes ? ` · ${confirmed.durationMinutes} min` : ""}
         </p>
-        <p className="text-sm text-laf-muted max-w-md mx-auto">
-          A calendar invitation with the Google Meet link has been sent to{" "}
+        <p className="text-sm text-laf-muted max-w-md mx-auto break-words">
+          Calendar invite + Google Meet link sent to{" "}
           <strong className="text-laf-navy">{confirmed.email || email}</strong>.
         </p>
         <button
@@ -147,7 +174,7 @@ export default function ScheduleBookingClient({
             setSelectedStart("");
             void loadSlots();
           }}
-          className="mt-4 inline-flex items-center justify-center rounded-lg bg-laf-navy text-white px-4 py-2.5 text-sm font-semibold hover:bg-laf-navy/90"
+          className="mt-2 w-full sm:w-auto min-h-12 inline-flex items-center justify-center rounded-xl bg-laf-navy text-white px-5 py-3 text-base font-semibold active:scale-[0.99]"
         >
           Book a different time
         </button>
@@ -158,27 +185,30 @@ export default function ScheduleBookingClient({
   return (
     <form
       onSubmit={(e) => void book(e)}
-      className="rounded-2xl border border-laf-border bg-white p-6 md:p-8 shadow-sm space-y-6"
+      className="rounded-2xl border border-laf-border bg-white p-4 sm:p-8 shadow-sm space-y-5 sm:space-y-6 pb-28 sm:pb-8"
     >
       <div>
-        <h2 className="text-xl font-bold text-laf-navy">Pick a {durationMinutes}-minute slot</h2>
-        <p className="mt-2 text-sm text-laf-muted">
+        <h2 className="text-lg sm:text-xl font-bold text-laf-navy">
+          Pick a {durationMinutes}-minute slot
+        </h2>
+        <p className="mt-1.5 text-sm text-laf-muted leading-relaxed">
           {workHours
             ? `${workHours.days}, ${formatHour12(workHours.startHour)}–${formatHour12(workHours.endHour)} IST. `
             : null}
-          Available times update from our calendar so you only see open slots.
+          Only open times are shown.
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <label className="block text-sm">
           <span className="font-medium text-laf-navy">Your name</span>
           <input
-            className="mt-1.5 w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+            className="mt-1.5 w-full rounded-xl border border-laf-border px-3.5 py-3 text-base"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Full name"
             autoComplete="name"
+            enterKeyHint="next"
           />
         </label>
         <label className="block text-sm">
@@ -186,25 +216,27 @@ export default function ScheduleBookingClient({
           <input
             type="email"
             required
-            className="mt-1.5 w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+            inputMode="email"
+            className="mt-1.5 w-full rounded-xl border border-laf-border px-3.5 py-3 text-base"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             autoComplete="email"
+            enterKeyHint="done"
           />
         </label>
       </div>
 
       {loading ? (
         <div
-          className="rounded-2xl border border-laf-border bg-laf-cream/40 px-6 py-12 sm:py-16 text-center"
+          className="rounded-2xl border border-laf-border bg-laf-cream/40 px-4 py-10 sm:px-6 sm:py-16 text-center"
           role="status"
           aria-live="polite"
           aria-busy="true"
         >
-          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-laf-border">
+          <div className="mx-auto mb-5 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-white shadow-sm border border-laf-border">
             <svg
-              className="h-12 w-12 text-laf-gold animate-spin"
+              className="h-10 w-10 sm:h-12 sm:w-12 text-laf-gold animate-spin"
               viewBox="0 0 24 24"
               fill="none"
               aria-hidden="true"
@@ -225,86 +257,140 @@ export default function ScheduleBookingClient({
             </svg>
           </div>
           <p className="text-lg sm:text-xl font-bold text-laf-navy">Loading available times</p>
-          <p className="mt-2 text-sm sm:text-base text-laf-muted max-w-md mx-auto">
-            Checking the calendar for open {durationMinutes}-minute slots. This can take a few
-            seconds…
+          <p className="mt-2 text-sm text-laf-muted max-w-sm mx-auto px-2">
+            Checking the calendar for open slots. This can take a few seconds…
           </p>
-          <div className="mt-8 space-y-4 max-w-lg mx-auto" aria-hidden="true">
-            <div className="flex flex-wrap justify-center gap-2">
-              {[1, 2, 3, 4].map((i) => (
+          <div className="mt-6 space-y-3" aria-hidden="true">
+            <div className="flex gap-2 overflow-hidden px-1">
+              {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={`d-${i}`}
-                  className="h-10 w-28 rounded-lg bg-white/80 border border-laf-border animate-pulse"
+                  className="h-16 w-14 shrink-0 rounded-xl bg-white/80 border border-laf-border animate-pulse"
                 />
               ))}
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div className="grid grid-cols-2 gap-2">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={`t-${i}`}
-                  className="h-11 rounded-lg bg-white/80 border border-laf-border animate-pulse"
+                  className="h-12 rounded-xl bg-white/80 border border-laf-border animate-pulse"
                 />
               ))}
             </div>
           </div>
         </div>
       ) : slots.length === 0 ? (
-        <p className="text-sm text-laf-muted">
+        <p className="text-sm text-laf-muted leading-relaxed">
           No open slots in the next two weeks. Please email us and we will find a time together.
         </p>
       ) : (
         <>
           <div>
-            <p className="text-sm font-medium text-laf-navy mb-2">Date</p>
-            <div className="flex flex-wrap gap-2">
-              {dates.map((d) => (
-                <button
-                  key={d.date}
-                  type="button"
-                  onClick={() => setSelectedDate(d.date)}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
-                    selectedDate === d.date
-                      ? "border-laf-gold bg-laf-gold/10 text-laf-navy font-semibold"
-                      : "border-laf-border bg-white text-laf-muted hover:border-laf-gold/50"
-                  }`}
-                >
-                  {d.labelDate}
-                </button>
-              ))}
+            <p className="text-sm font-semibold text-laf-navy mb-2">1. Choose a date</p>
+            <div className="-mx-4 sm:mx-0 px-4 sm:px-0">
+              <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
+                {dates.map((d) => {
+                  const active = selectedDate === d.date;
+                  return (
+                    <button
+                      key={d.date}
+                      type="button"
+                      onClick={() => setSelectedDate(d.date)}
+                      className={`snap-start shrink-0 w-[4.5rem] min-h-[4.5rem] rounded-xl border px-2 py-2.5 text-center transition active:scale-[0.98] ${
+                        active
+                          ? "border-laf-gold bg-laf-navy text-white shadow-sm"
+                          : "border-laf-border bg-white text-laf-navy"
+                      }`}
+                      aria-pressed={active}
+                      aria-label={d.labelDate}
+                    >
+                      <span
+                        className={`block text-[11px] font-semibold uppercase tracking-wide ${
+                          active ? "text-white/80" : "text-laf-muted"
+                        }`}
+                      >
+                        {d.weekday}
+                      </span>
+                      <span className="block text-xl font-bold leading-tight mt-0.5">{d.day}</span>
+                      <span
+                        className={`block text-[11px] font-medium ${
+                          active ? "text-white/80" : "text-laf-muted"
+                        }`}
+                      >
+                        {d.month}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            {selectedDate ? (
+              <p className="mt-2 text-xs text-laf-muted sm:hidden">
+                {dates.find((d) => d.date === selectedDate)?.labelDate}
+              </p>
+            ) : null}
           </div>
 
           <div>
-            <p className="text-sm font-medium text-laf-navy mb-2">Time (IST)</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {timesForDate.map((slot) => (
-                <button
-                  key={slot.startLocal}
-                  type="button"
-                  onClick={() => setSelectedStart(slot.startLocal)}
-                  className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
-                    selectedStart === slot.startLocal
-                      ? "border-laf-gold bg-laf-navy text-white"
-                      : "border-laf-border bg-laf-cream/40 text-laf-navy hover:border-laf-gold/60"
-                  }`}
-                >
-                  {slot.labelTime.replace(" IST", "")}
-                </button>
-              ))}
+            <p className="text-sm font-semibold text-laf-navy mb-2">2. Choose a time (IST)</p>
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+              {timesForDate.map((slot) => {
+                const active = selectedStart === slot.startLocal;
+                return (
+                  <button
+                    key={slot.startLocal}
+                    type="button"
+                    onClick={() => {
+                      setSelectedStart(slot.startLocal);
+                      setError("");
+                    }}
+                    className={`min-h-12 rounded-xl border px-3 py-3 text-base font-semibold transition active:scale-[0.98] ${
+                      active
+                        ? "border-laf-gold bg-laf-gold text-white shadow-sm"
+                        : "border-laf-border bg-laf-cream/50 text-laf-navy"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {slot.labelTime.replace(" IST", "")}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
       )}
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600 leading-relaxed">{error}</p> : null}
 
+      {/* Desktop / tablet confirm */}
       <button
         type="submit"
-        disabled={booking || loading || !selectedStart || !email.trim()}
-        className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-laf-gold text-white px-5 py-2.5 text-sm font-bold hover:bg-laf-gold/90 disabled:opacity-50"
+        disabled={!canSubmit}
+        className="hidden sm:inline-flex items-center justify-center rounded-xl bg-laf-gold text-white px-6 py-3 text-base font-bold hover:bg-laf-gold/90 disabled:opacity-50 min-h-12"
       >
         {booking ? "Booking…" : "Confirm meeting"}
       </button>
+
+      {/* Mobile sticky confirm */}
+      <div className="sm:hidden fixed inset-x-0 bottom-0 z-40 border-t border-laf-border bg-white/95 backdrop-blur-sm px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        {selectedSlot ? (
+          <p className="text-xs text-laf-muted mb-2 truncate">
+            <span className="font-semibold text-laf-navy">{selectedSlot.labelDate}</span>
+            {" · "}
+            {selectedSlot.labelTime}
+          </p>
+        ) : (
+          <p className="text-xs text-laf-muted mb-2">Select a date and time to continue</p>
+        )}
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={() => void book()}
+          className="w-full min-h-12 inline-flex items-center justify-center rounded-xl bg-laf-gold text-white px-5 py-3 text-base font-bold disabled:opacity-45 active:scale-[0.99]"
+        >
+          {booking ? "Booking…" : "Confirm meeting"}
+        </button>
+      </div>
     </form>
   );
 }

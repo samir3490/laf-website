@@ -32,17 +32,16 @@ export default async function SchedulePage({
     <>
       <PageHeader
         title="Schedule your intro call"
-        subtitle="Choose a 30-minute Google Meet time that works for you — only open slots are shown."
+        subtitle="Pick an open 30-minute Google Meet slot — we’ll email you the invite."
       />
-      <PageContainer className="py-12 lg:py-16">
-        <div className="max-w-3xl mx-auto space-y-8">
-          <p className="text-laf-muted leading-relaxed">
-            After you complete our{" "}
+      <PageContainer className="py-8 sm:py-12 lg:py-16">
+        <div className="max-w-3xl mx-auto space-y-5 sm:space-y-8">
+          <p className="text-sm sm:text-base text-laf-muted leading-relaxed">
+            After our{" "}
             <Link href="/volunteer" className="text-laf-gold font-medium hover:underline">
               volunteer form
             </Link>
-            , use this page to book your introductory call. You will receive a calendar invite with
-            the Google Meet link at the email you use below.
+            , book your intro call here. You’ll get a calendar invite with the Meet link.
           </p>
           <ScheduleBookingClient initialEmail={email} initialName={name} />
         </div>
