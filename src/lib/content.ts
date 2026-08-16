@@ -36,14 +36,27 @@ export function getPage(slug: string): WpPage | undefined {
   return (pages as Record<string, WpPage>)[slug];
 }
 
+export function isPostPublished(post: { date: string }, now = new Date()): boolean {
+  return new Date(post.date).getTime() <= now.getTime();
+}
+
 export function getAllPosts(): WpPost[] {
-  return [...posts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  return [...posts]
+    .filter((post) => isPostPublished(post))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export function getPost(slug: string): WpPost | undefined {
-  return posts.find((p) => p.slug === slug);
+  const post = posts.find((p) => p.slug === slug);
+  if (!post || !isPostPublished(post)) return undefined;
+  return post;
+}
+
+/** All posts including future-dated (scheduled) ones — for middleware / admin tooling. */
+export function getAllPostsIncludingScheduled(): WpPost[] {
+  return [...posts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 }
 
 export function sanitizeHtml(html: string): string {

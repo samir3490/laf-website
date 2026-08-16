@@ -10,6 +10,10 @@ import Link from "next/link";
 import { getAllPosts, getPost, getPostBodyHtml, getPostFeaturedImage } from "@/lib/content";
 import { articleJsonLd, postMetadata } from "@/lib/seo";
 
+/** Revalidate hourly so scheduled posts appear after their publish time without a redeploy. */
+export const revalidate = 3600;
+export const dynamicParams = true;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {

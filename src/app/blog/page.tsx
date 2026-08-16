@@ -7,6 +7,9 @@ import BlogPagination, { BLOG_PER_PAGE, blogPageCount } from "@/components/BlogP
 import { getAllPosts, getPostFeaturedImage, stripHtml } from "@/lib/content";
 import { pageMetadata, siteUrl } from "@/lib/seo";
 
+/** Revalidate hourly so scheduled posts appear after their publish time without a redeploy. */
+export const revalidate = 3600;
+
 type Props = { searchParams: Promise<{ page?: string }> };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
