@@ -11,6 +11,10 @@
     {
       "path": "/api/reviews/sync",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/blog/notify-schedule",
+      "schedule": "35 3 * * *"
     }
   ]
 }

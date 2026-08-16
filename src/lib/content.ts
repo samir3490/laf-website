@@ -59,6 +59,27 @@ export function getAllPostsIncludingScheduled(): WpPost[] {
   );
 }
 
+/** Future-dated posts, earliest first. */
+export function getScheduledPosts(now = new Date()): WpPost[] {
+  return [...posts]
+    .filter((post) => new Date(post.date).getTime() > now.getTime())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
+
+/** Posts that became public within the given window (default 36 hours). */
+export function getRecentlyPublishedPosts(
+  withinMs = 36 * 60 * 60 * 1000,
+  now = new Date()
+): WpPost[] {
+  const cutoff = now.getTime() - withinMs;
+  return [...posts]
+    .filter((post) => {
+      const t = new Date(post.date).getTime();
+      return t <= now.getTime() && t >= cutoff;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export function sanitizeHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
