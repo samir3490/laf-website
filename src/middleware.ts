@@ -10,6 +10,7 @@ const RESERVED = new Set([
   "donate",
   "contact",
   "volunteer",
+  "schedule",
   "csr",
   "faq",
   "blog",
