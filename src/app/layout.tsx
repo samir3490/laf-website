@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import Analytics from "@/components/Analytics";
 import JsonLd from "@/components/JsonLd";
 import { getSite } from "@/lib/content";
-import { organizationJsonLd, siteUrl } from "@/lib/seo";
+import { organizationJsonLd, rssAlternateTypes, siteUrl } from "@/lib/seo";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -36,7 +36,10 @@ export const metadata: Metadata = {
     icon: "/favicon.png",
     apple: "/favicon.png",
   },
-  alternates: { canonical: siteUrl() },
+  alternates: {
+    canonical: siteUrl(),
+    types: rssAlternateTypes(),
+  },
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? {
         verification: {

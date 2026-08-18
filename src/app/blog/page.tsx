@@ -5,7 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import BlogPagination, { BLOG_PER_PAGE, blogPageCount } from "@/components/BlogPagination";
 import { getAllPosts, getPostFeaturedImage, stripHtml } from "@/lib/content";
-import { pageMetadata, siteUrl } from "@/lib/seo";
+import { pageMetadata, rssAlternateTypes, siteUrl } from "@/lib/seo";
 
 /** Revalidate hourly so scheduled posts appear after their publish time without a redeploy. */
 export const revalidate = 3600;
@@ -29,6 +29,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     ...base,
     alternates: {
       canonical: siteUrl(page > 1 ? `/blog?page=${page}` : "/blog"),
+      types: rssAlternateTypes(),
     },
     robots: page > 1 ? { index: true, follow: true } : base.robots,
   };

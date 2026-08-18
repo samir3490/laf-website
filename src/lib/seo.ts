@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
 import { getPostFeaturedImage, getSite, stripHtml, type WpPost } from "@/lib/content";
 
+export const RSS_FEED_PATH = "/blog/rss.xml";
+
+/** Keep RSS discovery on every page even when child metadata sets a canonical. */
+export function rssAlternateTypes(): NonNullable<Metadata["alternates"]>["types"] {
+  const site = getSite();
+  return {
+    "application/rss+xml": [
+      {
+        url: siteUrl(RSS_FEED_PATH),
+        title: `${site.name} Blog`,
+      },
+    ],
+  };
+}
+
 export function siteUrl(path = ""): string {
   const base = getSite().url.replace(/\/$/, "");
   return path ? `${base}${path.startsWith("/") ? path : `/${path}`}` : base;
