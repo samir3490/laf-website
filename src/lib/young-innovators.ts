@@ -1,5 +1,3 @@
-export const INNOVATORS_ENTRIES_COLLECTION = "innovators_entries";
-
 export const YOUNG_INNOVATORS_PROMO_IMAGE =
   "/images/events/young-innovators-challenge-promo.jpg";
 

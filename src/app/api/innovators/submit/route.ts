@@ -6,7 +6,10 @@ import { notifyAdminOfInnovatorsSubmission } from "@/lib/innovators-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
 import {
-  INNOVATORS_ENTRIES_COLLECTION,
+  LAF_EVENT_SUBMISSIONS_COLLECTION,
+  YOUNG_INNOVATORS_2026_EVENT_SLUG,
+} from "@/lib/event-submissions";
+import {
   isAllowedDriveOrVideoUrl,
   isAllowedVideoLink,
   isValidInnovatorsEmail,
@@ -175,6 +178,7 @@ export async function POST(req: Request) {
 
     const entryId = randomUUID();
     const doc = {
+      eventSlug: YOUNG_INNOVATORS_2026_EVENT_SLUG,
       title,
       description,
       childName,
@@ -197,7 +201,7 @@ export async function POST(req: Request) {
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    await adminDb.collection(INNOVATORS_ENTRIES_COLLECTION).doc(entryId).set(doc);
+    await adminDb.collection(LAF_EVENT_SUBMISSIONS_COLLECTION).doc(entryId).set(doc);
 
     void notifyAdminOfInnovatorsSubmission({
       entryId,
