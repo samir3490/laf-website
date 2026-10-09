@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import EventsAuthPanel from "@/components/events/EventsAuthPanel";
 import { EVENT_COMPETITIONS } from "@/lib/events";
 import { DRAWING_COMPETITION_PROMO_ALT } from "@/lib/drawing-competition-promo";
 import { YOUNG_INNOVATORS_PROMO_ALT } from "@/lib/young-innovators";
@@ -11,6 +12,8 @@ export default function EventsHub() {
         Join LAF events and competitions for children and learners across India. Submit your work,
         explore what others have created, and celebrate creativity together.
       </p>
+
+      <EventsAuthPanel />
 
       <div className="grid md:grid-cols-2 gap-6">
         {EVENT_COMPETITIONS.map((event) => (
