@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import EventEmailOtp from "@/components/events/EventEmailOtp";
+import EventFilePicker from "@/components/events/EventFilePicker";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
 import { compressImageForUpload } from "@/lib/compress-image";
 import { YOUNG_INNOVATORS_2026_EVENT_SLUG } from "@/lib/event-submissions";
@@ -307,35 +308,23 @@ export default function YoungInnovatorsSubmitForm() {
 
       <fieldset className="space-y-4" disabled={busy || !verifyToken}>
         <legend className="text-lg font-semibold text-laf-navy">Photos &amp; video</legend>
-        <div>
-          <label htmlFor="yi-p1" className="block text-sm font-medium text-laf-navy mb-1">
-            Photo of the project *{" "}
-            <span className="font-normal text-laf-muted">(required — JPG/PNG preferred)</span>
-          </label>
-          <input
-            id="yi-p1"
-            required
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/*"
-            capture="environment"
-            onChange={(e) => setPhoto1(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="yi-p2" className="block text-sm font-medium text-laf-navy mb-1">
-            Second photo{" "}
-            <span className="font-normal text-laf-muted">(optional)</span>
-          </label>
-          <input
-            id="yi-p2"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/*"
-            capture="environment"
-            onChange={(e) => setPhoto2(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm"
-          />
-        </div>
+        <EventFilePicker
+          id="yi-p1"
+          label="Photo of the project"
+          hint="(required — JPG/PNG preferred)"
+          required
+          disabled={busy || !verifyToken}
+          fileName={photo1?.name}
+          onChange={setPhoto1}
+        />
+        <EventFilePicker
+          id="yi-p2"
+          label="Second photo"
+          hint="(optional)"
+          disabled={busy || !verifyToken}
+          fileName={photo2?.name}
+          onChange={setPhoto2}
+        />
 
         <div>
           <label htmlFor="yi-vlink" className="block text-sm font-medium text-laf-navy mb-1">

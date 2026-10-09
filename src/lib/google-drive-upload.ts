@@ -15,8 +15,8 @@ export function getGoogleDriveUploadApiUrl(): string | null {
 }
 
 /**
- * Google Apps Script web apps often respond with 302. Following that as GET drops the body
- * and breaks uploads. Re-POST to the Location header when we get a redirect.
+ * Google Apps Script web apps: POST runs doPost, then Google responds with a 302 to a
+ * googleusercontent URL that serves the JSON via GET. Re-POSTing that URL returns 405.
  */
 async function postJsonToAppsScript(
   uploadUrl: string,
@@ -38,9 +38,7 @@ async function postJsonToAppsScript(
       throw new Error("Upload service redirected without a destination URL.");
     }
     return fetch(location, {
-      method: "POST",
-      headers,
-      body,
+      method: "GET",
       redirect: "follow",
     });
   }
