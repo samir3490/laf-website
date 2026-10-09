@@ -74,7 +74,7 @@ export type LibrarySubmission = LibraryResource & {
 export const ADMIN_EMAIL = "admin@agrawalfoundation.org";
 
 export function isLibraryAdmin(email: string | null | undefined): boolean {
-  return email === ADMIN_EMAIL;
+  return (email ?? "").trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
 }
 
 export type LibraryFilters = {

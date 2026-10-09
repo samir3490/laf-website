@@ -42,7 +42,8 @@ export async function sendFoundationEmail(options: SendMailOptions): Promise<boo
       html: options.html,
     });
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[mail] sendFoundationEmail failed", err);
     return false;
   }
 }

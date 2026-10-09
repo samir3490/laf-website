@@ -66,7 +66,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     }
 
-    if (typeof body.website === "string" && body.website.trim()) {
+    // Obscure honeypot only — do NOT use "website" (browsers autofill it and skip real saves).
+    if (typeof body.laf_hp_xf7 === "string" && body.laf_hp_xf7.trim()) {
       return NextResponse.json({ ok: true, entryId: "ok" });
     }
 
@@ -235,20 +236,27 @@ export async function POST(req: Request) {
 
     await adminDb.collection(LAF_EVENT_SUBMISSIONS_COLLECTION).doc(entryId).set(doc);
 
-    void notifyAdminOfInnovatorsSubmission({
-      entryId,
-      title,
-      childName,
-      parentEmail: contactEmail,
-      photo1Url,
-      photo2Url,
-      videoUrl,
-    });
+    // Must await on Vercel — fire-and-forget emails are often killed after the response.
+    let adminNotified = false;
+    try {
+      adminNotified = await notifyAdminOfInnovatorsSubmission({
+        entryId,
+        title,
+        childName,
+        parentEmail: contactEmail,
+        photo1Url,
+        photo2Url: photo2Url || "",
+        videoUrl: videoUrl || "",
+      });
+    } catch (notifyErr) {
+      console.error("[innovators/submit] admin notify failed", notifyErr);
+    }
 
     return NextResponse.json({
       ok: true,
       entryId,
       status: "pending",
+      adminNotified,
       message:
         "Thank you! Your project was submitted for review. After LAF approves it, it will appear in the public gallery. We will email a digital certificate for valid entries.",
     });

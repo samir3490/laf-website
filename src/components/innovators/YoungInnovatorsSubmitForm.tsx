@@ -51,7 +51,7 @@ export default function YoungInnovatorsSubmitForm() {
   const [photo2, setPhoto2] = useState<File | null>(null);
   const [videoLink, setVideoLink] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [website, setWebsite] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [status, setStatus] = useState<"idle" | "uploading" | "saving" | "error">("idle");
   const [progress, setProgress] = useState("");
@@ -121,13 +121,17 @@ export default function YoungInnovatorsSubmitForm() {
           videoUrl: videoLink.trim(),
           termsAccepted: true,
           turnstileToken,
-          website,
+          laf_hp_xf7: honeypot,
         }),
       });
 
-      const data = (await res.json()) as { error?: string; message?: string };
+      const data = (await res.json()) as { error?: string; message?: string; entryId?: string };
       if (!res.ok) {
         throw new Error(data.error || "Submission failed.");
+      }
+      // Honeypot / bot stub returns entryId "ok" without saving — never treat as success for humans.
+      if (!data.entryId || data.entryId === "ok") {
+        throw new Error("Submission did not save. Please try again, or contact LAF if this continues.");
       }
 
       router.push("/events/young-innovators/gallery?submitted=pending");
@@ -347,13 +351,14 @@ export default function YoungInnovatorsSubmitForm() {
       </fieldset>
 
       <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden>
-        <label htmlFor="yi-website">Website</label>
+        <label htmlFor="yi-laf-hp">Leave blank</label>
         <input
-          id="yi-website"
+          id="yi-laf-hp"
+          name="laf_hp_xf7"
           tabIndex={-1}
           autoComplete="off"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
         />
       </div>
 

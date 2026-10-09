@@ -8,12 +8,15 @@ type NotifyPayload = {
   childName: string;
   parentEmail: string;
   photo1Url: string;
-  photo2Url: string;
-  videoUrl: string;
+  photo2Url?: string;
+  videoUrl?: string;
 };
 
-export async function notifyAdminOfInnovatorsSubmission(payload: NotifyPayload): Promise<void> {
-  if (!isMailConfigured()) return;
+export async function notifyAdminOfInnovatorsSubmission(payload: NotifyPayload): Promise<boolean> {
+  if (!isMailConfigured()) {
+    console.warn("[innovators-notify] Mail not configured (GMAIL_USER / GMAIL_APP_PASSWORD).");
+    return false;
+  }
 
   const subject = `Young Innovators Challenge entry: ${payload.title}`;
   const text = [
@@ -23,11 +26,23 @@ export async function notifyAdminOfInnovatorsSubmission(payload: NotifyPayload):
     `Child: ${payload.childName}`,
     `Email: ${payload.parentEmail}`,
     `Entry ID: ${payload.entryId}`,
-    `Approve at: /admin/innovators`,
+    `Approve at: https://agrawalfoundation.org/admin/innovators`,
     `Photo 1: ${payload.photo1Url}`,
-    `Photo 2: ${payload.photo2Url}`,
-    `Video: ${payload.videoUrl}`,
-  ].join("\n");
+    payload.photo2Url ? `Photo 2: ${payload.photo2Url}` : "",
+    payload.videoUrl ? `Video: ${payload.videoUrl}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const links = [
+    payload.photo1Url
+      ? `<a href="${escapeHtml(payload.photo1Url)}">Photo 1</a>`
+      : "",
+    payload.photo2Url
+      ? `<a href="${escapeHtml(payload.photo2Url)}">Photo 2</a>`
+      : "",
+    payload.videoUrl ? `<a href="${escapeHtml(payload.videoUrl)}">Video</a>` : "",
+  ].filter(Boolean);
 
   const html = `
     <p>A new <strong>Young Innovators Challenge</strong> entry was submitted (pending review).</p>
@@ -37,21 +52,22 @@ export async function notifyAdminOfInnovatorsSubmission(payload: NotifyPayload):
       <li><strong>Email:</strong> ${escapeHtml(payload.parentEmail)}</li>
       <li><strong>Entry ID:</strong> ${escapeHtml(payload.entryId)}</li>
     </ul>
-    <p><a href="https://agrawalfoundation.org/admin/innovators">Open admin</a></p>
-    <p>
-      <a href="${escapeHtml(payload.photo1Url)}">Photo 1</a> ·
-      <a href="${escapeHtml(payload.photo2Url)}">Photo 2</a> ·
-      <a href="${escapeHtml(payload.videoUrl)}">Video</a>
-    </p>
+    <p><a href="https://agrawalfoundation.org/admin/innovators">Open admin to approve</a></p>
+    ${links.length ? `<p>${links.join(" · ")}</p>` : ""}
   `;
 
-  await sendFoundationEmail({
+  const sent = await sendFoundationEmail({
     to: ADMIN_EMAIL,
     subject,
     text,
     html,
     replyTo: payload.parentEmail,
   });
+
+  if (!sent) {
+    console.error("[innovators-notify] sendFoundationEmail returned false for", payload.entryId);
+  }
+  return sent;
 }
 
 type ReportPayload = {
@@ -61,8 +77,8 @@ type ReportPayload = {
   details?: string;
 };
 
-export async function notifyAdminOfInnovatorsReport(payload: ReportPayload): Promise<void> {
-  if (!isMailConfigured()) return;
+export async function notifyAdminOfInnovatorsReport(payload: ReportPayload): Promise<boolean> {
+  if (!isMailConfigured()) return false;
 
   const subject = `Young Innovators report: ${payload.title}`;
   const text = [
@@ -85,5 +101,5 @@ export async function notifyAdminOfInnovatorsReport(payload: ReportPayload): Pro
     </ul>
   `;
 
-  await sendFoundationEmail({ to: ADMIN_EMAIL, subject, text, html });
+  return sendFoundationEmail({ to: ADMIN_EMAIL, subject, text, html });
 }

@@ -7,19 +7,24 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import {
   innovatorsAgeGroupLabel,
   isEventAdmin,
+  LAF_EVENT_SUBMISSIONS_COLLECTION,
+  toAdminEventEntry,
   type LafEventAdminEntry,
+  YOUNG_INNOVATORS_2026_EVENT_SLUG,
   youtubeEmbedUrl,
 } from "@/lib/event-submissions";
-import { getFirebaseAuth, getFirebaseConfig } from "@/lib/firebase";
+import { getFirebaseAuth, getFirebaseConfig, getFirebaseDb } from "@/lib/firebase";
 
 type Filter = "all" | "pending" | "approved" | "removed";
 
 export default function AdminInnovatorsApp() {
   const config = getFirebaseConfig();
   const auth = getFirebaseAuth();
+  const db = getFirebaseDb();
 
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
@@ -29,7 +34,8 @@ export default function AdminInnovatorsApp() {
   const [busy, setBusy] = useState("");
   const [entries, setEntries] = useState<LafEventAdminEntry[]>([]);
   const [filter, setFilter] = useState<Filter>("pending");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [listenError, setListenError] = useState("");
 
   const isAdmin = isEventAdmin(user?.email);
 
@@ -38,7 +44,49 @@ export default function AdminInnovatorsApp() {
     return onAuthStateChanged(auth, setUser);
   }, [auth]);
 
-  const loadEntries = useCallback(async () => {
+  // Live list from Firestore (same pattern as Drawing admin) — requires published rules + isAdmin().
+  useEffect(() => {
+    if (!db || !isAdmin) {
+      setEntries([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setListenError("");
+    const q = query(
+      collection(db, LAF_EVENT_SUBMISSIONS_COLLECTION),
+      where("eventSlug", "==", YOUNG_INNOVATORS_2026_EVENT_SLUG)
+    );
+
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const list = snap.docs
+          .map((d) => toAdminEventEntry(d.id, d.data() as Record<string, unknown>))
+          .filter((e): e is LafEventAdminEntry => e !== null)
+          .sort((a, b) => {
+            const ta = a.createdAt ? Date.parse(a.createdAt) : 0;
+            const tb = b.createdAt ? Date.parse(b.createdAt) : 0;
+            return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0);
+          });
+        setEntries(list);
+        setLoading(false);
+        setListenError("");
+      },
+      (err) => {
+        console.error("[admin/innovators] firestore listen", err);
+        setListenError(err.message || "Could not read submissions from Firestore.");
+        setLoading(false);
+        void loadViaApi();
+      }
+    );
+
+    return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadViaApi defined below
+  }, [db, isAdmin]);
+
+  const loadViaApi = useCallback(async () => {
     if (!user || !isAdmin) return;
     setLoading(true);
     try {
@@ -48,21 +96,22 @@ export default function AdminInnovatorsApp() {
       });
       const data = (await res.json()) as { entries?: LafEventAdminEntry[]; error?: string };
       if (!res.ok) {
-        setMsg(data.error ?? "Could not load entries.");
+        setMsg(data.error ?? "Could not load entries via API.");
         return;
       }
       setEntries(Array.isArray(data.entries) ? data.entries : []);
-      setMsg("");
+      setMsg(
+        Array.isArray(data.entries) && data.entries.length === 0
+          ? "No submissions found in laf_event_submissions for this event yet."
+          : "Loaded via API."
+      );
+      setListenError("");
     } catch {
       setMsg("Could not load entries.");
     } finally {
       setLoading(false);
     }
   }, [user, isAdmin]);
-
-  useEffect(() => {
-    void loadEntries();
-  }, [loadEntries]);
 
   const filtered = useMemo(() => {
     if (filter === "all") return entries;
@@ -76,7 +125,7 @@ export default function AdminInnovatorsApp() {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch {
-      setAuthError("Sign-in failed. Check email and password.");
+      setAuthError("Sign-in failed. Use admin@agrawalfoundation.org (same as Drawing admin).");
     }
   }
 
@@ -99,13 +148,6 @@ export default function AdminInnovatorsApp() {
         setMsg(data.error ?? "Action failed.");
         return;
       }
-      setEntries((prev) =>
-        prev.map((e) =>
-          e.id === entryId
-            ? { ...e, status: action === "approve" ? "approved" : "removed" }
-            : e
-        )
-      );
       setMsg(action === "approve" ? "Approved — now in gallery." : "Removed from gallery.");
     } catch {
       setMsg("Action failed.");
@@ -121,7 +163,10 @@ export default function AdminInnovatorsApp() {
   if (!user) {
     return (
       <form onSubmit={(e) => void signIn(e)} className="max-w-sm space-y-4">
-        <p className="text-sm text-laf-muted">Sign in with the LAF admin account.</p>
+        <p className="text-sm text-laf-muted">
+          Sign in with <strong>admin@agrawalfoundation.org</strong> (same account as Drawing
+          Competition admin).
+        </p>
         <input
           type="email"
           required
@@ -152,7 +197,10 @@ export default function AdminInnovatorsApp() {
   if (!isAdmin) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-red-700">This account is not an event admin.</p>
+        <p className="text-sm text-red-700">
+          Signed in as {user.email}, but this account is not the event admin. Use
+          admin@agrawalfoundation.org.
+        </p>
         <button
           type="button"
           onClick={() => auth && signOut(auth)}
@@ -172,20 +220,29 @@ export default function AdminInnovatorsApp() {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-xl border border-laf-border bg-laf-cream/40 px-4 py-3 text-sm text-laf-muted">
+        Submissions are stored in Firestore collection <code className="text-laf-navy">laf_event_submissions</code>
+        . Open{" "}
+        <a href="/admin/innovators" className="text-laf-gold font-medium hover:underline">
+          /admin/innovators
+        </a>{" "}
+        (not the public gallery) to approve. Public gallery only shows approved entries.
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm text-laf-muted">
             Signed in as {user.email} · Pending {counts.pending} · Approved {counts.approved} ·
-            Removed {counts.removed}
+            Removed {counts.removed} · Total {entries.length}
           </p>
         </div>
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => void loadEntries()}
+            onClick={() => void loadViaApi()}
             className="px-3 py-2 rounded-lg border border-laf-border text-sm"
           >
-            Refresh
+            Refresh via API
           </button>
           <button
             type="button"
@@ -212,6 +269,12 @@ export default function AdminInnovatorsApp() {
         ))}
       </div>
 
+      {listenError && (
+        <p className="text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+          Live sync issue: {listenError}. Try &quot;Refresh via API&quot;. Confirm Firestore rules for{" "}
+          <code>laf_event_submissions</code> are published.
+        </p>
+      )}
       {msg && <p className="text-sm text-laf-navy bg-laf-cream rounded-lg px-4 py-2">{msg}</p>}
       {loading && <p className="text-sm text-laf-muted">Loading…</p>}
 
@@ -295,7 +358,15 @@ export default function AdminInnovatorsApp() {
           );
         })}
         {!loading && filtered.length === 0 && (
-          <p className="text-sm text-laf-muted">No entries in this filter.</p>
+          <div className="rounded-xl border border-laf-border bg-white p-5 text-sm text-laf-muted space-y-2">
+            <p>No entries in this filter ({filter}).</p>
+            <p>
+              If a parent just submitted: check Firebase Console → Firestore →{" "}
+              <strong>laf_event_submissions</strong>. If that collection is empty, the earlier submit
+              may not have been saved (a browser autofill bug we just fixed). Ask them to submit
+              again after this deploy.
+            </p>
+          </div>
         )}
       </div>
     </div>
