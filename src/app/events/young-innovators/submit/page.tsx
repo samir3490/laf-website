@@ -4,13 +4,21 @@ import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
 import YoungInnovatorsSubmitForm from "@/components/innovators/YoungInnovatorsSubmitForm";
 import { pageMetadata } from "@/lib/seo";
-import { YOUNG_INNOVATORS_DATES } from "@/lib/young-innovators";
+import {
+  YOUNG_INNOVATORS_DATES,
+  YOUNG_INNOVATORS_PROMO_ALT,
+  YOUNG_INNOVATORS_PROMO_IMAGE,
+} from "@/lib/young-innovators";
 
 export const metadata: Metadata = pageMetadata({
   title: "Submit — Young Innovators Challenge 2026",
   description:
     "Verify your email, then submit 2 photos and a 1-minute video for the LAF Young Innovators Challenge. Free, ages 6–16.",
   path: "/events/young-innovators/submit",
+  image: YOUNG_INNOVATORS_PROMO_IMAGE,
+  imageAlt: YOUNG_INNOVATORS_PROMO_ALT,
+  imageWidth: 1280,
+  imageHeight: 720,
 });
 
 export default function YoungInnovatorsSubmitPage() {

@@ -14,10 +14,14 @@ import {
 } from "@/lib/young-innovators";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Young Innovators Challenge 2026",
+  title: "Young Innovators Challenge 2026 | Free Online Competition",
   description:
-    "Free online challenge for ages 6–16: create something useful from home materials, verify email, upload 2 photos and a 1-minute video. Browse the gallery and vote with Google.",
+    "Free online innovation challenge for children aged 6–16. Build something useful at home and earn a participation certificate.",
   path: "/events/young-innovators",
+  image: YOUNG_INNOVATORS_PROMO_IMAGE,
+  imageAlt: YOUNG_INNOVATORS_PROMO_ALT,
+  imageWidth: 1280,
+  imageHeight: 720,
 });
 
 const EXAMPLES = [

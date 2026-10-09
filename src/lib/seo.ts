@@ -25,13 +25,27 @@ export function pageMetadata({
   title,
   description,
   path,
+  image,
+  imageAlt,
+  imageWidth = 1200,
+  imageHeight = 630,
 }: {
   title: string;
   description: string;
   path: string;
+  /** Absolute URL or site path (e.g. `/images/events/foo.jpg`) for social share preview. */
+  image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }): Metadata {
   const url = siteUrl(path);
-  const ogImage = siteUrl("/opengraph-image");
+  const ogImage = image
+    ? image.startsWith("http")
+      ? image
+      : siteUrl(image)
+    : siteUrl("/opengraph-image");
+  const alt = imageAlt ?? getSite().name;
   return {
     title,
     description,
@@ -43,7 +57,7 @@ export function pageMetadata({
       siteName: getSite().name,
       type: "website",
       locale: "en_IN",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: getSite().name }],
+      images: [{ url: ogImage, width: imageWidth, height: imageHeight, alt }],
     },
     twitter: {
       card: "summary_large_image",
