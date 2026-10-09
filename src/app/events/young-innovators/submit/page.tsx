@@ -9,7 +9,7 @@ import { YOUNG_INNOVATORS_DATES } from "@/lib/young-innovators";
 export const metadata: Metadata = pageMetadata({
   title: "Submit — Young Innovators Challenge 2026",
   description:
-    "Submit 2 photos and a 1-minute video for the LAF Young Innovators Challenge. Free, ages 6–16, no account required.",
+    "Verify your email, then submit 2 photos and a 1-minute video for the LAF Young Innovators Challenge. Free, ages 6–16.",
   path: "/events/young-innovators/submit",
 });
 
@@ -20,9 +20,13 @@ export default function YoungInnovatorsSubmitPage() {
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink href="/events/young-innovators" label="Back to Young Innovators Challenge" />
         <p className="mt-4 mb-8 text-laf-muted max-w-2xl leading-relaxed">
-          Young Innovators Challenge 2026 ({YOUNG_INNOVATORS_DATES.label}). Upload two photos (saved
-          to LAF Google Drive) and paste a YouTube or Drive link to your short explanation video. We
-          email digital certificates after review.
+          Young Innovators Challenge 2026 ({YOUNG_INNOVATORS_DATES.label}). First verify your email
+          with a one-time code (no password). Then upload two photos and paste a YouTube or Drive
+          video link. Projects appear in the{" "}
+          <a href="/events/young-innovators/gallery" className="text-laf-gold hover:underline">
+            gallery
+          </a>{" "}
+          after LAF review. We email certificates for valid entries.
         </p>
         <YoungInnovatorsSubmitForm />
       </PageContainer>

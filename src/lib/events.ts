@@ -19,6 +19,7 @@ export type EventCompetition = {
   image?: string;
   href: string;
   submitHref?: string;
+  galleryHref?: string;
   cta: string;
 };
 
@@ -28,11 +29,12 @@ export const EVENT_COMPETITIONS: EventCompetition[] = [
     title: "Young Innovators Challenge 2026",
     subtitle: `${YOUNG_INNOVATORS_DATES.labelShort} · Free · Ages 6–16 · From home`,
     description:
-      "Create something useful with home materials — bird feeders, water filters, cardboard inventions, science experiments, eco-friendly house models. Upload 2 photos and a YouTube/Drive video link. Digital certificates for valid entries.",
+      "Create something useful with home materials. Verify email, upload 2 photos and a YouTube/Drive video link. Browse the gallery and vote with Google. Digital certificates for valid entries.",
     dateRange: YOUNG_INNOVATORS_DATES.label,
     image: YOUNG_INNOVATORS_PROMO_IMAGE,
     href: "/events/young-innovators",
     submitHref: "/events/young-innovators/submit",
+    galleryHref: "/events/young-innovators/gallery",
     cta: "View challenge",
   },
   {

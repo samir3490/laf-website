@@ -59,6 +59,14 @@ export default function EventsHub() {
                 >
                   {event.cta}
                 </Link>
+                {event.galleryHref && (
+                  <Link
+                    href={event.galleryHref}
+                    className="px-5 py-2.5 rounded-lg border border-laf-border text-sm font-medium text-laf-navy hover:bg-laf-cream/60 transition-colors"
+                  >
+                    Gallery &amp; vote
+                  </Link>
+                )}
                 {event.submitHref && (
                   <Link
                     href={event.submitHref}

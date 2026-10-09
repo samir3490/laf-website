@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import EventEmailOtp from "@/components/events/EventEmailOtp";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
+import { YOUNG_INNOVATORS_2026_EVENT_SLUG } from "@/lib/event-submissions";
 import {
   INNOVATORS_PHOTO_MIME,
   isYoungInnovatorsOpen,
@@ -29,28 +32,29 @@ async function uploadPhotoToDrive(file: File, slot: "photo1" | "photo2"): Promis
 }
 
 export default function YoungInnovatorsSubmitForm() {
+  const router = useRouter();
   const open = useMemo(() => isYoungInnovatorsOpen(), []);
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
+  const [verifyToken, setVerifyToken] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
   const [childCity, setChildCity] = useState("");
   const [childSchool, setChildSchool] = useState("");
-  const [parentName, setParentName] = useState("");
-  const [parentEmail, setParentEmail] = useState("");
-  const [parentPhone, setParentPhone] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [photo1, setPhoto1] = useState<File | null>(null);
   const [photo2, setPhoto2] = useState<File | null>(null);
   const [videoLink, setVideoLink] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [website, setWebsite] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
-  const [status, setStatus] = useState<"idle" | "uploading" | "saving" | "done" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "uploading" | "saving" | "error">("idle");
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
-  const [doneMessage, setDoneMessage] = useState("");
 
   const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(""), []);
@@ -61,6 +65,10 @@ export default function YoungInnovatorsSubmitForm() {
 
     if (!open) {
       setError("Submissions are closed for this challenge.");
+      return;
+    }
+    if (!verifyToken) {
+      setError("Please verify your email first (Step 1).");
       return;
     }
     if (!photo1 || !photo2) {
@@ -110,15 +118,16 @@ export default function YoungInnovatorsSubmitForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          verifyToken,
           title: title.trim(),
           description: description.trim(),
           childName: childName.trim(),
           childAge,
           childCity: childCity.trim(),
           childSchool: childSchool.trim(),
-          parentName: parentName.trim(),
-          parentEmail: parentEmail.trim(),
-          parentPhone: parentPhone.trim(),
+          contactName: contactName.trim(),
+          contactEmail: contactEmail.trim(),
+          contactPhone: contactPhone.trim(),
           photo1Url: uploaded1.url,
           photo2Url: uploaded2.url,
           photo1FileId: uploaded1.fileId,
@@ -135,11 +144,7 @@ export default function YoungInnovatorsSubmitForm() {
         throw new Error(data.error || "Submission failed.");
       }
 
-      setDoneMessage(
-        data.message ||
-          "Thank you! Your project was submitted. We will email a certificate after review."
-      );
-      setStatus("done");
+      router.push("/events/young-innovators/gallery?submitted=pending");
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -151,23 +156,11 @@ export default function YoungInnovatorsSubmitForm() {
     return (
       <div className="rounded-2xl border border-laf-border bg-laf-cream/50 p-6 text-sm text-laf-muted">
         Submissions for the Young Innovators Challenge ({YOUNG_INNOVATORS_DATES.label}) are currently
-        closed. Follow us on social media for the next challenge.
-      </div>
-    );
-  }
-
-  if (status === "done") {
-    return (
-      <div className="rounded-2xl border border-laf-gold/40 bg-laf-cream/60 p-8 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-laf-navy">Project submitted!</h2>
-        <p className="text-laf-muted leading-relaxed max-w-lg mx-auto">{doneMessage}</p>
-        <p className="text-sm text-laf-muted">
-          Keep building and learning. Explore more on our{" "}
-          <a href="/library" className="text-laf-gold font-medium hover:underline">
-            free learning library
-          </a>
-          .
-        </p>
+        closed. You can still{" "}
+        <a href="/events/young-innovators/gallery" className="text-laf-gold font-medium hover:underline">
+          browse the gallery
+        </a>
+        .
       </div>
     );
   }
@@ -178,16 +171,26 @@ export default function YoungInnovatorsSubmitForm() {
     <form onSubmit={onSubmit} className="relative space-y-6 max-w-2xl">
       <div className="rounded-xl border border-laf-gold/30 bg-laf-cream/50 px-4 py-3 text-sm text-laf-navy space-y-1">
         <p>
-          <strong>Easy steps:</strong> fill the form → choose 2 photos → paste a YouTube or Google
-          Drive video link → submit.
+          <strong>Easy steps:</strong> verify email → fill the form → choose 2 photos → paste a
+          YouTube or Google Drive video link → submit.
         </p>
         <p className="text-laf-muted">
-          No account or email code needed. Photos are saved to LAF&apos;s Google Drive (same as our
-          other events).
+          No password needed. We only send a one-time code to your email. Projects appear in the
+          gallery after LAF reviews them.
         </p>
       </div>
 
-      <fieldset className="space-y-4" disabled={busy}>
+      <EventEmailOtp
+        eventSlug={YOUNG_INNOVATORS_2026_EVENT_SLUG}
+        email={contactEmail}
+        onEmailChange={setContactEmail}
+        onVerified={setVerifyToken}
+        onClear={() => setVerifyToken("")}
+        disabled={busy}
+        eventLabel="Young Innovators Challenge"
+      />
+
+      <fieldset className="space-y-4" disabled={busy || !verifyToken}>
         <legend className="text-lg font-semibold text-laf-navy">About the project</legend>
         <div>
           <label htmlFor="yi-title" className="block text-sm font-medium text-laf-navy mb-1">
@@ -221,7 +224,7 @@ export default function YoungInnovatorsSubmitForm() {
         </div>
       </fieldset>
 
-      <fieldset className="space-y-4" disabled={busy}>
+      <fieldset className="space-y-4" disabled={busy || !verifyToken}>
         <legend className="text-lg font-semibold text-laf-navy">Child details</legend>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
@@ -280,59 +283,44 @@ export default function YoungInnovatorsSubmitForm() {
         </div>
       </fieldset>
 
-      <fieldset className="space-y-4" disabled={busy}>
-        <legend className="text-lg font-semibold text-laf-navy">Parent / guardian contact</legend>
+      <fieldset className="space-y-4" disabled={busy || !verifyToken}>
+        <legend className="text-lg font-semibold text-laf-navy">Your contact details</legend>
         <p className="text-xs text-laf-muted">
-          Used only for certificates and LAF contact — not shown publicly.
+          Used only for certificates and LAF contact — not shown on the public gallery. Email must
+          match the address you verified above.
         </p>
         <div>
-          <label htmlFor="yi-parent" className="block text-sm font-medium text-laf-navy mb-1">
-            Parent / guardian name *
+          <label htmlFor="yi-contact" className="block text-sm font-medium text-laf-navy mb-1">
+            Your name *
           </label>
           <input
-            id="yi-parent"
+            id="yi-contact"
             required
             maxLength={80}
-            value={parentName}
-            onChange={(e) => setParentName(e.target.value)}
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
             className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
           />
         </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="yi-email" className="block text-sm font-medium text-laf-navy mb-1">
-              Email * <span className="font-normal text-laf-muted">(for certificate)</span>
-            </label>
-            <input
-              id="yi-email"
-              required
-              type="email"
-              autoComplete="email"
-              value={parentEmail}
-              onChange={(e) => setParentEmail(e.target.value)}
-              className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="yi-phone" className="block text-sm font-medium text-laf-navy mb-1">
-              Mobile (WhatsApp) *
-            </label>
-            <input
-              id="yi-phone"
-              required
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel"
-              placeholder="10-digit number"
-              value={parentPhone}
-              onChange={(e) => setParentPhone(e.target.value)}
-              className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
-            />
-          </div>
+        <div>
+          <label htmlFor="yi-phone" className="block text-sm font-medium text-laf-navy mb-1">
+            Mobile (WhatsApp) *
+          </label>
+          <input
+            id="yi-phone"
+            required
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            placeholder="10-digit number"
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+            className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+          />
         </div>
       </fieldset>
 
-      <fieldset className="space-y-4" disabled={busy}>
+      <fieldset className="space-y-4" disabled={busy || !verifyToken}>
         <legend className="text-lg font-semibold text-laf-navy">Photos &amp; video</legend>
         <div>
           <label htmlFor="yi-p1" className="block text-sm font-medium text-laf-navy mb-1">
@@ -365,7 +353,7 @@ export default function YoungInnovatorsSubmitForm() {
 
         <div>
           <label htmlFor="yi-vlink" className="block text-sm font-medium text-laf-navy mb-1">
-            1-minute explanation video link * (YouTube or Google Drive)
+            1-minute explanation video link * (YouTube preferred, or Google Drive)
           </label>
           <input
             id="yi-vlink"
@@ -377,9 +365,8 @@ export default function YoungInnovatorsSubmitForm() {
             placeholder="https://youtu.be/… or https://drive.google.com/file/d/…"
           />
           <p className="mt-2 text-xs text-laf-muted leading-relaxed">
-            Easiest on a phone: record ~1 minute in your camera app → upload to{" "}
-            <strong>Google Drive</strong> or <strong>YouTube</strong> (unlisted is fine) → copy the
-            share link here. Make sure “Anyone with the link” can view Drive files.
+            YouTube (unlisted is fine) works best in the gallery. For Drive: set “Anyone with the
+            link can view.”
           </p>
         </div>
       </fieldset>
@@ -401,11 +388,11 @@ export default function YoungInnovatorsSubmitForm() {
           checked={termsAccepted}
           onChange={(e) => setTermsAccepted(e.target.checked)}
           className="mt-1"
-          disabled={busy}
+          disabled={busy || !verifyToken}
         />
         <span>
-          I confirm this project was made by the child with parental guidance, using materials from
-          home, and I allow LAF to review it and feature approved entries for education awareness. *
+          I confirm this project was made by the child with guidance, using materials from home, and
+          I allow LAF to review it and feature approved entries in the public gallery. *
         </span>
       </label>
 
@@ -428,7 +415,7 @@ export default function YoungInnovatorsSubmitForm() {
 
       <button
         type="submit"
-        disabled={busy}
+        disabled={busy || !verifyToken}
         className="w-full sm:w-auto px-8 py-3 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright disabled:opacity-60 transition-colors"
       >
         {busy ? "Submitting…" : "Submit project — free"}

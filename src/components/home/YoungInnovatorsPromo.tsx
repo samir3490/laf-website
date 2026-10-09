@@ -9,9 +9,9 @@ import {
 const HIGHLIGHTS = [
   "Ages 6–16 · free · online from home",
   "Build something useful with home materials",
+  "Verify email with a one-time code (no password)",
   "Upload 2 photos + paste a YouTube/Drive video link",
-  "No signup code — simple form for parents",
-  "Digital certificates for valid entries",
+  "Gallery & Google voting · certificates after review",
 ];
 
 export default function YoungInnovatorsPromo() {
@@ -59,10 +59,10 @@ export default function YoungInnovatorsPromo() {
                 Submit your project
               </Link>
               <Link
-                href="/events/young-innovators"
+                href="/events/young-innovators/gallery"
                 className="inline-flex justify-center items-center px-6 py-3 rounded-lg border-2 border-laf-navy text-laf-navy text-sm font-semibold hover:bg-laf-navy hover:text-white transition-colors"
               >
-                Event details
+                Gallery &amp; vote
               </Link>
             </div>
           </div>

@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = pageMetadata({
   title: "Young Innovators Challenge 2026",
   description:
-    "Free online challenge for ages 6–16: create something useful from home materials, upload 2 photos and a 1-minute video. Digital certificates from Lata Agrawal Foundation.",
+    "Free online challenge for ages 6–16: create something useful from home materials, verify email, upload 2 photos and a 1-minute video. Browse the gallery and vote with Google.",
   path: "/events/young-innovators",
 });
 
@@ -46,8 +46,8 @@ export default function YoungInnovatorsPage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button href="/events/young-innovators/submit">Submit your project</Button>
-              <Button href="/library" variant="outline">
-                Free learning library
+              <Button href="/events/young-innovators/gallery" variant="outline">
+                Gallery &amp; vote
               </Button>
             </div>
           </div>
@@ -89,47 +89,59 @@ export default function YoungInnovatorsPage() {
           <div className="rounded-2xl border border-laf-border bg-white p-6">
             <h3 className="font-semibold text-laf-navy">How to participate</h3>
             <ol className="mt-4 space-y-2 text-sm text-laf-muted list-decimal list-inside leading-relaxed">
-              <li>Build the project at home with a parent</li>
+              <li>Build the project at home with guidance</li>
               <li>Take 2 clear photos</li>
-              <li>Record a ~1-minute video and upload it to YouTube or Google Drive</li>
+              <li>Record a ~1-minute video (YouTube preferred)</li>
               <li>
                 <Link href="/events/young-innovators/submit" className="text-laf-gold hover:underline">
-                  Submit on this website
+                  Verify your email
                 </Link>{" "}
-                — paste the video link; no account or email code needed
+                with a one-time code, then submit
               </li>
+              <li>LAF reviews — approved projects appear in the gallery</li>
             </ol>
           </div>
           <div className="rounded-2xl border border-laf-border bg-white p-6">
-            <h3 className="font-semibold text-laf-navy">Recognition</h3>
+            <h3 className="font-semibold text-laf-navy">Gallery &amp; voting</h3>
             <ul className="mt-4 space-y-2 text-sm text-laf-muted leading-relaxed">
-              <li>Digital participation certificates for valid entries</li>
-              <li>Special certificates for the most creative projects</li>
-              <li>Certificates emailed to the parent address after review</li>
+              <li>Anyone can browse approved projects</li>
+              <li>Sign in with Google to vote (one vote per project)</li>
+              <li>Age groups: 6–10 and 11–16</li>
+              <li>
+                <Link href="/events/young-innovators/gallery" className="text-laf-gold hover:underline">
+                  Open gallery
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="rounded-2xl border border-laf-border bg-laf-cream/50 p-6">
-            <h3 className="font-semibold text-laf-navy">Why this matters</h3>
-            <p className="mt-4 text-sm text-laf-muted leading-relaxed">
-              Hands-on making builds problem-solving, digital sharing skills, and confidence —
-              especially for children who learn best by doing. LAF celebrates young innovators across
-              India.
-            </p>
+            <h3 className="font-semibold text-laf-navy">Recognition</h3>
+            <ul className="mt-4 space-y-2 text-sm text-laf-muted leading-relaxed">
+              <li>Digital certificates for valid entries (emailed after review)</li>
+              <li>Special certificates for the most creative projects</li>
+              <li>Your email and phone are never shown on the gallery</li>
+            </ul>
           </div>
         </section>
 
         <div className="rounded-2xl bg-laf-navy text-white p-8 md:p-10 text-center">
           <h2 className="text-2xl font-bold">Ready to invent?</h2>
           <p className="mt-3 text-white/85 max-w-xl mx-auto text-sm leading-relaxed">
-            Open {YOUNG_INNOVATORS_DATES.label}. Free for ages 6–16. Parents can submit in a few
-            minutes from a phone.
+            Open {YOUNG_INNOVATORS_DATES.label}. Free for ages 6–16. Verify email, submit from a
+            phone, then explore the gallery.
           </p>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/events/young-innovators/submit"
               className="inline-flex px-6 py-3 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright transition-colors"
             >
               Open submission form
+            </Link>
+            <Link
+              href="/events/young-innovators/gallery"
+              className="inline-flex px-6 py-3 rounded-lg border border-white/40 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+            >
+              View gallery
             </Link>
           </div>
         </div>

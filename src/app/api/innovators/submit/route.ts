@@ -1,21 +1,23 @@
 import { createHash, randomUUID } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
+import { verifyEventEmailSession } from "@/lib/event-email-otp";
+import {
+  innovatorsAgeGroupFromAge,
+  LAF_EVENT_SUBMISSIONS_COLLECTION,
+  normalizeEventEmail,
+  YOUNG_INNOVATORS_2026_EVENT_SLUG,
+} from "@/lib/event-submissions";
 import { getFirebaseAdminDb } from "@/lib/firebase-admin";
 import { notifyAdminOfInnovatorsSubmission } from "@/lib/innovators-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
-import {
-  LAF_EVENT_SUBMISSIONS_COLLECTION,
-  YOUNG_INNOVATORS_2026_EVENT_SLUG,
-} from "@/lib/event-submissions";
 import {
   isAllowedDriveOrVideoUrl,
   isAllowedVideoLink,
   isValidInnovatorsEmail,
   isYoungInnovatorsOpen,
   normalizeIndiaPhone,
-  normalizeInnovatorsEmail,
   YOUNG_INNOVATORS_AGE,
 } from "@/lib/young-innovators";
 
@@ -26,6 +28,13 @@ const RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function ipHash(ip: string): string {
   return createHash("sha256").update(`innovators:${ip}`).digest("hex").slice(0, 16);
+}
+
+function emailHash(email: string): string {
+  return createHash("sha256")
+    .update(`innovators-email:${normalizeEventEmail(email)}`)
+    .digest("hex")
+    .slice(0, 32);
 }
 
 export async function POST(req: Request) {
@@ -57,7 +66,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     }
 
-    // Honeypot — bots fill this; humans never see it
     if (typeof body.website === "string" && body.website.trim()) {
       return NextResponse.json({ ok: true, entryId: "ok" });
     }
@@ -76,9 +84,9 @@ export async function POST(req: Request) {
     const title = String(body.title ?? "").trim();
     const description = String(body.description ?? "").trim();
     const childName = String(body.childName ?? "").trim();
-    const parentName = String(body.parentName ?? "").trim();
-    const parentEmailRaw = String(body.parentEmail ?? "").trim();
-    const parentPhoneRaw = String(body.parentPhone ?? "").trim();
+    const contactName = String(body.contactName ?? body.parentName ?? "").trim();
+    const contactEmailRaw = String(body.contactEmail ?? body.parentEmail ?? "").trim();
+    const contactPhoneRaw = String(body.contactPhone ?? body.parentPhone ?? "").trim();
     const childCity = String(body.childCity ?? "").trim();
     const childSchool = String(body.childSchool ?? "").trim();
     const ageRaw = String(body.childAge ?? "").trim();
@@ -87,7 +95,25 @@ export async function POST(req: Request) {
     const videoUrl = String(body.videoUrl ?? "").trim();
     const photo1FileId = String(body.photo1FileId ?? "").trim();
     const photo2FileId = String(body.photo2FileId ?? "").trim();
+    const verifyToken = String(body.verifyToken ?? "").trim();
     const termsAccepted = body.termsAccepted === true;
+
+    const contactEmail = normalizeEventEmail(contactEmailRaw);
+    if (!contactEmail || !isValidInnovatorsEmail(contactEmail) || contactEmail.length > 120) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+
+    const session = await verifyEventEmailSession(
+      YOUNG_INNOVATORS_2026_EVENT_SLUG,
+      verifyToken,
+      contactEmail
+    );
+    if (!session) {
+      return NextResponse.json(
+        { error: "Please verify your email with the code we sent, then try again." },
+        { status: 401 }
+      );
+    }
 
     if (!title || title.length > 120) {
       return NextResponse.json({ error: "Please enter a project title (max 120 characters)." }, { status: 400 });
@@ -104,15 +130,11 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    if (!parentName || parentName.length > 80) {
-      return NextResponse.json({ error: "Please enter parent / guardian name." }, { status: 400 });
+    if (!contactName || contactName.length > 80) {
+      return NextResponse.json({ error: "Please enter your name." }, { status: 400 });
     }
-    const parentEmail = normalizeInnovatorsEmail(parentEmailRaw);
-    if (!parentEmail || !isValidInnovatorsEmail(parentEmail) || parentEmail.length > 120) {
-      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
-    }
-    const parentPhone = normalizeIndiaPhone(parentPhoneRaw);
-    if (!parentPhone) {
+    const contactPhone = normalizeIndiaPhone(contactPhoneRaw);
+    if (!contactPhone) {
       return NextResponse.json(
         { error: "Please enter a valid 10-digit Indian mobile number." },
         { status: 400 }
@@ -137,6 +159,11 @@ export async function POST(req: Request) {
         },
         { status: 400 }
       );
+    }
+
+    const ageGroup = innovatorsAgeGroupFromAge(age);
+    if (!ageGroup) {
+      return NextResponse.json({ error: "Invalid age for this challenge." }, { status: 400 });
     }
 
     if (!termsAccepted) {
@@ -185,9 +212,10 @@ export async function POST(req: Request) {
       childAge: age,
       childCity,
       childSchool: childSchool || null,
-      parentName,
-      parentEmail,
-      parentPhone,
+      ageGroup,
+      contactName,
+      contactEmail,
+      contactPhone,
       photo1Url,
       photo2Url,
       photo1FileId: photo1FileId || null,
@@ -195,8 +223,10 @@ export async function POST(req: Request) {
       videoUrl,
       videoSource: "link",
       status: "pending",
+      voteCount: 0,
       termsAccepted: true,
       submitterIpHash: ipHash(ip),
+      submitterEmailHash: emailHash(contactEmail),
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     };
@@ -207,7 +237,7 @@ export async function POST(req: Request) {
       entryId,
       title,
       childName,
-      parentEmail,
+      parentEmail: contactEmail,
       photo1Url,
       photo2Url,
       videoUrl,
@@ -216,8 +246,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       entryId,
+      status: "pending",
       message:
-        "Thank you! Your project was submitted. We will review it and email a digital certificate to the parent address for valid entries.",
+        "Thank you! Your project was submitted for review. After LAF approves it, it will appear in the public gallery. We will email a digital certificate for valid entries.",
     });
   } catch (err) {
     console.error("[innovators/submit]", err);
