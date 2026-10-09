@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackEventAnalytics } from "@/components/events/EventAnalytics";
 
 type EventEmailOtpProps = {
   eventSlug: string;
@@ -49,6 +50,7 @@ export default function EventEmailOtp({
         setError(data.error ?? "Could not send code.");
         return;
       }
+      void trackEventAnalytics(eventSlug, "otp_sent", "submit");
       setStep("otp");
     } catch {
       setError("Could not send code. Please try again.");
@@ -71,6 +73,7 @@ export default function EventEmailOtp({
         setError(data.error ?? "Verification failed.");
         return;
       }
+      void trackEventAnalytics(eventSlug, "otp_verified", "submit");
       setStep("done");
       onVerified(data.verifyToken as string);
     } catch {

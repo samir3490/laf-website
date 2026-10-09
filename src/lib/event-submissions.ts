@@ -65,6 +65,8 @@ export function eventVoteDocId(eventSlug: string, voterUid: string, entryId: str
 }
 
 /** Public gallery card — never includes contact phone/email. */
+export type LafEventTrafficSource = "instagram" | "facebook" | "direct" | "other";
+
 export type LafEventPublicEntry = {
   id: string;
   eventSlug: string;
@@ -89,6 +91,7 @@ export type LafEventAdminEntry = LafEventPublicEntry & {
   contactPhone: string;
   photo1FileId?: string | null;
   photo2FileId?: string | null;
+  trafficSource?: LafEventTrafficSource;
 };
 
 function createdAtIso(raw: unknown): string | undefined {
@@ -189,6 +192,13 @@ export function toAdminEventEntry(
     contactPhone,
     photo1FileId: typeof data.photo1FileId === "string" ? data.photo1FileId : null,
     photo2FileId: typeof data.photo2FileId === "string" ? data.photo2FileId : null,
+    trafficSource:
+      data.trafficSource === "instagram" ||
+      data.trafficSource === "facebook" ||
+      data.trafficSource === "direct" ||
+      data.trafficSource === "other"
+        ? data.trafficSource
+        : undefined,
   };
 }
 

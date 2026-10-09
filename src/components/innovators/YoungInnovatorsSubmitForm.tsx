@@ -2,10 +2,12 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import EventAnalytics, { trackEventAnalytics } from "@/components/events/EventAnalytics";
 import EventEmailOtp from "@/components/events/EventEmailOtp";
 import EventFilePicker from "@/components/events/EventFilePicker";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
 import { compressImageForUpload } from "@/lib/compress-image";
+import { getStoredEventAttribution } from "@/lib/event-attribution";
 import { YOUNG_INNOVATORS_2026_EVENT_SLUG } from "@/lib/event-submissions";
 import {
   isYoungInnovatorsOpen,
@@ -100,6 +102,7 @@ export default function YoungInnovatorsSubmitForm() {
       setStatus("saving");
       setProgress("Saving your entry…");
 
+      const attribution = getStoredEventAttribution(YOUNG_INNOVATORS_2026_EVENT_SLUG);
       const res = await fetch("/api/innovators/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -122,18 +125,24 @@ export default function YoungInnovatorsSubmitForm() {
           termsAccepted: true,
           turnstileToken,
           laf_hp_xf7: honeypot,
+          attribution,
         }),
       });
 
       const data = (await res.json()) as { error?: string; message?: string; entryId?: string };
       if (!res.ok) {
+        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit");
         throw new Error(data.error || "Submission failed.");
       }
       // Honeypot / bot stub returns entryId "ok" without saving — never treat as success for humans.
       if (!data.entryId || data.entryId === "ok") {
+        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit");
         throw new Error("Submission did not save. Please try again, or contact LAF if this continues.");
       }
 
+      void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_success", "submit", {
+        entryId: data.entryId,
+      });
       router.push("/events/young-innovators/gallery?submitted=pending");
     } catch (err) {
       setStatus("error");
@@ -159,6 +168,7 @@ export default function YoungInnovatorsSubmitForm() {
 
   return (
     <form onSubmit={onSubmit} className="relative space-y-6 max-w-2xl">
+      <EventAnalytics eventSlug={YOUNG_INNOVATORS_2026_EVENT_SLUG} page="submit" />
       <div className="rounded-xl border border-laf-gold/30 bg-laf-cream/50 px-4 py-3 text-sm text-laf-navy space-y-1">
         <p>
           <strong>Easy steps:</strong> verify email → fill the form → add at least one photo →

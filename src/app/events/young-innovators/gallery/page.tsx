@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
 import YoungInnovatorsGallery from "@/components/innovators/YoungInnovatorsGallery";
+import YoungInnovatorsPageTracker from "@/components/innovators/YoungInnovatorsPageTracker";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -16,6 +17,7 @@ export const metadata: Metadata = pageMetadata({
 export default function YoungInnovatorsGalleryPage() {
   return (
     <>
+      <YoungInnovatorsPageTracker page="gallery" />
       <PageHeader title="Young Innovators gallery" />
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink href="/events/young-innovators" label="Back to Young Innovators Challenge" />

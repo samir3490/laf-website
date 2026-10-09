@@ -14,8 +14,9 @@ export default function AdminInnovatorsPage() {
       <PageHeader title="Young Innovators Admin" />
       <PageContainer className="py-12 lg:py-16">
         <p className="mb-8 text-sm text-laf-muted max-w-2xl">
-          Approve projects for the public gallery, or remove entries. Certificates are handled
-          separately after you confirm valid submissions.
+          Traffic &amp; submissions analytics, approve projects for the gallery, remove entries, and
+          announce age-group winners — same workflow as Drawing Competition admin. Certificates are
+          handled separately after you confirm valid submissions.
         </p>
         <AdminInnovatorsApp />
       </PageContainer>

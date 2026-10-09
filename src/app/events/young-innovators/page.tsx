@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
 import Button from "@/components/Button";
+import YoungInnovatorsPageTracker from "@/components/innovators/YoungInnovatorsPageTracker";
 import { pageMetadata } from "@/lib/seo";
 import {
   YOUNG_INNOVATORS_DATES,
@@ -30,6 +31,7 @@ const EXAMPLES = [
 export default function YoungInnovatorsPage() {
   return (
     <>
+      <YoungInnovatorsPageTracker page="home" />
       <PageHeader title="Young Innovators Challenge 2026" />
       <PageContainer className="py-12 lg:py-16 space-y-12">
         <EventBackLink />

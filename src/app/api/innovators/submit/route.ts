@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
+import { attributionFromPayload } from "@/lib/event-analytics";
 import { verifyEventEmailSession } from "@/lib/event-email-otp";
 import {
   innovatorsAgeGroupFromAge,
@@ -98,6 +99,9 @@ export async function POST(req: Request) {
     const photo2FileId = String(body.photo2FileId ?? "").trim();
     const verifyToken = String(body.verifyToken ?? "").trim();
     const termsAccepted = body.termsAccepted === true;
+    const attribution = attributionFromPayload(
+      body.attribution as Record<string, unknown> | undefined
+    );
 
     const contactEmail = normalizeEventEmail(contactEmailRaw);
     if (!contactEmail || !isValidInnovatorsEmail(contactEmail) || contactEmail.length > 120) {
@@ -228,6 +232,7 @@ export async function POST(req: Request) {
       status: "pending",
       voteCount: 0,
       termsAccepted: true,
+      trafficSource: attribution?.source ?? "direct",
       submitterIpHash: ipHash(ip),
       submitterEmailHash: emailHash(contactEmail),
       createdAt: FieldValue.serverTimestamp(),
