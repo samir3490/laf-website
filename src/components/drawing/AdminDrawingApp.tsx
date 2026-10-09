@@ -7,6 +7,7 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import {
   collection,
   doc,
@@ -60,6 +61,7 @@ export default function AdminDrawingApp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState("");
 
@@ -331,29 +333,54 @@ export default function AdminDrawingApp() {
 
   if (!user || !isAdmin) {
     return (
-      <form onSubmit={handleLogin} className="max-w-md space-y-4 rounded-2xl border border-laf-border bg-white p-6">
+      <div className="max-w-md space-y-4 rounded-2xl border border-laf-border bg-white p-6">
         <p className="text-sm text-laf-muted">Sign in with your LAF admin account.</p>
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-laf-border"
+        {user && !isAdmin && (
+          <p className="text-sm text-red-600">
+            Signed in as {user.email}, but this is not the admin account. Sign out and use
+            admin@agrawalfoundation.org.
+          </p>
+        )}
+        <GoogleSignInButton
+          auth={auth}
+          label="Sign in with Google"
+          disabled={authBusy}
+          onBusy={setAuthBusy}
+          onError={setAuthError}
         />
-        <input
-          type="password"
-          required
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-laf-border"
-        />
-        {authError && <p className="text-sm text-red-600">{authError}</p>}
-        <button type="submit" className="px-5 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold">
-          Sign in
-        </button>
-      </form>
+        <p className="text-xs text-laf-muted text-center">or use email and password</p>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            required
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-laf-border"
+          />
+          <input
+            type="password"
+            required
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-laf-border"
+          />
+          {authError && <p className="text-sm text-red-600">{authError}</p>}
+          <button
+            type="submit"
+            disabled={authBusy}
+            className="w-full px-5 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
+          >
+            Sign in with email
+          </button>
+        </form>
+        {user && !isAdmin && auth && (
+          <button type="button" onClick={() => signOut(auth)} className="text-sm text-laf-gold hover:underline">
+            Sign out
+          </button>
+        )}
+      </div>
     );
   }
 

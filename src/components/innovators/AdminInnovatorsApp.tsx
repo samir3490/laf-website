@@ -8,6 +8,7 @@ import {
   type User,
 } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import {
   innovatorsAgeGroupLabel,
   isEventAdmin,
@@ -30,6 +31,7 @@ export default function AdminInnovatorsApp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState("");
   const [entries, setEntries] = useState<LafEventAdminEntry[]>([]);
@@ -162,35 +164,46 @@ export default function AdminInnovatorsApp() {
 
   if (!user) {
     return (
-      <form onSubmit={(e) => void signIn(e)} className="max-w-sm space-y-4">
+      <div className="max-w-sm space-y-4">
         <p className="text-sm text-laf-muted">
           Sign in with <strong>admin@agrawalfoundation.org</strong> (same account as Drawing
           Competition admin).
         </p>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Admin email"
-          className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+        <GoogleSignInButton
+          auth={auth}
+          label="Sign in with Google"
+          disabled={authBusy}
+          onBusy={setAuthBusy}
+          onError={setAuthError}
         />
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
-        />
-        {authError && <p className="text-sm text-red-700">{authError}</p>}
-        <button
-          type="submit"
-          className="px-5 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold"
-        >
-          Sign in
-        </button>
-      </form>
+        <p className="text-xs text-laf-muted text-center">or use email and password</p>
+        <form onSubmit={(e) => void signIn(e)} className="space-y-4">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Admin email"
+            className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+          />
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+          />
+          {authError && <p className="text-sm text-red-700">{authError}</p>}
+          <button
+            type="submit"
+            disabled={authBusy}
+            className="w-full px-5 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold disabled:opacity-60"
+          >
+            Sign in with email
+          </button>
+        </form>
+      </div>
     );
   }
 

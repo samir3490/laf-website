@@ -4,14 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   updateProfile,
   type User,
 } from "firebase/auth";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { isEventsAdmin } from "@/lib/event-members";
 import { getFirebaseAuth, getFirebaseConfig } from "@/lib/firebase";
 
@@ -123,24 +122,6 @@ export default function EventsAuthPanel() {
         "auth/popup-closed-by-user": "Sign-in was cancelled.",
       };
       setError(messages[code ?? ""] ?? "Could not sign in. Please try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleGoogle() {
-    if (!auth) return;
-    setBusy(true);
-    setError("");
-    setInfo("");
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (err: unknown) {
-      const code = (err as { code?: string }).code;
-      if (code !== "auth/popup-closed-by-user") {
-        setError("Google sign-in failed. Please try again.");
-      }
     } finally {
       setBusy(false);
     }
@@ -358,19 +339,31 @@ export default function EventsAuthPanel() {
 
   return (
     <div className="rounded-2xl border border-laf-border bg-white p-5 lg:p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-laf-navy">Sign up or log in</p>
-          <p className="text-sm text-laf-muted mt-1 max-w-xl">
-            Get emails when we announce new events. Admins can approve submissions after logging in.
-          </p>
-        </div>
+      <div>
+        <p className="text-sm font-semibold text-laf-navy">Sign up or log in</p>
+        <p className="text-sm text-laf-muted mt-1 max-w-xl">
+          Get emails when we announce new events. Admins can approve submissions after logging in.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+        <GoogleSignInButton
+          auth={auth}
+          label="Sign up / Log in with Google"
+          disabled={busy}
+          onBusy={setBusy}
+          onError={(msg) => {
+            setError(msg);
+            setInfo("");
+          }}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border-2 border-[#1e3a5f] bg-white text-[#1e3a5f] text-sm font-semibold hover:bg-laf-cream/60 disabled:opacity-60"
+        />
         <button
           type="button"
           onClick={() => setPanelOpen((o) => !o)}
           className="px-5 py-2.5 rounded-lg bg-laf-navy text-white text-sm font-semibold hover:bg-laf-navy/90"
         >
-          {panelOpen ? "Close" : "Sign up / Log in"}
+          {panelOpen ? "Hide email form" : "Sign up / Log in with email"}
         </button>
       </div>
 
@@ -402,17 +395,6 @@ export default function EventsAuthPanel() {
               Log in
             </button>
           </div>
-
-          <button
-            type="button"
-            disabled={busy || !auth}
-            onClick={() => void handleGoogle()}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-lg border-2 border-laf-navy text-laf-navy text-sm font-semibold disabled:opacity-60"
-          >
-            Continue with Google
-          </button>
-
-          <p className="text-xs text-laf-muted">Or use email and password</p>
 
           <form onSubmit={(e) => void handleEmailAuth(e)} className="space-y-3 max-w-md">
             {mode === "signup" && (
@@ -453,17 +435,18 @@ export default function EventsAuthPanel() {
               disabled={busy}
               className="px-5 py-2.5 rounded-lg bg-laf-gold text-white text-sm font-semibold disabled:opacity-60"
             >
-              {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Log in"}
+              {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Log in with email"}
             </button>
           </form>
-
-          {error && (
-            <p className="text-sm text-red-700" role="alert">
-              {error}
-            </p>
-          )}
         </div>
       )}
+
+      {error && (
+        <p className="text-sm text-red-700" role="alert">
+          {error}
+        </p>
+      )}
+      {info && !error && <p className="text-sm text-laf-navy">{info}</p>}
     </div>
   );
 }
