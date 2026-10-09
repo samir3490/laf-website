@@ -76,8 +76,8 @@ export type LafEventPublicEntry = {
   childSchool?: string | null;
   ageGroup: string;
   photo1Url: string;
-  photo2Url: string;
-  videoUrl: string;
+  photo2Url?: string | null;
+  videoUrl?: string | null;
   voteCount: number;
   status: LafEventSubmissionStatus;
   createdAt?: string;
@@ -137,8 +137,8 @@ export function toPublicEventEntry(
     childSchool: typeof data.childSchool === "string" ? data.childSchool : null,
     ageGroup,
     photo1Url,
-    photo2Url: photo2Url || photo1Url,
-    videoUrl,
+    photo2Url: photo2Url || null,
+    videoUrl: videoUrl || null,
     voteCount: typeof data.voteCount === "number" ? data.voteCount : 0,
     status: "approved",
     createdAt: createdAtIso(data.createdAt),

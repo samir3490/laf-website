@@ -217,7 +217,7 @@ export default function AdminInnovatorsApp() {
 
       <div className="space-y-4">
         {filtered.map((entry) => {
-          const embed = youtubeEmbedUrl(entry.videoUrl);
+          const embed = entry.videoUrl ? youtubeEmbedUrl(entry.videoUrl) : null;
           return (
             <article
               key={entry.id}
@@ -259,11 +259,15 @@ export default function AdminInnovatorsApp() {
                 </div>
               </div>
               <p className="text-sm text-laf-muted whitespace-pre-wrap">{entry.description}</p>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={entry.photo1Url} alt="" className="rounded-lg object-cover aspect-video" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={entry.photo2Url} alt="" className="rounded-lg object-cover aspect-video" />
+              <div className={`grid gap-2 ${entry.photo2Url ? "sm:grid-cols-2" : ""}`}>
+                {entry.photo1Url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={entry.photo1Url} alt="" className="rounded-lg object-cover aspect-video" />
+                ) : null}
+                {entry.photo2Url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={entry.photo2Url} alt="" className="rounded-lg object-cover aspect-video" />
+                ) : null}
               </div>
               {embed ? (
                 <div className="aspect-video max-w-xl rounded-lg overflow-hidden bg-black">
@@ -274,7 +278,7 @@ export default function AdminInnovatorsApp() {
                     allowFullScreen
                   />
                 </div>
-              ) : (
+              ) : entry.videoUrl ? (
                 <a
                   href={entry.videoUrl}
                   target="_blank"
@@ -283,6 +287,8 @@ export default function AdminInnovatorsApp() {
                 >
                   Open video link
                 </a>
+              ) : (
+                <p className="text-xs text-laf-muted">No video link</p>
               )}
               <p className="text-xs text-laf-muted break-all">ID: {entry.id}</p>
             </article>

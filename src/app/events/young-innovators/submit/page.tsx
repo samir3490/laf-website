@@ -21,8 +21,8 @@ export default function YoungInnovatorsSubmitPage() {
         <EventBackLink href="/events/young-innovators" label="Back to Young Innovators Challenge" />
         <p className="mt-4 mb-8 text-laf-muted max-w-2xl leading-relaxed">
           Young Innovators Challenge 2026 ({YOUNG_INNOVATORS_DATES.label}). First verify your email
-          with a one-time code (no password). Then upload two photos and paste a YouTube or Drive
-          video link. Projects appear in the{" "}
+          with a one-time code (no password). Then upload at least one photo (second photo and video
+          link are optional). Projects appear in the{" "}
           <a href="/events/young-innovators/gallery" className="text-laf-gold hover:underline">
             gallery
           </a>{" "}

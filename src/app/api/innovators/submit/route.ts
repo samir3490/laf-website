@@ -173,23 +173,25 @@ export async function POST(req: Request) {
       );
     }
 
-    if (
-      !photo1Url ||
-      !isAllowedDriveOrVideoUrl(photo1Url) ||
-      !photo2Url ||
-      !isAllowedDriveOrVideoUrl(photo2Url)
-    ) {
+    if (!photo1Url || !isAllowedDriveOrVideoUrl(photo1Url)) {
       return NextResponse.json(
-        { error: "Please upload two clear project photos." },
+        { error: "Please upload at least one clear project photo." },
         { status: 400 }
       );
     }
 
-    if (!videoUrl || !isAllowedVideoLink(videoUrl)) {
+    if (photo2Url && !isAllowedDriveOrVideoUrl(photo2Url)) {
+      return NextResponse.json(
+        { error: "Photo 2 link looks invalid. Remove it or upload again." },
+        { status: 400 }
+      );
+    }
+
+    if (videoUrl && !isAllowedVideoLink(videoUrl)) {
       return NextResponse.json(
         {
           error:
-            "Please paste a YouTube or Google Drive link to your ~1-minute explanation video.",
+            "Video link must be YouTube or Google Drive (or leave it blank).",
         },
         { status: 400 }
       );
@@ -217,11 +219,11 @@ export async function POST(req: Request) {
       contactEmail,
       contactPhone,
       photo1Url,
-      photo2Url,
+      photo2Url: photo2Url || null,
       photo1FileId: photo1FileId || null,
       photo2FileId: photo2FileId || null,
-      videoUrl,
-      videoSource: "link",
+      videoUrl: videoUrl || null,
+      videoSource: videoUrl ? "link" : null,
       status: "pending",
       voteCount: 0,
       termsAccepted: true,

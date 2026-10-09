@@ -92,9 +92,12 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error("[innovators/upload]", err);
-    return NextResponse.json(
-      { error: "Could not upload photo to Google Drive. Please try again." },
-      { status: 500 }
-    );
+    const message =
+      err instanceof Error && err.message && !err.message.includes("not configured")
+        ? err.message
+        : "Could not upload photo to Google Drive. Please try a smaller JPG/PNG and try again.";
+    const status =
+      err instanceof Error && err.message.includes("not configured") ? 503 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

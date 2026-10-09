@@ -11,6 +11,7 @@
 
 const ROOT_FOLDER_ID = "1v-V-Q6PFp_qhZO3iw_XUtyDAurG7I8od";
 const DRAWING_SUBFOLDER = "Drawing Competition";
+const INNOVATORS_SUBFOLDER = "Young Innovators";
 const DELETE_SECRET = ""; // e.g. random string — must match GOOGLE_DRIVE_UPLOAD_SECRET on Vercel
 
 function parseBase64Payload(imageOrFile) {
@@ -25,11 +26,18 @@ function parseBase64Payload(imageOrFile) {
   return null;
 }
 
-function getDrawingFolder() {
+function getOrCreateSubfolder(name) {
   const root = DriveApp.getFolderById(ROOT_FOLDER_ID);
-  const existing = root.getFoldersByName(DRAWING_SUBFOLDER);
+  const existing = root.getFoldersByName(name);
   if (existing.hasNext()) return existing.next();
-  return root.createFolder(DRAWING_SUBFOLDER);
+  return root.createFolder(name);
+}
+
+function getUploadFolder(fileName) {
+  if (String(fileName || "").indexOf("innovators-") === 0) {
+    return getOrCreateSubfolder(INNOVATORS_SUBFOLDER);
+  }
+  return getOrCreateSubfolder(DRAWING_SUBFOLDER);
 }
 
 function doPost(e) {
@@ -65,7 +73,7 @@ function doPost(e) {
       fileName
     );
 
-    const folder = getDrawingFolder();
+    const folder = getUploadFolder(fileName);
     const file = folder.createFile(blob);
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 

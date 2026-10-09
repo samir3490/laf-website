@@ -378,7 +378,7 @@ export default function YoungInnovatorsGallery() {
 
           <div className="grid sm:grid-cols-2 gap-5">
             {sortedEntries.map((entry) => {
-              const embed = youtubeEmbedUrl(entry.videoUrl);
+              const embed = entry.videoUrl ? youtubeEmbedUrl(entry.videoUrl) : null;
               const open = expandedId === entry.id;
               const voted = votedIds.has(entry.id);
               return (
@@ -431,11 +431,19 @@ export default function YoungInnovatorsGallery() {
                     </div>
                     {open && (
                       <div className="pt-3 space-y-3 border-t border-laf-border mt-2">
-                        <div className="grid grid-cols-2 gap-2">
+                        <div
+                          className={`grid gap-2 ${entry.photo2Url ? "grid-cols-2" : "grid-cols-1"}`}
+                        >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={entry.photo1Url} alt="" className="rounded-lg object-cover aspect-square" />
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={entry.photo2Url} alt="" className="rounded-lg object-cover aspect-square" />
+                          {entry.photo2Url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={entry.photo2Url}
+                              alt=""
+                              className="rounded-lg object-cover aspect-square"
+                            />
+                          ) : null}
                         </div>
                         {embed ? (
                           <div className="aspect-video rounded-lg overflow-hidden bg-black">
@@ -447,7 +455,7 @@ export default function YoungInnovatorsGallery() {
                               allowFullScreen
                             />
                           </div>
-                        ) : (
+                        ) : entry.videoUrl ? (
                           <a
                             href={entry.videoUrl}
                             target="_blank"
@@ -456,7 +464,7 @@ export default function YoungInnovatorsGallery() {
                           >
                             Watch video (opens in new tab)
                           </a>
-                        )}
+                        ) : null}
                       </div>
                     )}
                   </div>

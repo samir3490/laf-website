@@ -29,7 +29,7 @@ export const EVENT_COMPETITIONS: EventCompetition[] = [
     title: "Young Innovators Challenge 2026",
     subtitle: `${YOUNG_INNOVATORS_DATES.labelShort} · Free · Ages 6–16 · From home`,
     description:
-      "Create something useful with home materials. Verify email, upload 2 photos and a YouTube/Drive video link. Browse the gallery and vote with Google. Digital certificates for valid entries.",
+      "Create something useful with home materials. Verify email, upload a photo (extra photo and video optional). Browse the gallery and vote with Google. Digital certificates for valid entries.",
     dateRange: YOUNG_INNOVATORS_DATES.label,
     image: YOUNG_INNOVATORS_PROMO_IMAGE,
     href: "/events/young-innovators",

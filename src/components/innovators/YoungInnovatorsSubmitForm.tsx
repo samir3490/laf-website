@@ -4,11 +4,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import EventEmailOtp from "@/components/events/EventEmailOtp";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
+import { compressImageForUpload } from "@/lib/compress-image";
 import { YOUNG_INNOVATORS_2026_EVENT_SLUG } from "@/lib/event-submissions";
 import {
-  INNOVATORS_PHOTO_MIME,
   isYoungInnovatorsOpen,
-  MAX_INNOVATORS_PHOTO_BYTES,
   YOUNG_INNOVATORS_AGE,
   YOUNG_INNOVATORS_DATES,
 } from "@/lib/young-innovators";
@@ -16,8 +15,9 @@ import {
 type UploadResult = { url: string; fileId: string };
 
 async function uploadPhotoToDrive(file: File, slot: "photo1" | "photo2"): Promise<UploadResult> {
+  const compressed = await compressImageForUpload(file);
   const formData = new FormData();
-  formData.set("file", file);
+  formData.set("file", compressed);
   formData.set("slot", slot);
 
   const res = await fetch("/api/innovators/upload", {
@@ -71,12 +71,8 @@ export default function YoungInnovatorsSubmitForm() {
       setError("Please verify your email first (Step 1).");
       return;
     }
-    if (!photo1 || !photo2) {
-      setError("Please choose two project photos.");
-      return;
-    }
-    if (!videoLink.trim()) {
-      setError("Please paste a YouTube or Google Drive link to your ~1-minute video.");
+    if (!photo1) {
+      setError("Please choose at least one project photo.");
       return;
     }
     if (!termsAccepted) {
@@ -88,28 +84,17 @@ export default function YoungInnovatorsSubmitForm() {
       return;
     }
 
-    for (const [label, file] of [
-      ["Photo 1", photo1],
-      ["Photo 2", photo2],
-    ] as const) {
-      if (!INNOVATORS_PHOTO_MIME[file.type] && !file.type.startsWith("image/")) {
-        setError(`${label} must be a JPG, PNG, or WebP image.`);
-        return;
-      }
-      if (file.size > MAX_INNOVATORS_PHOTO_BYTES) {
-        setError(`${label} must be under 5 MB. Use a smaller photo from your phone gallery.`);
-        return;
-      }
-    }
-
     setStatus("uploading");
 
     try {
-      setProgress("Uploading photo 1 to LAF Google Drive…");
+      setProgress("Preparing and uploading photo…");
       const uploaded1 = await uploadPhotoToDrive(photo1, "photo1");
 
-      setProgress("Uploading photo 2 to LAF Google Drive…");
-      const uploaded2 = await uploadPhotoToDrive(photo2, "photo2");
+      let uploaded2: UploadResult | null = null;
+      if (photo2) {
+        setProgress("Uploading second photo…");
+        uploaded2 = await uploadPhotoToDrive(photo2, "photo2");
+      }
 
       setStatus("saving");
       setProgress("Saving your entry…");
@@ -129,9 +114,9 @@ export default function YoungInnovatorsSubmitForm() {
           contactEmail: contactEmail.trim(),
           contactPhone: contactPhone.trim(),
           photo1Url: uploaded1.url,
-          photo2Url: uploaded2.url,
+          photo2Url: uploaded2?.url ?? "",
           photo1FileId: uploaded1.fileId,
-          photo2FileId: uploaded2.fileId,
+          photo2FileId: uploaded2?.fileId ?? "",
           videoUrl: videoLink.trim(),
           termsAccepted: true,
           turnstileToken,
@@ -171,8 +156,8 @@ export default function YoungInnovatorsSubmitForm() {
     <form onSubmit={onSubmit} className="relative space-y-6 max-w-2xl">
       <div className="rounded-xl border border-laf-gold/30 bg-laf-cream/50 px-4 py-3 text-sm text-laf-navy space-y-1">
         <p>
-          <strong>Easy steps:</strong> verify email → fill the form → choose 2 photos → paste a
-          YouTube or Google Drive video link → submit.
+          <strong>Easy steps:</strong> verify email → fill the form → add at least one photo →
+          submit. A second photo and video link are optional.
         </p>
         <p className="text-laf-muted">
           No password needed. We only send a one-time code to your email. Projects appear in the
@@ -324,7 +309,8 @@ export default function YoungInnovatorsSubmitForm() {
         <legend className="text-lg font-semibold text-laf-navy">Photos &amp; video</legend>
         <div>
           <label htmlFor="yi-p1" className="block text-sm font-medium text-laf-navy mb-1">
-            Photo 1 of the project * <span className="font-normal text-laf-muted">(max 5 MB)</span>
+            Photo of the project *{" "}
+            <span className="font-normal text-laf-muted">(required — JPG/PNG preferred)</span>
           </label>
           <input
             id="yi-p1"
@@ -338,11 +324,11 @@ export default function YoungInnovatorsSubmitForm() {
         </div>
         <div>
           <label htmlFor="yi-p2" className="block text-sm font-medium text-laf-navy mb-1">
-            Photo 2 of the project * <span className="font-normal text-laf-muted">(max 5 MB)</span>
+            Second photo{" "}
+            <span className="font-normal text-laf-muted">(optional)</span>
           </label>
           <input
             id="yi-p2"
-            required
             type="file"
             accept="image/jpeg,image/png,image/webp,image/*"
             capture="environment"
@@ -353,11 +339,11 @@ export default function YoungInnovatorsSubmitForm() {
 
         <div>
           <label htmlFor="yi-vlink" className="block text-sm font-medium text-laf-navy mb-1">
-            1-minute explanation video link * (YouTube preferred, or Google Drive)
+            Explanation video link{" "}
+            <span className="font-normal text-laf-muted">(optional — YouTube or Google Drive)</span>
           </label>
           <input
             id="yi-vlink"
-            required
             type="url"
             value={videoLink}
             onChange={(e) => setVideoLink(e.target.value)}
@@ -365,8 +351,8 @@ export default function YoungInnovatorsSubmitForm() {
             placeholder="https://youtu.be/… or https://drive.google.com/file/d/…"
           />
           <p className="mt-2 text-xs text-laf-muted leading-relaxed">
-            YouTube (unlisted is fine) works best in the gallery. For Drive: set “Anyone with the
-            link can view.”
+            Optional. YouTube (unlisted is fine) works best in the gallery. For Drive: set “Anyone
+            with the link can view.”
           </p>
         </div>
       </fieldset>
@@ -418,7 +404,7 @@ export default function YoungInnovatorsSubmitForm() {
         disabled={busy || !verifyToken}
         className="w-full sm:w-auto px-8 py-3 rounded-lg bg-laf-gold text-white font-semibold text-sm hover:bg-laf-gold-bright disabled:opacity-60 transition-colors"
       >
-        {busy ? "Submitting…" : "Submit project — free"}
+        {busy ? "Submitting…" : "Submit"}
       </button>
     </form>
   );

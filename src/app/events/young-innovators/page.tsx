@@ -90,8 +90,7 @@ export default function YoungInnovatorsPage() {
             <h3 className="font-semibold text-laf-navy">How to participate</h3>
             <ol className="mt-4 space-y-2 text-sm text-laf-muted list-decimal list-inside leading-relaxed">
               <li>Build the project at home with guidance</li>
-              <li>Take 2 clear photos</li>
-              <li>Record a ~1-minute video (YouTube preferred)</li>
+              <li>Take at least one clear photo (second photo and video are optional)</li>
               <li>
                 <Link href="/events/young-innovators/submit" className="text-laf-gold hover:underline">
                   Verify your email

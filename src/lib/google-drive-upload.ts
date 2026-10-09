@@ -14,6 +14,40 @@ export function getGoogleDriveUploadApiUrl(): string | null {
   );
 }
 
+/**
+ * Google Apps Script web apps often respond with 302. Following that as GET drops the body
+ * and breaks uploads. Re-POST to the Location header when we get a redirect.
+ */
+async function postJsonToAppsScript(
+  uploadUrl: string,
+  payload: Record<string, unknown>
+): Promise<Response> {
+  const body = JSON.stringify(payload);
+  const headers = { "Content-Type": "application/json" };
+
+  const first = await fetch(uploadUrl, {
+    method: "POST",
+    headers,
+    body,
+    redirect: "manual",
+  });
+
+  if (first.status >= 300 && first.status < 400) {
+    const location = first.headers.get("location");
+    if (!location) {
+      throw new Error("Upload service redirected without a destination URL.");
+    }
+    return fetch(location, {
+      method: "POST",
+      headers,
+      body,
+      redirect: "follow",
+    });
+  }
+
+  return first;
+}
+
 export async function uploadBufferToGoogleDrive(
   buffer: Buffer,
   fileName: string,
@@ -26,13 +60,20 @@ export async function uploadBufferToGoogleDrive(
     );
   }
 
+  // Keep payloads under typical Apps Script / proxy limits (~few MB base64).
+  if (buffer.length > 3.5 * 1024 * 1024) {
+    throw new Error(
+      "Photo is too large after processing. Please use a smaller photo (under about 3 MB)."
+    );
+  }
+
   const base64 = buffer.toString("base64");
   const dataUrl = `data:${mimeType};base64,${base64}`;
 
-  const res = await fetch(uploadUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file: dataUrl, fileName, mimeType }),
+  const res = await postJsonToAppsScript(uploadUrl, {
+    file: dataUrl,
+    fileName,
+    mimeType,
   });
 
   const text = await res.text();
@@ -40,7 +81,9 @@ export async function uploadBufferToGoogleDrive(
   try {
     result = JSON.parse(text) as typeof result;
   } catch {
-    throw new Error(`Upload API returned invalid JSON: ${text.slice(0, 200)}`);
+    throw new Error(
+      `Upload service returned an unexpected response (${res.status}). Please try again in a minute.`
+    );
   }
 
   if (!result.success || !result.url || !result.fileId) {
@@ -61,10 +104,10 @@ export async function trashGoogleDriveFile(fileId: string): Promise<boolean> {
   if (!uploadUrl || !secret || !fileId) return false;
 
   try {
-    const res = await fetch(uploadUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", fileId, secret }),
+    const res = await postJsonToAppsScript(uploadUrl, {
+      action: "delete",
+      fileId,
+      secret,
     });
     const data = (await res.json()) as { success?: boolean };
     return Boolean(data.success);

@@ -10,7 +10,7 @@ const HIGHLIGHTS = [
   "Ages 6–16 · free · online from home",
   "Build something useful with home materials",
   "Verify email with a one-time code (no password)",
-  "Upload 2 photos + paste a YouTube/Drive video link",
+  "Upload a photo (second photo & video optional)",
   "Gallery & Google voting · certificates after review",
 ];
 
