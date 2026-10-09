@@ -64,6 +64,8 @@ export default function HomePage() {
         </PageContainer>
       </section>
 
+      <YoungInnovatorsPromo />
+
       <section className="py-20 bg-laf-cream">
         <PageContainer>
           <h2 className="text-3xl md:text-4xl font-bold text-laf-navy text-center">{centers.title}</h2>
@@ -103,8 +105,6 @@ export default function HomePage() {
           </div>
         </PageContainer>
       </section>
-
-      <YoungInnovatorsPromo />
 
       <HomeLatestStories />
 

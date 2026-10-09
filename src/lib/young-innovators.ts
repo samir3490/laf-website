@@ -8,9 +8,9 @@ export const YOUNG_INNOVATORS_PROMO_ALT =
 
 export const YOUNG_INNOVATORS_DATES = {
   start: "2026-10-09",
-  end: "2026-11-30",
-  label: "9 October – 30 November 2026",
-  labelShort: "9 Oct – 30 Nov 2026",
+  end: "2026-12-31",
+  label: "9 October – 31 December 2026",
+  labelShort: "9 Oct – 31 Dec 2026",
 } as const;
 
 export const YOUNG_INNOVATORS_AGE = { min: 6, max: 16 } as const;
