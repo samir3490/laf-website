@@ -9,6 +9,7 @@ import YoungInnovatorsPageTracker from "@/components/innovators/YoungInnovatorsP
 import { pageMetadata } from "@/lib/seo";
 import {
   YOUNG_INNOVATORS_DATES,
+  YOUNG_INNOVATORS_OG_IMAGE,
   YOUNG_INNOVATORS_PROMO_ALT,
   YOUNG_INNOVATORS_PROMO_IMAGE,
 } from "@/lib/young-innovators";
@@ -18,7 +19,7 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Free online innovation challenge for children aged 6–16. Build something useful at home and earn a participation certificate.",
   path: "/events/young-innovators",
-  image: YOUNG_INNOVATORS_PROMO_IMAGE,
+  image: YOUNG_INNOVATORS_OG_IMAGE,
   imageAlt: YOUNG_INNOVATORS_PROMO_ALT,
   imageWidth: 1280,
   imageHeight: 720,

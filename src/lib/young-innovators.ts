@@ -1,6 +1,9 @@
 export const YOUNG_INNOVATORS_PROMO_IMAGE =
   "/images/events/young-innovators-challenge-promo.jpg";
 
+/** Dedicated share-preview URL (new path so Facebook/LinkedIn re-fetch instead of using cached site OG). */
+export const YOUNG_INNOVATORS_OG_IMAGE = "/images/young-innovators-2026-og.jpg";
+
 export const YOUNG_INNOVATORS_PROMO_ALT =
   "Indian children creating science inventions and eco-friendly models at home for the Young Innovators Challenge";
 
