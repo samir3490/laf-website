@@ -1,55 +1,31 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
-import { getFirebaseClientStorage } from "@/lib/firebase";
 import {
   INNOVATORS_PHOTO_MIME,
-  INNOVATORS_VIDEO_MIME,
   isYoungInnovatorsOpen,
   MAX_INNOVATORS_PHOTO_BYTES,
-  MAX_INNOVATORS_VIDEO_BYTES,
   YOUNG_INNOVATORS_AGE,
   YOUNG_INNOVATORS_DATES,
 } from "@/lib/young-innovators";
 
-type VideoMode = "upload" | "link";
+type UploadResult = { url: string; fileId: string };
 
-function newEntryId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID().replace(/-/g, "").slice(0, 24);
-  }
-  return `e${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
-}
+async function uploadPhotoToDrive(file: File, slot: "photo1" | "photo2"): Promise<UploadResult> {
+  const formData = new FormData();
+  formData.set("file", file);
+  formData.set("slot", slot);
 
-async function uploadFile(
-  entryId: string,
-  fileName: string,
-  file: File,
-  onProgress: (pct: number) => void
-): Promise<string> {
-  const storage = getFirebaseClientStorage();
-  if (!storage) throw new Error("Upload is not configured. Please refresh and try again.");
-
-  const path = `innovators/${entryId}/${fileName}`;
-  const storageRef = ref(storage, path);
-  const task = uploadBytesResumable(storageRef, file, { contentType: file.type });
-
-  await new Promise<void>((resolve, reject) => {
-    task.on(
-      "state_changed",
-      (snap) => {
-        if (snap.totalBytes > 0) {
-          onProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100));
-        }
-      },
-      reject,
-      () => resolve()
-    );
+  const res = await fetch("/api/innovators/upload", {
+    method: "POST",
+    body: formData,
   });
-
-  return getDownloadURL(task.snapshot.ref);
+  const data = (await res.json()) as { error?: string; url?: string; fileId?: string };
+  if (!res.ok || !data.url) {
+    throw new Error(data.error || "Photo upload failed.");
+  }
+  return { url: data.url, fileId: data.fileId || "" };
 }
 
 export default function YoungInnovatorsSubmitForm() {
@@ -67,11 +43,9 @@ export default function YoungInnovatorsSubmitForm() {
   const [parentPhone, setParentPhone] = useState("");
   const [photo1, setPhoto1] = useState<File | null>(null);
   const [photo2, setPhoto2] = useState<File | null>(null);
-  const [video, setVideo] = useState<File | null>(null);
-  const [videoMode, setVideoMode] = useState<VideoMode>("upload");
   const [videoLink, setVideoLink] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [website, setWebsite] = useState(""); // honeypot
+  const [website, setWebsite] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [status, setStatus] = useState<"idle" | "uploading" | "saving" | "done" | "error">("idle");
   const [progress, setProgress] = useState("");
@@ -93,12 +67,8 @@ export default function YoungInnovatorsSubmitForm() {
       setError("Please choose two project photos.");
       return;
     }
-    if (videoMode === "upload" && !video) {
-      setError("Please choose a short video (about 1 minute), or switch to a YouTube / Drive link.");
-      return;
-    }
-    if (videoMode === "link" && !videoLink.trim()) {
-      setError("Please paste a YouTube or Google Drive video link.");
+    if (!videoLink.trim()) {
+      setError("Please paste a YouTube or Google Drive link to your ~1-minute video.");
       return;
     }
     if (!termsAccepted) {
@@ -114,55 +84,24 @@ export default function YoungInnovatorsSubmitForm() {
       ["Photo 1", photo1],
       ["Photo 2", photo2],
     ] as const) {
-      if (!INNOVATORS_PHOTO_MIME[file.type]) {
-        setError(`${label} must be JPG, PNG, or WebP.`);
+      if (!INNOVATORS_PHOTO_MIME[file.type] && !file.type.startsWith("image/")) {
+        setError(`${label} must be a JPG, PNG, or WebP image.`);
         return;
       }
       if (file.size > MAX_INNOVATORS_PHOTO_BYTES) {
-        setError(`${label} must be under 8 MB. Try a smaller photo from your phone.`);
+        setError(`${label} must be under 5 MB. Use a smaller photo from your phone gallery.`);
         return;
       }
     }
 
-    if (videoMode === "upload" && video) {
-      if (!INNOVATORS_VIDEO_MIME[video.type]) {
-        setError("Video must be MP4, MOV, or WebM.");
-        return;
-      }
-      if (video.size > MAX_INNOVATORS_VIDEO_BYTES) {
-        setError(
-          "Video must be under 40 MB (about 1 minute). Record a shorter clip, or paste a YouTube / Drive link instead."
-        );
-        return;
-      }
-    }
-
-    const entryId = newEntryId();
     setStatus("uploading");
 
     try {
-      setProgress("Uploading photo 1…");
-      const ext1 = INNOVATORS_PHOTO_MIME[photo1.type];
-      const photo1Url = await uploadFile(entryId, `photo1.${ext1}`, photo1, (p) =>
-        setProgress(`Uploading photo 1… ${p}%`)
-      );
+      setProgress("Uploading photo 1 to LAF Google Drive…");
+      const uploaded1 = await uploadPhotoToDrive(photo1, "photo1");
 
-      setProgress("Uploading photo 2…");
-      const ext2 = INNOVATORS_PHOTO_MIME[photo2.type];
-      const photo2Url = await uploadFile(entryId, `photo2.${ext2}`, photo2, (p) =>
-        setProgress(`Uploading photo 2… ${p}%`)
-      );
-
-      let videoUrl = videoLink.trim();
-      let videoSource: VideoMode = "link";
-      if (videoMode === "upload" && video) {
-        setProgress("Uploading video… this may take a minute on mobile data");
-        const vext = INNOVATORS_VIDEO_MIME[video.type];
-        videoUrl = await uploadFile(entryId, `video.${vext}`, video, (p) =>
-          setProgress(`Uploading video… ${p}%`)
-        );
-        videoSource = "upload";
-      }
+      setProgress("Uploading photo 2 to LAF Google Drive…");
+      const uploaded2 = await uploadPhotoToDrive(photo2, "photo2");
 
       setStatus("saving");
       setProgress("Saving your entry…");
@@ -180,11 +119,11 @@ export default function YoungInnovatorsSubmitForm() {
           parentName: parentName.trim(),
           parentEmail: parentEmail.trim(),
           parentPhone: parentPhone.trim(),
-          photo1Url,
-          photo2Url,
-          videoUrl,
-          videoSource,
-          storageEntryId: entryId,
+          photo1Url: uploaded1.url,
+          photo2Url: uploaded2.url,
+          photo1FileId: uploaded1.fileId,
+          photo2FileId: uploaded2.fileId,
+          videoUrl: videoLink.trim(),
           termsAccepted: true,
           turnstileToken,
           website,
@@ -237,9 +176,15 @@ export default function YoungInnovatorsSubmitForm() {
 
   return (
     <form onSubmit={onSubmit} className="relative space-y-6 max-w-2xl">
-      <div className="rounded-xl border border-laf-gold/30 bg-laf-cream/50 px-4 py-3 text-sm text-laf-navy">
-        <strong>Easy steps:</strong> fill the form → choose 2 photos → add a 1-minute video (or
-        YouTube/Drive link) → submit. No account or email code required.
+      <div className="rounded-xl border border-laf-gold/30 bg-laf-cream/50 px-4 py-3 text-sm text-laf-navy space-y-1">
+        <p>
+          <strong>Easy steps:</strong> fill the form → choose 2 photos → paste a YouTube or Google
+          Drive video link → submit.
+        </p>
+        <p className="text-laf-muted">
+          No account or email code needed. Photos are saved to LAF&apos;s Google Drive (same as our
+          other events).
+        </p>
       </div>
 
       <fieldset className="space-y-4" disabled={busy}>
@@ -391,7 +336,7 @@ export default function YoungInnovatorsSubmitForm() {
         <legend className="text-lg font-semibold text-laf-navy">Photos &amp; video</legend>
         <div>
           <label htmlFor="yi-p1" className="block text-sm font-medium text-laf-navy mb-1">
-            Photo 1 of the project * <span className="font-normal text-laf-muted">(max 8 MB)</span>
+            Photo 1 of the project * <span className="font-normal text-laf-muted">(max 5 MB)</span>
           </label>
           <input
             id="yi-p1"
@@ -405,7 +350,7 @@ export default function YoungInnovatorsSubmitForm() {
         </div>
         <div>
           <label htmlFor="yi-p2" className="block text-sm font-medium text-laf-navy mb-1">
-            Photo 2 of the project * <span className="font-normal text-laf-muted">(max 8 MB)</span>
+            Photo 2 of the project * <span className="font-normal text-laf-muted">(max 5 MB)</span>
           </label>
           <input
             id="yi-p2"
@@ -418,68 +363,27 @@ export default function YoungInnovatorsSubmitForm() {
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setVideoMode("upload")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
-              videoMode === "upload"
-                ? "bg-laf-navy text-white border-laf-navy"
-                : "bg-white text-laf-navy border-laf-border"
-            }`}
-          >
-            Upload video file
-          </button>
-          <button
-            type="button"
-            onClick={() => setVideoMode("link")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
-              videoMode === "link"
-                ? "bg-laf-navy text-white border-laf-navy"
-                : "bg-white text-laf-navy border-laf-border"
-            }`}
-          >
-            Paste YouTube / Drive link
-          </button>
+        <div>
+          <label htmlFor="yi-vlink" className="block text-sm font-medium text-laf-navy mb-1">
+            1-minute explanation video link * (YouTube or Google Drive)
+          </label>
+          <input
+            id="yi-vlink"
+            required
+            type="url"
+            value={videoLink}
+            onChange={(e) => setVideoLink(e.target.value)}
+            className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
+            placeholder="https://youtu.be/… or https://drive.google.com/file/d/…"
+          />
+          <p className="mt-2 text-xs text-laf-muted leading-relaxed">
+            Easiest on a phone: record ~1 minute in your camera app → upload to{" "}
+            <strong>Google Drive</strong> or <strong>YouTube</strong> (unlisted is fine) → copy the
+            share link here. Make sure “Anyone with the link” can view Drive files.
+          </p>
         </div>
-
-        {videoMode === "upload" ? (
-          <div>
-            <label htmlFor="yi-video" className="block text-sm font-medium text-laf-navy mb-1">
-              1-minute explanation video *{" "}
-              <span className="font-normal text-laf-muted">(MP4/MOV, max 40 MB)</span>
-            </label>
-            <input
-              id="yi-video"
-              type="file"
-              accept="video/mp4,video/quicktime,video/webm,video/*"
-              capture="environment"
-              onChange={(e) => setVideo(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm"
-            />
-            <p className="mt-1 text-xs text-laf-muted">
-              Tip: record in your phone&apos;s camera app, keep it under ~1 minute, then pick the file
-              here. If upload is slow, use a YouTube or Drive link instead.
-            </p>
-          </div>
-        ) : (
-          <div>
-            <label htmlFor="yi-vlink" className="block text-sm font-medium text-laf-navy mb-1">
-              Video link * (YouTube or Google Drive)
-            </label>
-            <input
-              id="yi-vlink"
-              type="url"
-              value={videoLink}
-              onChange={(e) => setVideoLink(e.target.value)}
-              className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
-              placeholder="https://youtu.be/… or https://drive.google.com/…"
-            />
-          </div>
-        )}
       </fieldset>
 
-      {/* Honeypot */}
       <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden>
         <label htmlFor="yi-website">Website</label>
         <input

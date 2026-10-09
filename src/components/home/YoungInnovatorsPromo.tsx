@@ -9,7 +9,7 @@ import {
 const HIGHLIGHTS = [
   "Ages 6–16 · free · online from home",
   "Build something useful with home materials",
-  "Upload 2 photos + a 1-minute video",
+  "Upload 2 photos + paste a YouTube/Drive video link",
   "No signup code — simple form for parents",
   "Digital certificates for valid entries",
 ];

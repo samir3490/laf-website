@@ -20,8 +20,9 @@ export default function YoungInnovatorsSubmitPage() {
       <PageContainer className="py-12 lg:py-16">
         <EventBackLink href="/events/young-innovators" label="Back to Young Innovators Challenge" />
         <p className="mt-4 mb-8 text-laf-muted max-w-2xl leading-relaxed">
-          Young Innovators Challenge 2026 ({YOUNG_INNOVATORS_DATES.label}). Upload two photos and a
-          short video explaining your invention. We email digital certificates after review.
+          Young Innovators Challenge 2026 ({YOUNG_INNOVATORS_DATES.label}). Upload two photos (saved
+          to LAF Google Drive) and paste a YouTube or Drive link to your short explanation video. We
+          email digital certificates after review.
         </p>
         <YoungInnovatorsSubmitForm />
       </PageContainer>

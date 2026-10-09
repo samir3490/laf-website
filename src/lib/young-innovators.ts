@@ -15,19 +15,13 @@ export const YOUNG_INNOVATORS_DATES = {
 
 export const YOUNG_INNOVATORS_AGE = { min: 6, max: 16 } as const;
 
-export const MAX_INNOVATORS_PHOTO_BYTES = 8 * 1024 * 1024; // 8 MB
-export const MAX_INNOVATORS_VIDEO_BYTES = 40 * 1024 * 1024; // 40 MB (~1 min phone video)
+/** Keep under Vercel serverless body limits; same ballpark as drawing competition. */
+export const MAX_INNOVATORS_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export const INNOVATORS_PHOTO_MIME: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
-};
-
-export const INNOVATORS_VIDEO_MIME: Record<string, string> = {
-  "video/mp4": "mp4",
-  "video/quicktime": "mov",
-  "video/webm": "webm",
 };
 
 export function isYoungInnovatorsOpen(now = new Date()): boolean {
@@ -53,12 +47,18 @@ export function normalizeIndiaPhone(raw: string): string | null {
   return null;
 }
 
-export function isOurStorageUrl(url: string): boolean {
+/** Photos uploaded via our Drive Apps Script, or shared Drive/YouTube links for video. */
+export function isAllowedDriveOrVideoUrl(url: string): boolean {
   try {
     const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
     return (
-      u.hostname.includes("firebasestorage.googleapis.com") ||
-      u.hostname.includes("storage.googleapis.com")
+      host === "drive.google.com" ||
+      host === "docs.google.com" ||
+      host.endsWith("googleusercontent.com") ||
+      host === "youtube.com" ||
+      host === "youtu.be" ||
+      host === "m.youtube.com"
     );
   } catch {
     return false;
@@ -66,17 +66,5 @@ export function isOurStorageUrl(url: string): boolean {
 }
 
 export function isAllowedVideoLink(url: string): boolean {
-  try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, "");
-    return (
-      host === "youtube.com" ||
-      host === "youtu.be" ||
-      host === "m.youtube.com" ||
-      host === "drive.google.com" ||
-      host === "docs.google.com"
-    );
-  } catch {
-    return false;
-  }
+  return isAllowedDriveOrVideoUrl(url);
 }

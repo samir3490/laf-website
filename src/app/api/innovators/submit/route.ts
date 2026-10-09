@@ -7,8 +7,8 @@ import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
 import {
   INNOVATORS_ENTRIES_COLLECTION,
+  isAllowedDriveOrVideoUrl,
   isAllowedVideoLink,
-  isOurStorageUrl,
   isValidInnovatorsEmail,
   isYoungInnovatorsOpen,
   normalizeIndiaPhone,
@@ -82,8 +82,8 @@ export async function POST(req: Request) {
     const photo1Url = String(body.photo1Url ?? "").trim();
     const photo2Url = String(body.photo2Url ?? "").trim();
     const videoUrl = String(body.videoUrl ?? "").trim();
-    const videoSource = String(body.videoSource ?? "upload").trim();
-    const storageEntryId = String(body.storageEntryId ?? "").trim();
+    const photo1FileId = String(body.photo1FileId ?? "").trim();
+    const photo2FileId = String(body.photo2FileId ?? "").trim();
     const termsAccepted = body.termsAccepted === true;
 
     if (!title || title.length > 120) {
@@ -143,28 +143,26 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!photo1Url || !isOurStorageUrl(photo1Url) || !photo2Url || !isOurStorageUrl(photo2Url)) {
+    if (
+      !photo1Url ||
+      !isAllowedDriveOrVideoUrl(photo1Url) ||
+      !photo2Url ||
+      !isAllowedDriveOrVideoUrl(photo2Url)
+    ) {
       return NextResponse.json(
         { error: "Please upload two clear project photos." },
         { status: 400 }
       );
     }
 
-    const videoOk =
-      (videoSource === "upload" && isOurStorageUrl(videoUrl)) ||
-      (videoSource === "link" && isAllowedVideoLink(videoUrl));
-    if (!videoUrl || !videoOk) {
+    if (!videoUrl || !isAllowedVideoLink(videoUrl)) {
       return NextResponse.json(
         {
           error:
-            "Please upload a short video (about 1 minute) or paste a YouTube / Google Drive link.",
+            "Please paste a YouTube or Google Drive link to your ~1-minute explanation video.",
         },
         { status: 400 }
       );
-    }
-
-    if (!storageEntryId || !/^[a-zA-Z0-9_-]{8,64}$/.test(storageEntryId)) {
-      return NextResponse.json({ error: "Upload session expired. Please try again." }, { status: 400 });
     }
 
     const adminDb = getFirebaseAdminDb();
@@ -188,9 +186,10 @@ export async function POST(req: Request) {
       parentPhone,
       photo1Url,
       photo2Url,
+      photo1FileId: photo1FileId || null,
+      photo2FileId: photo2FileId || null,
       videoUrl,
-      videoSource: videoSource === "link" ? "link" : "upload",
-      storageEntryId,
+      videoSource: "link",
       status: "pending",
       termsAccepted: true,
       submitterIpHash: ipHash(ip),

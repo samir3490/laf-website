@@ -91,12 +91,12 @@ export default function YoungInnovatorsPage() {
             <ol className="mt-4 space-y-2 text-sm text-laf-muted list-decimal list-inside leading-relaxed">
               <li>Build the project at home with a parent</li>
               <li>Take 2 clear photos</li>
-              <li>Record a ~1-minute explanation video</li>
+              <li>Record a ~1-minute video and upload it to YouTube or Google Drive</li>
               <li>
                 <Link href="/events/young-innovators/submit" className="text-laf-gold hover:underline">
                   Submit on this website
                 </Link>{" "}
-                — no account or email code needed
+                — paste the video link; no account or email code needed
               </li>
             </ol>
           </div>
