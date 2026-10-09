@@ -72,6 +72,8 @@ const nextConfig: NextConfig = {
       { source: "/author/:path*", destination: "/blog", permanent: true },
       { source: "/drawing-competition", destination: "/events/drawing-competition", permanent: true },
       { source: "/drawing-competition/submit", destination: "/events/drawing-competition/submit", permanent: true },
+      { source: "/young-innovators", destination: "/events/young-innovators", permanent: true },
+      { source: "/young-innovators/submit", destination: "/events/young-innovators/submit", permanent: true },
       { source: "/community-scratch-games", destination: "/events/scratch-games", permanent: true },
     ];
     return redirects;

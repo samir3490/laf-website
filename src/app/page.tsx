@@ -5,6 +5,7 @@ import { getSite } from "@/lib/content";
 import Button from "@/components/Button";
 import PageContainer from "@/components/PageContainer";
 import HomeLatestStories from "@/components/home/HomeLatestStories";
+import YoungInnovatorsPromo from "@/components/home/YoungInnovatorsPromo";
 import FacebookPagePlugin from "@/components/FacebookPagePlugin";
 import JsonLd from "@/components/JsonLd";
 import { pageMetadata, websiteJsonLd } from "@/lib/seo";
@@ -102,6 +103,8 @@ export default function HomePage() {
           </div>
         </PageContainer>
       </section>
+
+      <YoungInnovatorsPromo />
 
       <HomeLatestStories />
 

@@ -5,6 +5,10 @@ import {
   DRAWING_COMPETITION_PROMO_IMAGE,
   DRAWING_COMPETITION_THEME,
 } from "@/lib/drawing-competition-promo";
+import {
+  YOUNG_INNOVATORS_DATES,
+  YOUNG_INNOVATORS_PROMO_IMAGE,
+} from "@/lib/young-innovators";
 
 export type EventCompetition = {
   id: string;
@@ -19,6 +23,18 @@ export type EventCompetition = {
 };
 
 export const EVENT_COMPETITIONS: EventCompetition[] = [
+  {
+    id: "young-innovators",
+    title: "Young Innovators Challenge 2026",
+    subtitle: `${YOUNG_INNOVATORS_DATES.labelShort} · Free · Ages 6–16 · From home`,
+    description:
+      "Create something useful with home materials — bird feeders, water filters, cardboard inventions, science experiments, eco-friendly house models. Upload 2 photos and a 1-minute video. Digital certificates for valid entries.",
+    dateRange: YOUNG_INNOVATORS_DATES.label,
+    image: YOUNG_INNOVATORS_PROMO_IMAGE,
+    href: "/events/young-innovators",
+    submitHref: "/events/young-innovators/submit",
+    cta: "View challenge",
+  },
   {
     id: "drawing",
     title: "Drawing Competition",

@@ -1,6 +1,7 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 export type FirebaseConfig = {
   apiKey: string;
@@ -30,6 +31,7 @@ export function getFirebaseConfig(): FirebaseConfig | null {
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
 export function getFirebaseApp(): FirebaseApp | null {
   const config = getFirebaseConfig();
@@ -52,6 +54,13 @@ export function getFirebaseDb(): Firestore | null {
   if (!firebaseApp) return null;
   if (!db) db = getFirestore(firebaseApp);
   return db;
+}
+
+export function getFirebaseClientStorage(): FirebaseStorage | null {
+  const firebaseApp = getFirebaseApp();
+  if (!firebaseApp) return null;
+  if (!storage) storage = getStorage(firebaseApp);
+  return storage;
 }
 
 export const SCRATCH_GAMES_COLLECTION = "scratchGames";

@@ -18,6 +18,7 @@ const RESERVED = new Set([
   "how-we-help",
   "events",
   "drawing-competition",
+  "young-innovators",
   "community-scratch-games",
   "privacy-policy",
   "terms-conditions",

@@ -1,12 +1,20 @@
 import Link from "next/link";
 
-export default function EventBackLink() {
+type EventBackLinkProps = {
+  href?: string;
+  label?: string;
+};
+
+export default function EventBackLink({
+  href = "/events",
+  label = "← All events",
+}: EventBackLinkProps) {
   return (
     <Link
-      href="/events"
+      href={href}
       className="inline-flex items-center gap-1 text-sm font-medium text-laf-gold hover:underline mb-6"
     >
-      ← All events
+      {label.startsWith("←") ? label : `← ${label}`}
     </Link>
   );
 }

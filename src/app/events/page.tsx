@@ -3,12 +3,12 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventsHub from "@/components/events/EventsHub";
 import { pageMetadata } from "@/lib/seo";
-import { DRAWING_COMPETITION_DATES } from "@/lib/drawing-competition-promo";
+import { YOUNG_INNOVATORS_DATES } from "@/lib/young-innovators";
 
 export const metadata: Metadata = pageMetadata({
   title: "Events & Competitions",
   description:
-    `Join LAF events — Drawing Competition (${DRAWING_COMPETITION_DATES.label}), Scratch games, and more for children across India.`,
+    `Join LAF events — Young Innovators Challenge (${YOUNG_INNOVATORS_DATES.labelShort}), Drawing Competition, Scratch games, and more for children across India.`,
   path: "/events",
 });
 

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { EVENT_COMPETITIONS } from "@/lib/events";
 import { DRAWING_COMPETITION_PROMO_ALT } from "@/lib/drawing-competition-promo";
+import { YOUNG_INNOVATORS_PROMO_ALT } from "@/lib/young-innovators";
 
 export default function EventsHub() {
   return (
@@ -21,7 +22,11 @@ export default function EventsHub() {
               <Link href={event.href} className="group block relative aspect-[16/10] w-full shrink-0">
                 <Image
                   src={event.image}
-                  alt={DRAWING_COMPETITION_PROMO_ALT}
+                  alt={
+                    event.id === "young-innovators"
+                      ? YOUNG_INNOVATORS_PROMO_ALT
+                      : DRAWING_COMPETITION_PROMO_ALT
+                  }
                   fill
                   quality={85}
                   className="object-cover object-center group-hover:scale-[1.02] transition-transform duration-300"
