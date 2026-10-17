@@ -12,7 +12,7 @@
 ## How to use this document
 
 - Check off items: `- [ ]` → `- [x]`
-- **Interactive checklist:** open [laf-seo-checklist.canvas.tsx](/Users/samir/.cursor/projects/c-Users-samir-OneDrive-Documents-Cursor-AI/canvases/laf-seo-checklist.canvas.tsx) beside this chat (checkboxes persist in the canvas panel).
+- **Interactive checklist:** open [laf-seo-checklist.canvas.tsx](/Users/samir/.cursor/projects/c-Users-samir-OneDrive-Documents-Cursor-AI/canvases/laf-seo-checklist.canvas.tsx) beside this chat (click remaining items to mark done; state persists).
 - **Priority:** P0 = do first, P1 = high impact, P2 = ongoing, P3 = nice to have
 
 ---
