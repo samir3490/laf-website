@@ -2,8 +2,10 @@
 
 **Site:** https://www.agrawalfoundation.org  
 **Platform:** Next.js on Vercel  
-**Last updated:** June 2026  
-**Goal:** Grow organic traffic for children's education NGO keywords (Wardha, Maharashtra, India): donate, volunteer, learning library, drawing competition, CSR.
+**Last updated:** October 2026  
+**Goal:** Grow organic traffic for children's education NGO keywords (Wardha, Maharashtra, India): donate, volunteer, learning library, Young Innovators, drawing competition, CSR.
+
+**Live audit (Oct 2026):** see canvas [laf-seo-audit.canvas.tsx](/Users/samir/.cursor/projects/c-Users-samir-OneDrive-Documents-Cursor-AI/canvases/laf-seo-audit.canvas.tsx) — technical base is solid; next wins are Event schema, Google recrawl of `/events`, Drawing OG image, CWV, and real Wardha content.
 
 ---
 
@@ -38,7 +40,7 @@
 | NGO / donate | donate to children education India, NGO Wardha | `/donate`, `/about`, `/csr` |
 | Volunteer | volunteer NGO Maharashtra, teach children Wardha | `/volunteer`, `/ways-to-help` |
 | Education | free learning resources India, student library | `/library` |
-| Events | drawing competition children India | `/events/drawing-competition` |
+| Events | young innovators challenge, drawing competition children India | `/events/young-innovators`, `/events/drawing-competition` |
 | Local | Lata Agrawal Foundation, NGO Sewashram Wardha | `/about`, `/contact`, blog impact stories |
 
 ---
@@ -62,7 +64,13 @@
 - [x] **P0** `WebSite` JSON-LD (home)
 - [x] **P1** `Article` JSON-LD on blog posts (with image + publisher logo)
 - [x] **P1** `FAQPage`, `ContactPage`, `LearningResource`, `BreadcrumbList`
-- [ ] **P2** `Event` schema for drawing competition dates
+- [x] **P0** `Event` schema for Young Innovators Challenge 2026
+- [x] **P2** `Event` schema for drawing competition dates
+- [x] **P1** Young Innovators Open Graph / Twitter share image
+- [x] **P1** Drawing competition dedicated OG image
+- [x] **P2** Admin page absolute titles (no duplicate site name)
+- [x] **P2** Events hub footer copy (no “more competitions coming” under live events)
+- [ ] **P0** Request Google re-index of `/events` and `/events/young-innovators` (Search still shows stale Drawing-only snippets)
 
 ### Performance
 

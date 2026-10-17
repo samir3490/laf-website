@@ -4,7 +4,7 @@ import PageContainer from "@/components/PageContainer";
 import AdminDrawingApp from "@/components/drawing/AdminDrawingApp";
 
 export const metadata: Metadata = {
-  title: "Drawing Competition Admin | Lata Agrawal Foundation",
+  title: { absolute: "Drawing Competition Admin" },
   robots: { index: false, follow: false },
 };
 

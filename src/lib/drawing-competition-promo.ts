@@ -2,6 +2,9 @@
 
 export const DRAWING_COMPETITION_PROMO_IMAGE = "/images/events/drawing-competition-promo.png";
 
+/** Dedicated share-preview URL so Facebook/LinkedIn do not reuse the site-wide OG image. */
+export const DRAWING_COMPETITION_OG_IMAGE = "/images/drawing-competition-2026-og.png";
+
 export const DRAWING_COMPETITION_PROMO_ALT =
   "Children's drawing competition — upload your artwork with crayons, paints, and colorful sketches";
 

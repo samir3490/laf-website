@@ -85,7 +85,8 @@ export default function EventsHub() {
       </div>
 
       <p className="text-xs text-laf-muted">
-        More competitions will be added here. Check back soon or follow us on social media for updates.
+        Start with Young Innovators or the Drawing Competition above — follow LAF on social media for
+        new events.
       </p>
     </div>
   );

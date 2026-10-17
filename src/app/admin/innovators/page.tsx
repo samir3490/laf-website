@@ -4,7 +4,7 @@ import PageContainer from "@/components/PageContainer";
 import AdminInnovatorsApp from "@/components/innovators/AdminInnovatorsApp";
 
 export const metadata: Metadata = {
-  title: "Young Innovators Admin | Lata Agrawal Foundation",
+  title: { absolute: "Young Innovators Admin" },
   robots: { index: false, follow: false },
 };
 

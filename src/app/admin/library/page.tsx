@@ -4,7 +4,7 @@ import PageContainer from "@/components/PageContainer";
 import AdminLibraryApp from "@/components/library/AdminLibraryApp";
 
 export const metadata: Metadata = {
-  title: "Library Admin | Lata Agrawal Foundation",
+  title: { absolute: "Library Admin" },
   robots: { index: false, follow: false },
 };
 

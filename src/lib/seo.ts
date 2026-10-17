@@ -236,3 +236,60 @@ export function contactPageJsonLd() {
     },
   };
 }
+
+/** Online free competition / workshop for Google Event rich results. */
+export function eventJsonLd(event: {
+  name: string;
+  description: string;
+  path: string;
+  startDate: string;
+  endDate: string;
+  image?: string;
+  imageAlt?: string;
+}) {
+  const site = getSite();
+  const url = siteUrl(event.path);
+  const end = new Date(event.endDate);
+  const now = new Date();
+  const status =
+    Number.isFinite(end.getTime()) && end < now
+      ? "https://schema.org/EventCompleted"
+      : "https://schema.org/EventScheduled";
+  const image = event.image
+    ? event.image.startsWith("http")
+      ? event.image
+      : siteUrl(event.image)
+    : siteUrl("/opengraph-image");
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.name,
+    description: event.description.slice(0, 300),
+    startDate: event.startDate,
+    endDate: event.endDate,
+    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+    eventStatus: status,
+    isAccessibleForFree: true,
+    inLanguage: "en-IN",
+    url,
+    image: [image],
+    location: {
+      "@type": "VirtualLocation",
+      url,
+    },
+    organizer: {
+      "@type": "NGO",
+      name: site.name,
+      url: site.url,
+    },
+    offers: {
+      "@type": "Offer",
+      price: 0,
+      priceCurrency: "INR",
+      availability: "https://schema.org/InStock",
+      url,
+      validFrom: event.startDate,
+    },
+  };
+}

@@ -5,8 +5,9 @@ import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 import EventBackLink from "@/components/events/EventBackLink";
 import Button from "@/components/Button";
+import JsonLd from "@/components/JsonLd";
 import YoungInnovatorsPageTracker from "@/components/innovators/YoungInnovatorsPageTracker";
-import { pageMetadata } from "@/lib/seo";
+import { eventJsonLd, pageMetadata } from "@/lib/seo";
 import {
   YOUNG_INNOVATORS_DATES,
   YOUNG_INNOVATORS_OG_IMAGE,
@@ -14,10 +15,12 @@ import {
   YOUNG_INNOVATORS_PROMO_IMAGE,
 } from "@/lib/young-innovators";
 
+const YOUNG_INNOVATORS_DESCRIPTION =
+  "Free online innovation challenge for children aged 6–16. Build something useful at home and earn a participation certificate.";
+
 export const metadata: Metadata = pageMetadata({
   title: "Young Innovators Challenge 2026 | Free Online Competition",
-  description:
-    "Free online innovation challenge for children aged 6–16. Build something useful at home and earn a participation certificate.",
+  description: YOUNG_INNOVATORS_DESCRIPTION,
   path: "/events/young-innovators",
   image: YOUNG_INNOVATORS_OG_IMAGE,
   imageAlt: YOUNG_INNOVATORS_PROMO_ALT,
@@ -36,6 +39,16 @@ const EXAMPLES = [
 export default function YoungInnovatorsPage() {
   return (
     <>
+      <JsonLd
+        data={eventJsonLd({
+          name: "Young Innovators Challenge 2026",
+          description: YOUNG_INNOVATORS_DESCRIPTION,
+          path: "/events/young-innovators",
+          startDate: `${YOUNG_INNOVATORS_DATES.start}T00:00:00+05:30`,
+          endDate: `${YOUNG_INNOVATORS_DATES.end}T23:59:59+05:30`,
+          image: YOUNG_INNOVATORS_OG_IMAGE,
+        })}
+      />
       <YoungInnovatorsPageTracker page="home" />
       <PageHeader title="Young Innovators Challenge 2026" />
       <PageContainer className="py-12 lg:py-16 space-y-12">
