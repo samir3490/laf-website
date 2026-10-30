@@ -13,12 +13,12 @@ import { getFirebaseAdminDb } from "@/lib/firebase-admin";
 import { notifyAdminOfInnovatorsSubmission } from "@/lib/innovators-notify";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isTurnstileEnabled, requireTurnstileInProduction, verifyTurnstileToken } from "@/lib/turnstile";
+import { normalizeInternationalMobile } from "@/lib/phone-e164";
 import {
   isAllowedDriveOrVideoUrl,
   isAllowedVideoLink,
   isValidInnovatorsEmail,
   isYoungInnovatorsOpen,
-  normalizeIndiaPhone,
   YOUNG_INNOVATORS_AGE,
 } from "@/lib/young-innovators";
 
@@ -138,10 +138,11 @@ export async function POST(req: Request) {
     if (!contactName || contactName.length > 80) {
       return NextResponse.json({ error: "Please enter your name." }, { status: 400 });
     }
-    const contactPhone = normalizeIndiaPhone(contactPhoneRaw);
+    const phoneCountry = String(body.phoneCountry ?? "IN").trim();
+    const contactPhone = normalizeInternationalMobile(contactPhoneRaw, phoneCountry);
     if (!contactPhone) {
       return NextResponse.json(
-        { error: "Please enter a valid 10-digit Indian mobile number." },
+        { error: "Please enter a valid mobile number for the country you selected." },
         { status: 400 }
       );
     }

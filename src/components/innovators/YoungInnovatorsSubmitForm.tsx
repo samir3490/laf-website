@@ -5,15 +5,21 @@ import { useRouter } from "next/navigation";
 import EventAnalytics, { trackEventAnalytics } from "@/components/events/EventAnalytics";
 import EventEmailOtp from "@/components/events/EventEmailOtp";
 import EventFilePicker from "@/components/events/EventFilePicker";
+import InternationalPhoneField from "@/components/events/InternationalPhoneField";
 import TurnstileWidget from "@/components/library/TurnstileWidget";
 import { compressImageForUpload } from "@/lib/compress-image";
 import { getStoredEventAttribution } from "@/lib/event-attribution";
 import { YOUNG_INNOVATORS_2026_EVENT_SLUG } from "@/lib/event-submissions";
 import {
+  DEFAULT_PHONE_COUNTRY,
+  normalizeInternationalMobile,
+} from "@/lib/phone-e164";
+import {
   isYoungInnovatorsOpen,
   YOUNG_INNOVATORS_AGE,
   YOUNG_INNOVATORS_DATES,
 } from "@/lib/young-innovators";
+import type { CountryCode } from "libphonenumber-js";
 
 type UploadResult = { url: string; fileId: string };
 
@@ -48,6 +54,7 @@ export default function YoungInnovatorsSubmitForm() {
   const [childSchool, setChildSchool] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [phoneCountry, setPhoneCountry] = useState<CountryCode>(DEFAULT_PHONE_COUNTRY);
   const [contactPhone, setContactPhone] = useState("");
   const [photo1, setPhoto1] = useState<File | null>(null);
   const [photo2, setPhoto2] = useState<File | null>(null);
@@ -86,6 +93,10 @@ export default function YoungInnovatorsSubmitForm() {
       setError("Please complete the captcha.");
       return;
     }
+    if (!normalizeInternationalMobile(contactPhone.trim(), phoneCountry)) {
+      setError("Please enter a valid mobile number for the country you selected.");
+      return;
+    }
 
     setStatus("uploading");
 
@@ -117,6 +128,7 @@ export default function YoungInnovatorsSubmitForm() {
           contactName: contactName.trim(),
           contactEmail: contactEmail.trim(),
           contactPhone: contactPhone.trim(),
+          phoneCountry,
           photo1Url: uploaded1.url,
           photo2Url: uploaded2?.url ?? "",
           photo1FileId: uploaded1.fileId,
@@ -302,22 +314,14 @@ export default function YoungInnovatorsSubmitForm() {
             className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
           />
         </div>
-        <div>
-          <label htmlFor="yi-phone" className="block text-sm font-medium text-laf-navy mb-1">
-            Mobile (WhatsApp) *
-          </label>
-          <input
-            id="yi-phone"
-            required
-            type="tel"
-            inputMode="numeric"
-            autoComplete="tel"
-            placeholder="10-digit number"
-            value={contactPhone}
-            onChange={(e) => setContactPhone(e.target.value)}
-            className="w-full rounded-lg border border-laf-border px-3 py-2.5 text-sm"
-          />
-        </div>
+        <InternationalPhoneField
+          id="yi-phone"
+          country={phoneCountry}
+          nationalNumber={contactPhone}
+          disabled={busy || !verifyToken}
+          onCountryChange={setPhoneCountry}
+          onNumberChange={setContactPhone}
+        />
       </fieldset>
 
       <fieldset className="space-y-4" disabled={busy || !verifyToken}>
