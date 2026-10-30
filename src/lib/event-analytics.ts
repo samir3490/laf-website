@@ -22,6 +22,7 @@ export type EventAnalyticsEvent = {
   utmMedium?: string;
   utmCampaign?: string;
   entryId?: string;
+  reason?: string;
   createdAt?: string;
 };
 
@@ -33,6 +34,7 @@ export type EventAnalyticsSummary = {
     otpVerified: number;
     submitSuccess: number;
     submitFailed: number;
+    failedByReason: Record<string, number>;
   };
   submissionsBySource: Record<EventTrafficSource, number>;
   conversionRate: number;
@@ -62,7 +64,13 @@ export function aggregateEventAnalytics(
 ): EventAnalyticsSummary {
   const pageViews = { home: 0, gallery: 0, submit: 0, total: 0 };
   const bySource = emptyBySource();
-  const funnel = { otpSent: 0, otpVerified: 0, submitSuccess: 0, submitFailed: 0 };
+  const funnel = {
+    otpSent: 0,
+    otpVerified: 0,
+    submitSuccess: 0,
+    submitFailed: 0,
+    failedByReason: {} as Record<string, number>,
+  };
   const submissionsBySource = emptyBySource();
   const dailyMap = new Map<string, { visits: number; submissions: number }>();
 
@@ -84,7 +92,11 @@ export function aggregateEventAnalytics(
       funnel.submitSuccess++;
       daily.submissions++;
     }
-    if (event.type === "submit_failed") funnel.submitFailed++;
+    if (event.type === "submit_failed") {
+      funnel.submitFailed++;
+      const reason = event.reason?.trim() || "unknown";
+      funnel.failedByReason[reason] = (funnel.failedByReason[reason] ?? 0) + 1;
+    }
 
     dailyMap.set(day, daily);
   }
@@ -154,6 +166,7 @@ export function normalizeEventAnalyticsEvent(
     utmMedium: typeof data.utmMedium === "string" ? data.utmMedium : undefined,
     utmCampaign: typeof data.utmCampaign === "string" ? data.utmCampaign : undefined,
     entryId: typeof data.entryId === "string" ? data.entryId : undefined,
+    reason: typeof data.reason === "string" ? data.reason.slice(0, 40) : undefined,
     createdAt,
   };
 }

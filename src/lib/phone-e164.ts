@@ -7,38 +7,11 @@ import {
 
 export const DEFAULT_PHONE_COUNTRY: CountryCode = "IN";
 
-const PINNED_COUNTRIES: CountryCode[] = [
-  "IN",
-  "MY",
-  "AE",
-  "SG",
-  "US",
-  "GB",
-  "CA",
-  "AU",
-  "NP",
-  "BD",
-  "LK",
-  "SA",
-  "QA",
-  "ID",
-  "TH",
-  "PH",
-];
-
 export type PhoneCountryOption = {
   iso2: CountryCode;
   dial: string;
   label: string;
 };
-
-function countryName(iso2: CountryCode): string {
-  try {
-    return new Intl.DisplayNames(["en"], { type: "region" }).of(iso2) ?? iso2;
-  } catch {
-    return iso2;
-  }
-}
 
 let cachedOptions: PhoneCountryOption[] | null = null;
 
@@ -46,23 +19,13 @@ export function phoneCountryOptions(): PhoneCountryOption[] {
   if (cachedOptions) return cachedOptions;
 
   const names = new Intl.DisplayNames(["en"], { type: "region" });
-  const rest = getCountries()
-    .filter((iso2) => !PINNED_COUNTRIES.includes(iso2))
+  cachedOptions = getCountries()
     .map((iso2) => ({
       iso2,
       dial: `+${getCountryCallingCode(iso2)}`,
       label: names.of(iso2) ?? iso2,
     }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-
-  cachedOptions = [
-    ...PINNED_COUNTRIES.map((iso2) => ({
-      iso2,
-      dial: `+${getCountryCallingCode(iso2)}`,
-      label: names.of(iso2) ?? iso2,
-    })),
-    ...rest,
-  ];
+    .sort((a, b) => a.label.localeCompare(b.label, "en"));
   return cachedOptions;
 }
 
@@ -94,9 +57,4 @@ export function normalizeInternationalMobile(
   if (type && !ACCEPTED_TYPES.has(type)) return null;
 
   return parsed.format("E.164");
-}
-
-export function phoneCountryLabel(iso2: CountryCode): string {
-  const dial = `+${getCountryCallingCode(iso2)}`;
-  return `${dial} ${countryName(iso2)}`;
 }

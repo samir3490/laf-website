@@ -9,7 +9,7 @@ export const LAF_EVENT_EMAIL_OTPS_COLLECTION = "laf_event_email_otps";
 export const LAF_EVENT_EMAIL_SESSIONS_COLLECTION = "laf_event_email_sessions";
 
 const OTP_TTL_MS = 10 * 60 * 1000;
-const SESSION_TTL_MS = 30 * 60 * 1000;
+const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_OTP_ATTEMPTS = 5;
 
 export function eventEmailDocId(eventSlug: string, email: string): string {

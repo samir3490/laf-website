@@ -24,8 +24,13 @@ import {
 
 export const maxDuration = 60;
 
-const RATE_LIMIT = 5;
+const IP_RATE_LIMIT = 40;
+const EMAIL_RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function jsonError(error: string, code: string, status = 400) {
+  return NextResponse.json({ error, code }, { status });
+}
 
 function ipHash(ip: string): string {
   return createHash("sha256").update(`innovators:${ip}`).digest("hex").slice(0, 16);
@@ -41,30 +46,32 @@ function emailHash(email: string): string {
 export async function POST(req: Request) {
   try {
     if (!isYoungInnovatorsOpen()) {
-      return NextResponse.json(
-        { error: "Submissions are closed for this challenge. Please check back for the next event." },
-        { status: 403 }
+      return jsonError(
+        "Submissions are closed for this challenge. Please check back for the next event.",
+        "closed",
+        403
       );
     }
 
     const ip = clientIp(req);
-    if (!checkRateLimit(`innovators-submit:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)) {
-      return NextResponse.json(
-        { error: "Daily submission limit reached. Please try again tomorrow." },
-        { status: 429 }
+    if (!checkRateLimit(`innovators-submit:${ip}`, IP_RATE_LIMIT, RATE_WINDOW_MS)) {
+      return jsonError(
+        "This network has reached today's submission limit. Please try again tomorrow.",
+        "rate_limited",
+        429
       );
     }
 
     const turnstileError = requireTurnstileInProduction();
     if (turnstileError) {
-      return NextResponse.json({ error: turnstileError }, { status: 503 });
+      return jsonError(turnstileError, "captcha", 503);
     }
 
     let body: Record<string, unknown>;
     try {
       body = (await req.json()) as Record<string, unknown>;
     } catch {
-      return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+      return jsonError("Invalid request.", "invalid_request");
     }
 
     // Obscure honeypot only — do NOT use "website" (browsers autofill it and skip real saves).
@@ -76,10 +83,7 @@ export async function POST(req: Request) {
       const token = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
       const valid = await verifyTurnstileToken(token, ip);
       if (!valid) {
-        return NextResponse.json(
-          { error: "Please complete the captcha and try again." },
-          { status: 403 }
-        );
+        return jsonError("Please complete the captcha and try again.", "captcha", 403);
       }
     }
 
@@ -105,7 +109,7 @@ export async function POST(req: Request) {
 
     const contactEmail = normalizeEventEmail(contactEmailRaw);
     if (!contactEmail || !isValidInnovatorsEmail(contactEmail) || contactEmail.length > 120) {
-      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+      return jsonError("Please enter a valid email address.", "invalid_email");
     }
 
     const session = await verifyEventEmailSession(
@@ -114,43 +118,49 @@ export async function POST(req: Request) {
       contactEmail
     );
     if (!session) {
-      return NextResponse.json(
-        { error: "Please verify your email with the code we sent, then try again." },
-        { status: 401 }
+      return jsonError(
+        "Your email verification expired. Please request a new code and try again.",
+        "email_unverified",
+        401
+      );
+    }
+
+    if (!checkRateLimit(`innovators-submit-email:${emailHash(contactEmail)}`, EMAIL_RATE_LIMIT, RATE_WINDOW_MS)) {
+      return jsonError(
+        "This email has already submitted today's limit. Please try again tomorrow.",
+        "rate_limited",
+        429
       );
     }
 
     if (!title || title.length > 120) {
-      return NextResponse.json({ error: "Please enter a project title (max 120 characters)." }, { status: 400 });
+      return jsonError("Please enter a project title (max 120 characters).", "invalid_title");
     }
     if (!description || description.length < 20 || description.length > 2000) {
-      return NextResponse.json(
-        { error: "Please describe the project in 20–2000 characters (materials used and how it works)." },
-        { status: 400 }
+      return jsonError(
+        "Please describe the project in 20–2000 characters (materials used and how it works).",
+        "invalid_description"
       );
     }
     if (!childName || childName.length > 40) {
-      return NextResponse.json(
-        { error: "Please enter the child's first name only (max 40 characters)." },
-        { status: 400 }
-      );
+      return jsonError("Please enter the child's first name only (max 40 characters).", "invalid_name");
     }
     if (!contactName || contactName.length > 80) {
-      return NextResponse.json({ error: "Please enter your name." }, { status: 400 });
+      return jsonError("Please enter your name.", "invalid_name");
     }
     const phoneCountry = String(body.phoneCountry ?? "IN").trim();
     const contactPhone = normalizeInternationalMobile(contactPhoneRaw, phoneCountry);
     if (!contactPhone) {
-      return NextResponse.json(
-        { error: "Please enter a valid mobile number for the country you selected." },
-        { status: 400 }
+      return jsonError(
+        "Please enter a valid mobile number for the country you selected.",
+        "invalid_phone"
       );
     }
     if (!childCity || childCity.length > 80) {
-      return NextResponse.json({ error: "Please enter your city." }, { status: 400 });
+      return jsonError("Please enter your city.", "invalid_city");
     }
     if (childSchool.length > 120) {
-      return NextResponse.json({ error: "School name is too long." }, { status: 400 });
+      return jsonError("School name is too long.", "invalid_school");
     }
 
     const age = parseInt(ageRaw, 10);
@@ -159,55 +169,42 @@ export async function POST(req: Request) {
       age < YOUNG_INNOVATORS_AGE.min ||
       age > YOUNG_INNOVATORS_AGE.max
     ) {
-      return NextResponse.json(
-        {
-          error: `Child must be between ${YOUNG_INNOVATORS_AGE.min} and ${YOUNG_INNOVATORS_AGE.max} years old.`,
-        },
-        { status: 400 }
+      return jsonError(
+        `Child must be between ${YOUNG_INNOVATORS_AGE.min} and ${YOUNG_INNOVATORS_AGE.max} years old.`,
+        "invalid_age"
       );
     }
 
     const ageGroup = innovatorsAgeGroupFromAge(age);
     if (!ageGroup) {
-      return NextResponse.json({ error: "Invalid age for this challenge." }, { status: 400 });
+      return jsonError("Invalid age for this challenge.", "invalid_age");
     }
 
     if (!termsAccepted) {
-      return NextResponse.json(
-        { error: "Please accept the terms to submit the project." },
-        { status: 400 }
-      );
+      return jsonError("Please accept the terms to submit the project.", "invalid_terms");
     }
 
     if (!photo1Url || !isAllowedDriveOrVideoUrl(photo1Url)) {
-      return NextResponse.json(
-        { error: "Please upload at least one clear project photo." },
-        { status: 400 }
-      );
+      return jsonError("Please upload at least one clear project photo.", "invalid_photo");
     }
 
     if (photo2Url && !isAllowedDriveOrVideoUrl(photo2Url)) {
-      return NextResponse.json(
-        { error: "Photo 2 link looks invalid. Remove it or upload again." },
-        { status: 400 }
-      );
+      return jsonError("Photo 2 link looks invalid. Remove it or upload again.", "invalid_photo");
     }
 
     if (videoUrl && !isAllowedVideoLink(videoUrl)) {
-      return NextResponse.json(
-        {
-          error:
-            "Video link must be YouTube or Google Drive (or leave it blank).",
-        },
-        { status: 400 }
+      return jsonError(
+        "Video link must be YouTube or Google Drive (or leave it blank).",
+        "invalid_video"
       );
     }
 
     const adminDb = getFirebaseAdminDb();
     if (!adminDb) {
-      return NextResponse.json(
-        { error: "Submissions are temporarily unavailable. Please try again later." },
-        { status: 503 }
+      return jsonError(
+        "Submissions are temporarily unavailable. Please try again later.",
+        "server_error",
+        503
       );
     }
 
@@ -268,9 +265,6 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error("[innovators/submit]", err);
-    return NextResponse.json(
-      { error: "Could not submit your project. Please try again." },
-      { status: 500 }
-    );
+    return jsonError("Could not submit your project. Please try again.", "server_error", 500);
   }
 }

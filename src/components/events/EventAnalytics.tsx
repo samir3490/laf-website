@@ -17,7 +17,7 @@ export async function trackEventAnalytics(
   eventSlug: string,
   event: EventAnalyticsEventType,
   page?: EventAnalyticsPage,
-  extra?: { entryId?: string }
+  extra?: { entryId?: string; reason?: string }
 ) {
   const attribution = getStoredEventAttribution(eventSlug);
   void fetch("/api/events/track", {
@@ -32,7 +32,7 @@ export function trackEventAnalyticsWithAttribution(
   event: EventAnalyticsEventType,
   attribution: EventAttribution,
   page?: EventAnalyticsPage,
-  extra?: { entryId?: string }
+  extra?: { entryId?: string; reason?: string }
 ) {
   void fetch("/api/events/track", {
     method: "POST",

@@ -75,6 +75,9 @@ export async function POST(req: Request) {
       ...(attribution?.utmMedium ? { utmMedium: attribution.utmMedium } : {}),
       ...(attribution?.utmCampaign ? { utmCampaign: attribution.utmCampaign } : {}),
       ...(typeof body.entryId === "string" ? { entryId: body.entryId } : {}),
+      ...(typeof body.reason === "string" && /^[a-z_]{2,40}$/.test(body.reason)
+        ? { reason: body.reason }
+        : {}),
       visitorHash: ipHash(ip),
       createdAt: FieldValue.serverTimestamp(),
     });

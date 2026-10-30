@@ -99,6 +99,7 @@ export default function YoungInnovatorsSubmitForm() {
     }
 
     setStatus("uploading");
+    let trackedFail = false;
 
     try {
       setProgress("Preparing and uploading photo…");
@@ -141,14 +142,25 @@ export default function YoungInnovatorsSubmitForm() {
         }),
       });
 
-      const data = (await res.json()) as { error?: string; message?: string; entryId?: string };
+      const data = (await res.json()) as {
+        error?: string;
+        code?: string;
+        message?: string;
+        entryId?: string;
+      };
       if (!res.ok) {
-        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit");
+        trackedFail = true;
+        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit", {
+          reason: data.code || "submit_rejected",
+        });
         throw new Error(data.error || "Submission failed.");
       }
       // Honeypot / bot stub returns entryId "ok" without saving — never treat as success for humans.
       if (!data.entryId || data.entryId === "ok") {
-        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit");
+        trackedFail = true;
+        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit", {
+          reason: "did_not_save",
+        });
         throw new Error("Submission did not save. Please try again, or contact LAF if this continues.");
       }
 
@@ -157,6 +169,11 @@ export default function YoungInnovatorsSubmitForm() {
       });
       router.push("/events/young-innovators/gallery?submitted=pending");
     } catch (err) {
+      if (!trackedFail) {
+        void trackEventAnalytics(YOUNG_INNOVATORS_2026_EVENT_SLUG, "submit_failed", "submit", {
+          reason: "upload_failed",
+        });
+      }
       setStatus("error");
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setProgress("");

@@ -20,6 +20,20 @@ function toEvent(snap: QueryDocumentSnapshot): EventAnalyticsEvent | null {
   return normalizeEventAnalyticsEvent(snap.data() as Record<string, unknown>, snap.id);
 }
 
+const FAIL_REASON_LABEL: Record<string, string> = {
+  invalid_phone: "Invalid / India-only mobile (fixed for other countries)",
+  email_unverified: "Email code expired or not verified",
+  invalid_email: "Invalid email",
+  invalid_description: "Description too short",
+  invalid_video: "Video link not YouTube/Drive",
+  invalid_photo: "Photo missing or invalid",
+  upload_failed: "Photo upload failed",
+  rate_limited: "Too many submits from same network/email",
+  captcha: "Captcha failed",
+  did_not_save: "Form did not save",
+  unknown: "No reason recorded (older attempts)",
+};
+
 function StatCard({
   label,
   value,
@@ -150,10 +164,25 @@ export default function AdminInnovatorsAnalytics({ entries }: Props) {
           </div>
         </div>
         {stats.funnel.submitFailed > 0 && (
-          <p className="mt-3 text-xs text-red-600">
-            {stats.funnel.submitFailed} failed submission attempt
-            {stats.funnel.submitFailed === 1 ? "" : "s"} recorded.
-          </p>
+          <div className="mt-3 space-y-1">
+            <p className="text-xs text-red-600">
+              {stats.funnel.submitFailed} failed attempt
+              {stats.funnel.submitFailed === 1 ? "" : "s"} — these are people who hit Submit but
+              were blocked (not lost approved entries). The same person retrying counts more than
+              once.
+            </p>
+            {Object.keys(stats.funnel.failedByReason).length > 0 && (
+              <ul className="text-xs text-laf-muted">
+                {Object.entries(stats.funnel.failedByReason)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([reason, count]) => (
+                    <li key={reason}>
+                      {FAIL_REASON_LABEL[reason] ?? reason}: {count}
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
 

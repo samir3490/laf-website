@@ -2,10 +2,7 @@
 
 import { useMemo } from "react";
 import type { CountryCode } from "libphonenumber-js";
-import {
-  DEFAULT_PHONE_COUNTRY,
-  phoneCountryOptions,
-} from "@/lib/phone-e164";
+import { phoneCountryOptions } from "@/lib/phone-e164";
 
 type Props = {
   id: string;
@@ -31,7 +28,7 @@ export default function InternationalPhoneField({
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-laf-navy mb-1">
-        Mobile (WhatsApp) *
+        Mobile *
       </label>
       <div className="flex gap-2">
         <label htmlFor={`${id}-country`} className="sr-only">
@@ -42,7 +39,7 @@ export default function InternationalPhoneField({
           disabled={disabled}
           value={country}
           onChange={(e) => onCountryChange(e.target.value as CountryCode)}
-          className="w-[9.5rem] shrink-0 rounded-lg border border-laf-border px-2 py-2.5 text-sm bg-white"
+          className="w-[11.5rem] shrink-0 rounded-lg border border-laf-border px-2 py-2.5 text-sm bg-white"
         >
           {options.map((opt) => (
             <option key={opt.iso2} value={opt.iso2}>
